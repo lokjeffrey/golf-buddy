@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#1b5e20">
+    <link rel="manifest" href="manifest.json">
+    <title>Golf Buddy</title>
+    <style>
+        :root {
+            --green-dark: #1b5e20;
+            --green:      #2e7d32;
+            --green-med:  #388e3c;
+            --green-lt:   #43a047;
+            --green-pale: #e8f5e9;
+            --green-xp:   #f1f8f0;
+            --orange:     #e65100;
+            --orange-lt:  #fff3e0;
+            --red:        #c62828;
+            --red-lt:     #ffebee;
+            --yellow:     #f9a825;
+            --yellow-lt:  #fffde7;
+            --text:       #1a1a1a;
+            --muted:      #757575;
+            --border:     #e0e0e0;
+            --white:      #ffffff;
+            --shadow:     0 2px 10px rgba(0,0,0,0.09);
+            --r:          12px;
+            --nav:        62px;
+        }
+        *{box-sizing:border-box;margin:0;padding:0;}
+        html,body{height:100%;}
+        body{
+            font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
+            background:var(--green-xp);
+            color:var(--text);
+            padding-bottom:var(--nav);
+        }
+
+        /* ── HEADER ── */
+        .hdr{
+            position:sticky;top:0;z-index:100;
+            background:var(--green-dark);color:#fff;
+            padding:14px 18px 10px;
+            box-shadow:0 2px 10px rgba(0,0,0,.25);
+        }
+        .hdr h1{font-size:19px;font-weight:800;letter-spacing:.4px;}
+        .hdr-sub{font-size:11px;opacity:.75;margin-top:2px;}
+
+        /* ── BOTTOM NAV ── */
+        .bnav{
+            position:fixed;bottom:0;left:0;right:0;
+            height:var(--nav);background:var(--white);
+            border-top:1px solid var(--border);
+            display:flex;z-index:100;
+            box-shadow:0 -2px 12px rgba(0,0,0,.07);
+        }
+        .nbtn{
+            flex:1;display:flex;flex-direction:column;
+            align-items:center;justify-content:center;gap:2px;
+            border:none;background:transparent;cursor:pointer;
+            color:var(--muted);font-size:10px;font-weight:600;
+            padding:6px 2px;transition:color .15s;
+        }
+        .nbtn .ico{font-size:21px;transition:transform .15s;}
+        .nbtn.active{color:var(--green-dark);}
+        .nbtn.active .ico{transform:scale(1.12);}
+
+        /* ── TABS ── */
+        .tab{display:none;padding:14px;}
+        .tab.active{display:block;}
+
+        /* ── CARD ── */
+        .card{background:var(--white);border-radius:var(--r);padding:15px;box-shadow:var(--shadow);margin-bottom:12px;}
+        .ctit{font-size:15px;font-weight:700;color:var(--green-dark);margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+
+        /* ── TOGGLE ── */
+        .tog{display:flex;background:var(--green-xp);border-radius:8px;padding:3px;margin-bottom:14px;}
+        .tbtn{flex:1;padding:8px 6px;border:none;background:transparent;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;color:var(--muted);transition:all .2s;}
+        .tbtn.active{background:var(--green-dark);color:#fff;}
+
+        /* ── FORM ── */
+        .fg{margin-bottom:11px;}
+        .fl{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;margin-bottom:4px;display:block;}
+        .fi{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:15px;background:var(--white);color:var(--text);transition:border-color .15s;-webkit-appearance:none;}
+        .fi:focus{outline:none;border-color:var(--green-med);}
+        .gr2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+        .gr3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+        .slbl{font-size:13px;font-weight:700;color:var(--green-dark);padding:8px 0 6px;border-bottom:1px solid var(--green-pale);margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+
+        /* ── BUTTONS ── */
+        .btn{width:100%;padding:13px;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;transition:opacity .15s;}
+        .btn:active{opacity:.82;}
+        .btn-p{background:var(--green-dark);color:#fff;}
+        .btn-s{background:var(--green-pale);color:var(--green-dark);}
+
+        /* ── WEAKNESS BARS ── */
+        .wbc{margin-bottom:11px;}
+        .wbh{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;}
+        .wbl{font-size:13px;font-weight:600;}
+        .wbv{font-size:11px;color:var(--muted);}
+        .wbt{height:10px;background:#eee;border-radius:5px;overflow:hidden;}
+        .wbf{height:100%;border-radius:5px;transition:width .6s ease;}
+        .b-ok  {background:var(--green-lt);}
+        .b-att {background:var(--yellow);}
+        .b-wk  {background:var(--orange);}
+        .b-crit{background:var(--red);}
+
+        /* ── HIGHLIGHT BOX ── */
+        .hl{padding:12px;border-radius:0 8px 8px 0;margin-bottom:12px;}
+        .hl-r{background:var(--red-lt);border-left:4px solid var(--red);}
+        .hl-o{background:var(--orange-lt);border-left:4px solid var(--orange);}
+        .hl-g{background:var(--green-pale);border-left:4px solid var(--green-lt);}
+        .hlt{font-size:13px;font-weight:700;margin-bottom:3px;}
+        .hld{font-size:12px;color:var(--muted);}
+
+        /* ── DURATION ── */
+        .dur{text-align:center;font-size:38px;font-weight:900;color:var(--green-dark);margin:6px 0;}
+        .dur span{font-size:16px;font-weight:400;color:var(--muted);}
+        input[type=range]{width:100%;accent-color:var(--green-dark);cursor:pointer;}
+
+        /* ── SESSION CARDS ── */
+        .sc{background:var(--white);border-radius:var(--r);box-shadow:var(--shadow);margin-bottom:11px;overflow:hidden;}
+        .sh{padding:13px 15px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;}
+        .shl{display:flex;align-items:center;gap:10px;}
+        .sbadge{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
+        .bd1{background:#e3f2fd;} .bd2{background:var(--green-pale);}
+        .bd3{background:#f3e5f5;} .bd4{background:var(--yellow-lt);}
+        .stit{font-size:14px;font-weight:700;color:var(--green-dark);}
+        .smeta{font-size:11px;color:var(--muted);margin-top:2px;}
+        .schev{font-size:13px;color:var(--muted);transition:transform .2s;}
+        .schev.open{transform:rotate(180deg);}
+        .sb{display:none;padding:0 15px 14px;border-top:1px solid var(--border);}
+        .sb.open{display:block;}
+
+        /* ── EXERCISE ITEM ── */
+        .ei{padding:10px 0;border-bottom:1px solid var(--border);}
+        .ei:last-child{border-bottom:none;}
+        .eih{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;}
+        .ein{font-size:13px;font-weight:700;flex:1;}
+        .eid{font-size:12px;color:var(--green-dark);font-weight:700;background:var(--green-pale);padding:2px 7px;border-radius:4px;margin-left:8px;white-space:nowrap;}
+        .eidesc{font-size:12px;color:var(--muted);line-height:1.45;}
+        .eitip{font-size:11px;color:var(--green-med);margin-top:4px;font-style:italic;}
+        .eicat{display:inline-block;font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;margin-top:5px;text-transform:uppercase;letter-spacing:.3px;}
+
+        /* ── PROGRESS ── */
+        .ent{padding:10px 0;border-bottom:1px solid var(--border);}
+        .ent:last-child{border-bottom:none;}
+        .entd{font-size:13px;font-weight:700;color:var(--green-dark);}
+        .entchips{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;}
+        .chip{font-size:11px;padding:2px 8px;border-radius:10px;background:var(--green-pale);color:var(--green-dark);font-weight:600;}
+        .chip-r{background:var(--red-lt);color:var(--red);}
+
+        /* ── EMPTY STATE ── */
+        .empty{text-align:center;padding:40px 20px;color:var(--muted);}
+        .empty .eico{font-size:50px;margin-bottom:12px;}
+        .empty p{font-size:14px;}
+
+        /* ── TOAST ── */
+        .toast{
+            position:fixed;bottom:calc(var(--nav) + 12px);left:50%;
+            transform:translateX(-50%) translateY(16px);
+            background:var(--green-dark);color:#fff;
+            padding:9px 18px;border-radius:20px;font-size:13px;font-weight:700;
+            opacity:0;transition:all .28s;z-index:200;white-space:nowrap;pointer-events:none;
+        }
+        .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+        /* ── TABLE ── */
+        .stbl{width:100%;border-collapse:collapse;font-size:13px;}
+        .stbl th{text-align:left;padding:6px 0;color:var(--muted);border-bottom:2px solid var(--border);font-size:11px;text-transform:uppercase;letter-spacing:.3px;}
+        .stbl td{padding:7px 4px;border-bottom:1px solid var(--border);}
+        .stbl tr:last-child td{border-bottom:none;}
+    </style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="hdr">
+    <h1>⛳ Golf Buddy</h1>
+    <div class="hdr-sub" id="hdr-sub">Voer je data in om te beginnen</div>
+</div>
+
+<!-- ══════════════ TAB: DATA ══════════════ -->
+<div id="tab-data" class="tab active">
+    <div class="card">
+        <div class="ctit">📋 Data invoer</div>
+
+        <div class="tog">
+            <button class="tbtn active" id="btn-garmin" onclick="setMode('garmin')">🟢 Garmin</button>
+            <button class="tbtn" id="btn-manual" onclick="setMode('manual')">✏️ Handmatig</button>
+        </div>
+
+        <p id="help-g" style="font-size:12px;color:var(--muted);margin-bottom:12px;">
+            Voer je statistieken in uit de <strong>Garmin Golf app</strong> → Statistieken → Seizoen/periode.
+        </p>
+        <p id="help-m" style="font-size:12px;color:var(--muted);margin-bottom:12px;display:none;">
+            Bereken je stats handmatig vanuit je scorekaart. Vul percentages in per categorie.
+        </p>
+
+        <div class="slbl">🏌️ Drive</div>
+        <div class="fg">
+            <label class="fl">Fairways Hit (%)</label>
+            <input class="fi" type="number" id="s-drv" placeholder="bijv. 55" min="0" max="100">
+        </div>
+
+        <div class="slbl">🎯 Approach / Ijzers</div>
+        <div class="fg">
+            <label class="fl">Greens in Regulation – GIR (%)</label>
+            <input class="fi" type="number" id="s-gir" placeholder="bijv. 32" min="0" max="100">
+        </div>
+
+        <div class="slbl">🏌 Chip &amp; Pitch</div>
+        <div class="gr2">
+            <div class="fg">
+                <label class="fl">Up-and-Down (%)</label>
+                <input class="fi" type="number" id="s-uad" placeholder="bijv. 30" min="0" max="100">
+            </div>
+            <div class="fg">
+                <label class="fl">Scrambling (%) opt.</label>
+                <input class="fi" type="number" id="s-scr" placeholder="bijv. 40" min="0" max="100">
+            </div>
+        </div>
+
+        <div class="slbl">🎱 Putting</div>
+        <div class="gr2">
+            <div class="fg">
+                <label class="fl">Gem. putts / hole</label>
+                <input class="fi" type="number" id="s-pavg" placeholder="bijv. 2.1" step="0.1" min="1" max="5">
+            </div>
+            <div class="fg">
+                <label class="fl">1-putt % opt.</label>
+                <input class="fi" type="number" id="s-p1" placeholder="bijv. 25" min="0" max="100">
+            </div>
+        </div>
+
+        <label class="fl" style="margin-bottom:6px;">3-putt % per afstand</label>
+        <div class="gr3">
+            <div class="fg">
+                <label class="fl">Kort (&lt;3m)</label>
+                <input class="fi" type="number" id="s-ps" placeholder="%" min="0" max="100">
+            </div>
+            <div class="fg">
+                <label class="fl">Medium (3-6m)</label>
+                <input class="fi" type="number" id="s-pm" placeholder="%" min="0" max="100">
+            </div>
+            <div class="fg">
+                <label class="fl">Lang (&gt;6m)</label>
+                <input class="fi" type="number" id="s-pl" placeholder="%" min="0" max="100">
+            </div>
+        </div>
+
+        <button class="btn btn-p" onclick="saveData()" style="margin-top:10px;">💾 Opslaan &amp; Analyseer</button>
+    </div>
+</div>
+
+<!-- ══════════════ TAB: ANALYSE ══════════════ -->
+<div id="tab-analyse" class="tab">
+    <div class="empty" id="ae">
+        <div class="eico">📊</div>
+        <p>Voer eerst je data in op het Data-tabblad.</p>
+    </div>
+    <div id="ac" style="display:none;"></div>
+</div>
+
+<!-- ══════════════ TAB: TRAINING ══════════════ -->
+<div id="tab-training" class="tab">
+    <div class="empty" id="te">
+        <div class="eico">🏌️</div>
+        <p>Sla eerst je data op voordat je een training genereert.</p>
+    </div>
+    <div id="tc" style="display:none;">
+        <div class="card">
+            <div class="ctit">⏱️ Sessieduur</div>
+            <div class="dur" id="dur-disp">60 <span>min</span></div>
+            <input type="range" id="dur-slider" min="30" max="120" step="5" value="60" oninput="updDur()">
+            <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:4px;">
+                <span>30 min</span><span>120 min</span>
+            </div>
+            <button class="btn btn-p" onclick="genSessions()" style="margin-top:14px;">🎯 Genereer 4 Sessies</button>
+        </div>
+        <div id="sess-container"></div>
+    </div>
+</div>
+
+<!-- ══════════════ TAB: PROGRESSIE ══════════════ -->
+<div id="tab-progressie" class="tab">
+    <div class="empty" id="pe">
+        <div class="eico">📈</div>
+        <p>Hier zie je je progressie zodra je meerdere metingen hebt ingevoerd.</p>
+    </div>
+    <div id="pc" style="display:none;"></div>
+</div>
+
+<!-- Bottom Nav -->
+<nav class="bnav">
+    <button class="nbtn active" id="nav-data"       onclick="showTab('data')">      <span class="ico">📋</span>Data</button>
+    <button class="nbtn"        id="nav-analyse"    onclick="showTab('analyse')">   <span class="ico">📊</span>Analyse</button>
+    <button class="nbtn"        id="nav-training"   onclick="showTab('training')">  <span class="ico">🏌️</span>Training</button>
+    <button class="nbtn"        id="nav-progressie" onclick="showTab('progressie')"><span class="ico">📈</span>Progressie</button>
+</nav>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ════════════════════════════════════════════════════
+   EXERCISE DATABASE  –  62 oefeningen
+════════════════════════════════════════════════════ */
+const EX = [
+    // ─── DRIVE (15) ───
+    {id:'d1',cat:'drive',name:'Alignment Stick – Swinglijn',dur:8,dif:'Gemakkelijk',
+     desc:'Leg een alignment stick parallel aan je doellijn. Sla 20 ballen en let op dat je clubpad langs de stick loopt. Voorkomt over-the-top en te veel inside-out.',
+     tip:'💡 Sla met 70% kracht. Vorm gaat boven snelheid.'},
+    {id:'d2',cat:'drive',name:'Slow Motion Herhaling',dur:6,dif:'Gemakkelijk',
+     desc:'Sla in slow motion (±20% snelheid). Focus op elke fase: grip → takeaway → top → impact → follow-through. 5 sets van 4 herhalingen.',
+     tip:'💡 Traagt spiergeheugen beter dan 20 volle swings.'},
+    {id:'d3',cat:'drive',name:'Tee Hoogte Variaties',dur:7,dif:'Gemakkelijk',
+     desc:'Afwisselend hoge tee (equator boven clubface) en lage tee. Voel het verschil in aanslaan (upswing vs flat contact). 5 hoog + 5 laag + 5 mix.',
+     tip:'💡 Ideale driver: bovenste rand clubface = equator van de bal.'},
+    {id:'d4',cat:'drive',name:'Voeten Bij Elkaar Drill',dur:6,dif:'Gemakkelijk',
+     desc:'Sla 15 ballen met voeten vlak naast elkaar. Dwingt balans en rotatie af – zonder balans geen krachtige swing.',
+     tip:'💡 Wiebel je? Dan roteer je heupen te weinig.'},
+    {id:'d5',cat:'drive',name:'¾ Swing Controle',dur:8,dif:'Gemiddeld',
+     desc:'Gebruik slechts ¾ backswing. Focus op consistente impact en rechte balvlucht. 20 ballen met ¾ swing, daarna vergelijken met volledige swing.',
+     tip:'💡 Veel amateurs treffen de bal beter met ¾ swing dan een volledige.'},
+    {id:'d6',cat:'drive',name:'Step-Through Drill',dur:7,dif:'Gemiddeld',
+     desc:'Begin met gewicht op rechtervoet. Terwijl je neerswingt, doe een stap voorwaarts met linkervoet. Traint gewichtsoverdracht naar voor.',
+     tip:'💡 Goed als je "achterop blijft" met je gewicht bij impact.'},
+    {id:'d7',cat:'drive',name:'Bucket Challenge: 5 Op Rij',dur:10,dif:'Gemiddeld',
+     desc:'5 ballen moeten achter elkaar een imaginaire fairway (30m breed) raken. Bij een miss begin je opnieuw. Houdt bij hoe vaak je 5 op rij haalt.',
+     tip:'💡 De druk simuleert echte rondedruk op de eerste tee.'},
+    {id:'d8',cat:'drive',name:'Gate Drill',dur:7,dif:'Gemiddeld',
+     desc:'Zet twee tees vlak naast de bal, net iets breder dan je club. Club mag ze niet raken = rechte swinglijn. 20 ballen.',
+     tip:'💡 Begin met tees iets verder en breng ze dichterbij naarmate je beter wordt.'},
+    {id:'d9',cat:'drive',name:'Pause At Top Drill',dur:6,dif:'Gemakkelijk',
+     desc:'Pauzeer 1 volle seconde boven in je backswing. Voorkomt haast bij het neerkomen. 15 ballen met bewuste pauze.',
+     tip:'💡 Meest voorkomende fout: te snel neerkomen vanuit de top.'},
+    {id:'d10',cat:'drive',name:'Eén-Hand Drill (Links)',dur:7,dif:'Moeilijk',
+     desc:'Sla 10 ballen met alleen je linkerhand. Traint de leidende hand en gevoel voor arm-extensie door impact. Gebruik een 7-ijzer of hybride.',
+     tip:'💡 De linkerhand stuurt de swing – de rechter geeft kracht.'},
+    {id:'d11',cat:'drive',name:'Eén-Hand Drill (Rechts)',dur:7,dif:'Moeilijk',
+     desc:'Sla 10 ballen met alleen je rechterhand. Traint kracht en rotatie. Korte backswing, volledige follow-through.',
+     tip:'💡 Rechterhand te dominant? Dit oefent een evenwichtige bijdrage.'},
+    {id:'d12',cat:'drive',name:'Afstandsdoelwit Series',dur:9,dif:'Gemiddeld',
+     desc:'5 ballen naar 100m doelwit → 5 naar 150m → 5 naar 200m. Let op consistentie per doelwit, niet op maximale afstand.',
+     tip:'💡 Kalibreer je afstandsgevoel elke sessie opnieuw.'},
+    {id:'d13',cat:'drive',name:'Fairway Nauwkeurigheid Test',dur:8,dif:'Gemiddeld',
+     desc:'Sla 20 ballen en houdt bij hoeveel een imaginaire fairway raken. Streef naar ≥50%. Noteer score voor progressie.',
+     tip:'💡 Nauwkeurigheid > afstand op de meeste holes.'},
+    {id:'d14',cat:'drive',name:'Impact Bag Training',dur:6,dif:'Gemakkelijk',
+     desc:'Sla met hands-first positie tegen een opgerolde handdoek of impact bag. Voelt de juiste handpositie bij impact (handen voor de bal).',
+     tip:'💡 Meest onderschatte trainingshulp voor de volle swing.'},
+    {id:'d15',cat:'drive',name:'Hips Lead Challenge',dur:7,dif:'Moeilijk',
+     desc:'Oefen de downswing bewust te starten met heupdraai (NIET met schouders). 15 halve swings met focus op: heupen gaan altijd eerst.',
+     tip:'💡 Heupen leiden = meer power + minder slice.'},
+
+    // ─── APPROACH (12) ───
+    {id:'a1',cat:'approach',name:'9-to-9 Drill',dur:8,dif:'Gemakkelijk',
+     desc:'Korte swing: backswing tot handenhoogte (9 uur), follow-through tot handenhoogte (3 uur). 20 ballen met 8-ijzer. Focus: zuivere impact vóór de bal.',
+     tip:'💡 Profis beginnen elke sessie hier. Gevoel voor "hitting down".'},
+    {id:'a2',cat:'approach',name:'Divot Before Ball Drill',dur:7,dif:'Gemiddeld',
+     desc:'Plak een stuk tape 5cm vóór de bal op de mat. Je impact moet beginnen nadat je over de tape bent. Traint het naar-beneden-slaan met ijzers.',
+     tip:'💡 Ijzers zijn bedoeld om naar beneden te slaan – nooit te "scoopen".'},
+    {id:'a3',cat:'approach',name:'7-IJzer Afstandscontrole',dur:9,dif:'Gemiddeld',
+     desc:'Sla 20 ballen met 7-ijzer en noteer de spreiding. Streef naar een spreidingszone van minder dan 15m. Elke sessie bijhouden als ijkmeter.',
+     tip:'💡 Ken je exacte afstanden per club – dit is cruciaal voor lay-ups.'},
+    {id:'a4',cat:'approach',name:'Vlag als Doelwit',dur:8,dif:'Gemiddeld',
+     desc:'Kies een specifieke vlag. 10 pogingen, noteer gemiddelde afstand tot de vlag. Doel: gemiddeld <10m. Elke sessie vergelijken.',
+     tip:'💡 Train altijd naar een specifiek doelwit – nooit "zomaar slaan".'},
+    {id:'a5',cat:'approach',name:'100 Yard Benchmark',dur:8,dif:'Gemiddeld',
+     desc:'Elke sessie: 10 ballen van 100 yard (91m) naar doelwit. Noteer score: hoeveel binnen 15m? Dit is je vaste ijkmeter.',
+     tip:'💡 De 100-yard shot is de meest gespeelde approach – moet je blind beheersen.'},
+    {id:'a6',cat:'approach',name:'Punch Shot (Lage Vlucht)',dur:7,dif:'Gemiddeld',
+     desc:'Korte follow-through, handen voor de bal, gewicht links. Laat bal laag vliegen. 15 ballen. Essentieel bij wind en schoten onder bomen.',
+     tip:'💡 Punch = minder backswing + 70% kracht + gewicht altijd links.'},
+    {id:'a7',cat:'approach',name:'Fade / Draw Controle',dur:9,dif:'Moeilijk',
+     desc:'Afwisselend 5 ballen met bewuste fade (links→rechts) en 5 met draw (rechts→links). Curvecontrole is essentieel voor doelwitbendering.',
+     tip:'💡 Fade: open stance + open face. Draw: gesloten stance + inside-out pad.'},
+    {id:'a8',cat:'approach',name:'Half Swing Nauwkeurigheid',dur:7,dif:'Gemakkelijk',
+     desc:'Half swing (backswing tot schouderhoogte). Welke afstand geeft dit? Welke spreiding? Nuttig voor 70-80% schoten bij vereiste nauwkeurigheid.',
+     tip:'💡 Half swing = meer controle dan volledige swing in krappe situaties.'},
+    {id:'a9',cat:'approach',name:'Hybride Approach (180m)',dur:8,dif:'Gemiddeld',
+     desc:'Sla 15 ballen met hybride of 3-hout van ±180m. Focus op contact en nauwkeurigheid. Nuttiger dan lange ijzers voor de meeste amateurs.',
+     tip:'💡 Vervang lange ijzers door hybriden als je GIR laag is.'},
+    {id:'a10',cat:'approach',name:'Iron Consistency Tracker',dur:10,dif:'Gemiddeld',
+     desc:'10 ballen per club (7, 8, 9 ijzer). Noteer je beste 7 van 10 per club. Vergelijk dit getal elke sessie – dit is je consistentie-meter.',
+     tip:'💡 Consistentie bouw je alleen door meting en herhaling.'},
+    {id:'a11',cat:'approach',name:'GIR Simulatie',dur:9,dif:'Moeilijk',
+     desc:'Simuleer echte approach-scenarios: 150m, 125m, 90m afwisselend. Noteer per shot: green geraakt? Ja/Nee. Doel: 3/3.',
+     tip:'💡 Game-realistische oefening geeft het meeste transfereffect.'},
+    {id:'a12',cat:'approach',name:'Cirkel van 6 Meter',dur:8,dif:'Gemiddeld',
+     desc:'Sla 10 approach shots naar een doelgebied van 6m rondom een vlag. Elk in de cirkel = 1 punt. Score bijhouden per sessie.',
+     tip:'💡 6 meter is een realistische GIR-definitie voor amateurs.'},
+
+    // ─── CHIP/PITCH (15) ───
+    {id:'c1',cat:'chip',name:'Bump-and-Run (8-IJzer)',dur:7,dif:'Gemakkelijk',
+     desc:'Chip met 8-ijzer (in plaats van wedge). Lagere balvlucht, meer roll. 20 chips vanuit verschillende posities rondom de practice green.',
+     tip:'💡 Bump-and-run is de veiligste chip – minder risico dan lob-wedge.'},
+    {id:'c2',cat:'chip',name:'Lob Wedge Precisie',dur:8,dif:'Gemiddeld',
+     desc:'Korte, precisie chips met lob-wedge (60°). Focus op een specifieke landingszone, niet direct op de hole. 20 chips.',
+     tip:'💡 Chip naar een landingszone – de bal rolt daarna vanzelf naar de hole.'},
+    {id:'c3',cat:'chip',name:'Cirkel van 3 Meter',dur:8,dif:'Gemiddeld',
+     desc:'Chip 15 ballen – allemaal moeten binnen 3 meter van de hole stoppen. Noteer score. Doel: 10/15. Elke sessie verbeteren.',
+     tip:'💡 3 meter = tap-in zone. Dit is je veiligheidszone voor up-and-downs.'},
+    {id:'c4',cat:'chip',name:'Flop Shot Training',dur:9,dif:'Moeilijk',
+     desc:'Open stance, open face, bal vooraan. Sla 10 hoge chips over een denkbeeldig obstakel. Essentieel bij krappe pin-plaatsing.',
+     tip:'💡 Flop shot = open face + extra acceleratie. Nooit decelereren!'},
+    {id:'c5',cat:'chip',name:'Tight Lie Chip',dur:7,dif:'Moeilijk',
+     desc:'Chip van harde, korte mat of kaal gras (simuleert "tight lie"). Vereist precieze impact. Bal iets achteraan in stance, handen voor de bal.',
+     tip:'💡 Tight lie = bal achteraan in stance + handen altijd voor.'},
+    {id:'c6',cat:'chip',name:'Helling Chips (Op/Neer)',dur:8,dif:'Moeilijk',
+     desc:'Chip van opgaande helling (5 chips) én neergaande helling (5 chips). Pas je stand en balpositionering aan per helling.',
+     tip:'💡 Opgaand: bal voor in stance. Neergaand: bal achter in stance.'},
+    {id:'c7',cat:'chip',name:'Up-and-Down Game (9 Holes)',dur:12,dif:'Gemiddeld',
+     desc:'Speel een 9-hole chip-putt ronde rondom de practice green. Score bijhouden: hoeveel up-and-downs lukt het (chip + putt)?',
+     tip:'💡 Dit is de meest game-realistische oefening voor de korte game.'},
+    {id:'c8',cat:'chip',name:'Landing Zone Drill',dur:7,dif:'Gemiddeld',
+     desc:'Markeer een 1×1m landingszone met tees. Chip moet IN die zone landen. 15 pogingen. Varieer de afstand van de hole.',
+     tip:'💡 Landingspuntcontrole is de sleutel tot consistente chipping.'},
+    {id:'c9',cat:'chip',name:'Clockwork Chip',dur:10,dif:'Gemiddeld',
+     desc:'Chip vanuit 12 posities rondom de hole (als klokwijzers, 2m afstand). Elke positie = andere hoek, andere slag.',
+     tip:'💡 Elke positie heeft andere break en ligkans – traint aanpassingsvermogen.'},
+    {id:'c10',cat:'chip',name:'Rough Chip Oefening',dur:7,dif:'Moeilijk',
+     desc:'Simuleer rough: leg de bal op langere mat. Oefen 15 chips. Open face en meer acceleratie vereist vanuit rough.',
+     tip:'💡 Rough = meer loft + meer kracht + kortere follow-through.'},
+    {id:'c11',cat:'chip',name:'60° vs 56° Vergelijking',dur:8,dif:'Gemiddeld',
+     desc:'Zelfde chipshot, afwisselend met 60° (lob) en 56° (sand wedge). Voel het verschil in balvlucht en roll. 5 chips per club.',
+     tip:'💡 Ken welke club welke roll geeft – dan kies je bewuster op de baan.'},
+    {id:'c12',cat:'chip',name:'Pitch Afstandsreeks',dur:9,dif:'Gemiddeld',
+     desc:'5 ballen van 10m → 5 van 20m → 5 van 30m. Afstandscontrole bij pitches. Noteer hoe dicht bij doelwit je landt.',
+     tip:'💡 Afstand controleer je met armlengte, niet met zwingsnelheid.'},
+    {id:'c13',cat:'chip',name:'Eén-Arm Chip (Links)',dur:6,dif:'Moeilijk',
+     desc:'Chip met alleen je linkerhand. 10 ballen. Vergroot gevoel voor controle en timing. Kleine, beheerste beweging.',
+     tip:'💡 Verbetert de non-dominante hand die bij veel golfers passief is.'},
+    {id:'c14',cat:'chip',name:'Fringe: Chippen of Putten?',dur:7,dif:'Gemiddeld',
+     desc:'Leg 8 ballen op de fringe. Beslissing oefenen: chippen of putten? Probeer beide methodes. Vergelijk resultaten per situatie.',
+     tip:'💡 Helder pad → putter. Ongelijk gras → chip.'},
+    {id:'c15',cat:'chip',name:'Bunker Basisoefening',dur:8,dif:'Moeilijk',
+     desc:'Open face, open stance, 3cm achter de bal slaan. 12 swing-herhalingen. Bunker is de enige slag waarbij je NIET direct de bal raakt.',
+     tip:'💡 Imageshout "zand tussen club en bal" bij elke bunkerslag.'},
+
+    // ─── PUTT KORT 0-2m (8) ───
+    {id:'ps1',cat:'puttShort',name:'1-Meter Cirkel',dur:8,dif:'Gemakkelijk',
+     desc:'Leg 6 ballen op 1m afstand in een cirkel. Maak alle 6. Ga naar 1,5m. Dan 2m. Stop zodra je er een mist.',
+     tip:'💡 Dit is de basistest voor korte putt-zekerheid. Profis maken 100% van 1m.'},
+    {id:'ps2',cat:'puttShort',name:'Gate Drill (Tees als Poortje)',dur:7,dif:'Gemakkelijk',
+     desc:'Zet twee tees iets breder dan je putter face. Putter mag ze niet raken tijdens de stroke. 15 putts van 1-1,5m.',
+     tip:'💡 Als je de tees raakt, beweegt je putter niet recht door de bal.'},
+    {id:'ps3',cat:'puttShort',name:'String Line Training',dur:8,dif:'Gemiddeld',
+     desc:'Span een stukje draad of snaar van bal naar hole. Sla langs de draad voor perfecte lijn-visualisatie.',
+     tip:'💡 String Line is het meest effectieve hulpmiddel voor putterlijngevoel.'},
+    {id:'ps4',cat:'puttShort',name:'Make 10 Op Rij Challenge',dur:9,dif:'Moeilijk',
+     desc:'10 putts achter elkaar van 1m maken. Elke miss = opnieuw bij 0 beginnen. Simuleert druk van korte putts op de baan.',
+     tip:'💡 Routine is de sleutel. Pre-shot routine moet altijd identiek zijn.'},
+    {id:'ps5',cat:'puttShort',name:'Pre-Shot Routine',dur:6,dif:'Gemakkelijk',
+     desc:'Focus op een vaste routine: aanlijn → 2 blikken op hole → stance → sla. 20 putts puur met routinefocus, niet op resultaat.',
+     tip:'💡 Routine verwijdert twijfel. Twijfel verstoort het tempo.'},
+    {id:'ps6',cat:'puttShort',name:'Ogen Dicht Putt',dur:6,dif:'Gemiddeld',
+     desc:'Lees de lijn, sla de putt met ogen dicht. Hoor de bal. Ontwikkelt puur gevoel voor swing zonder visuele sturing.',
+     tip:'💡 Ogen dicht = meer intuïtie, minder technische over-analyse.'},
+    {id:'ps7',cat:'puttShort',name:'Metronoom Tempo',dur:7,dif:'Gemiddeld',
+     desc:'Gebruik een metronoom-app (80 BPM). Backswing op beat 1, impact op beat 2. 20 putts. Gelijk tempo = basis van goed putten.',
+     tip:'💡 Ideale puttverhouding: backswing en follow-through even lang (1:1).'},
+    {id:'ps8',cat:'puttShort',name:'Face Impact Check',dur:6,dif:'Gemakkelijk',
+     desc:'Plak tape op het midden van je putter face. Sla 15 putts. Na afloop zie je exact waar je impact valt – sweetspot of niet.',
+     tip:'💡 Impact buiten het sweetspot = verlies van afstandscontrole en lijn.'},
+
+    // ─── PUTT MEDIUM 3-6m (6) ───
+    {id:'pm1',cat:'puttMedium',name:'Ladder Drill (3-6m)',dur:9,dif:'Gemiddeld',
+     desc:'Ballen op 3m, 4m, 5m, 6m. Sla ze allemaal in volgorde. Probeer elk in één putt. Voelt je afstandscontrole telescopisch verbeteren.',
+     tip:'💡 Ladder drill is dé klassieke oefening voor afstandsgevoel bij medium putts.'},
+    {id:'pm2',cat:'puttMedium',name:'2-Putt Zone Training',dur:8,dif:'Gemiddeld',
+     desc:'Van 5m: eerste putt moet stoppen binnen 1m van hole. 10 pogingen, noteer score. Doel: 8/10.',
+     tip:'💡 2-putt zone = eerste putt op "tap-in afstand". Hier altijd op richten.'},
+    {id:'pm3',cat:'puttMedium',name:'Break Lezen Training',dur:9,dif:'Moeilijk',
+     desc:'Lees de lijn van achter de hole (laagste kant). Maak een voorspelling. Sla dan en vergelijk je voorspelling met realiteit.',
+     tip:'💡 Lees altijd van de laagste kant. De bal breekt altijd naar het laagste punt.'},
+    {id:'pm4',cat:'puttMedium',name:'9-Hole Putting Ronde',dur:15,dif:'Gemiddeld',
+     desc:'Speel 9 holes op de practice green van ±4m. Score bijhouden. Doel: ≤9 putts (par). Elke sessie verbeteren.',
+     tip:'💡 Competitieve context traint beter dan losse oefening.'},
+    {id:'pm5',cat:'puttMedium',name:'Target Putt (Poortje)',dur:8,dif:'Gemiddeld',
+     desc:'Zet twee tees 30cm van de hole als poortje. Van 4m: sla door het poortje. 15 pogingen. Combineert lijn en afstandscontrole.',
+     tip:'💡 Maak het poortje smaller naarmate je beter wordt.'},
+    {id:'pm6',cat:'puttMedium',name:'Afstandsgevoel Test',dur:7,dif:'Gemiddeld',
+     desc:'Sluit ogen na het lezen van de lijn, sla een putt van 5m. Open ogen: hoe ver ben je over/kort? 10 herhalingen.',
+     tip:'💡 Dwingt je brein om afstandsgevoel intern te kalibreren.'},
+
+    // ─── PUTT LANG 6m+ (6) ───
+    {id:'pl1',cat:'puttLong',name:'Distance Ladder (6-12m)',dur:10,dif:'Gemiddeld',
+     desc:'Ballen op 6m, 8m, 10m, 12m. Elke putt moet eindigen binnen 1m van hole. Als dat niet lukt: opnieuw. Traint grote afstanden.',
+     tip:'💡 Van ver: focus op "stoppen dichtbij" – niet op "erin putten".'},
+    {id:'pl2',cat:'puttLong',name:'Bucket Challenge (10m)',dur:8,dif:'Gemiddeld',
+     desc:'Van 10m: alle 10 ballen moeten eindigen binnen 1m van hole. Stel een cirkel of bucket in als doelzone. Score bijhouden.',
+     tip:'💡 Minder dan 1m = tap-in = 3-putt voorkomen.'},
+    {id:'pl3',cat:'puttLong',name:'Cross-Slope Lag Putting',dur:9,dif:'Moeilijk',
+     desc:'Sla diagonaal over een helling op de practice green. Combineer afstandscontrole met break-lezen. 8 putts.',
+     tip:'💡 Schuine greens zijn de moeilijkste situatie – train dit actief.'},
+    {id:'pl4',cat:'puttLong',name:'Twee-Putt Garantie',dur:9,dif:'Gemiddeld',
+     desc:'Van 10m: eerste putt moet eindigen op tap-in afstand. 5 ballen van 10m → 5 van 12m. Houdt bij hoeveel 2-putts lukken.',
+     tip:'💡 3-putt voorkomen begint bij de eerste putt – niet bij de tweede.'},
+    {id:'pl5',cat:'puttLong',name:'Links/Rechts Afwisseling',dur:8,dif:'Moeilijk',
+     desc:'Van 8m: afwisselend links brekende en rechts brekende putt. Leer bewust te compenseren voor slope in beide richtingen.',
+     tip:'💡 Rechtshandige golfers struikelen vaker over rechts-brekende putts.'},
+    {id:'pl6',cat:'puttLong',name:'Grote Green Simulatie',dur:8,dif:'Gemiddeld',
+     desc:'Sla van extreem ver (12m+). Focus puur op stoppen dichtbij. 8 ballen. Simuleert reële situaties op grote greens.',
+     tip:'💡 Lag conservatief van ver – met de ambitie om dichtbij te stoppen.'}
+];
+
+/* ════════════════════════════════════════════════════
+   CONSTANTS
+════════════════════════════════════════════════════ */
+const BM = { drive:50, approach:35, chip:35, puttAvg:1.9, puttShort:15, puttMedium:25, puttLong:40 };
+
+const CAT_LBL = {
+    drive:'🏌️ Drive', approach:'🎯 Approach', chip:'🏌 Chip/Pitch',
+    puttShort:'🎱 Putt Kort', puttMedium:'🎱 Putt Medium', puttLong:'🎱 Putt Lang'
+};
+
+const CAT_COL = {
+    drive:'#e3f2fd', approach:'#e8f5e9', chip:'#f3e5f5',
+    puttShort:'#fce4ec', puttMedium:'#fff3e0', puttLong:'#e0f2f1'
+};
+
+const SESS_TYPES = [
+    {id:'spotlight', lbl:'Spotlight Focus',      icon:'🎯', bc:'bd1',
+     desc:'Maximale focus op je zwakste punt'},
+    {id:'balance',   lbl:'Gebalanceerde Aanval', icon:'⚖️', bc:'bd2',
+     desc:'Top 3 zwaktes gelijk aanpakken'},
+    {id:'full',      lbl:'Volledig Programma',   icon:'🔄', bc:'bd3',
+     desc:'Alle categorieën, gewogen op zwaktes'},
+    {id:'gamesim',   lbl:'Game Simulatie',       icon:'🏆', bc:'bd4',
+     desc:'Verdeling zoals een echte ronde'}
+];
+
+/* ════════════════════════════════════════════════════
+   STATE
+════════════════════════════════════════════════════ */
+let mode = 'garmin';
+let genSessData = [];
+
+/* ════════════════════════════════════════════════════
+   STORAGE
+════════════════════════════════════════════════════ */
+const LS_ENT = 'gb_entries';
+const LS_LAT = 'gb_latest';
+
+function getEntries(){ try{ return JSON.parse(localStorage.getItem(LS_ENT)||'[]'); }catch{return [];} }
+function getLatest(){  try{ return JSON.parse(localStorage.getItem(LS_LAT)||'null'); }catch{return null;} }
+
+function persistEntry(e){
+    const arr = getEntries();
+    arr.unshift(e);
+    if(arr.length > 10) arr.pop();
+    localStorage.setItem(LS_ENT, JSON.stringify(arr));
+    localStorage.setItem(LS_LAT, JSON.stringify(e));
+}
+
+/* ════════════════════════════════════════════════════
+   WEAKNESS ALGORITHM
+════════════════════════════════════════════════════ */
+function calcScores(s){
+    const sc = {};
+    sc.drive    = s.drive    ? Math.max(0,(BM.drive    - +s.drive)    * 1.5) : 0;
+    sc.approach = s.approach ? Math.max(0,(BM.approach - +s.approach) * 2.0) : 0;
+    sc.chip     = s.chip     ? Math.max(0,(BM.chip     - +s.chip)     * 2.0) : 0;
+
+    const pBase = s.puttAvg ? Math.max(0,(+s.puttAvg - BM.puttAvg) * 40) : 0;
+
+    sc.puttShort  = (s.puttShort  ? Math.max(0,(+s.puttShort  - BM.puttShort)  * 1.5) : 0) + pBase*0.3;
+    sc.puttMedium = (s.puttMedium ? Math.max(0,(+s.puttMedium - BM.puttMedium) * 1.5) : 0) + pBase*0.4;
+    sc.puttLong   = (s.puttLong   ? Math.max(0,(+s.puttLong   - BM.puttLong)   * 1.0) : 0) + pBase*0.3;
+
+    return sc;
+}
+
+function rankCats(sc){
+    return Object.entries(sc).sort((a,b)=>b[1]-a[1]).map(([cat,score])=>({cat,score}));
+}
+
+/* ════════════════════════════════════════════════════
+   SESSION BUILDER
+════════════════════════════════════════════════════ */
+function shuffle(arr){ return arr.slice().sort(()=>Math.random()-.5); }
+
+function buildSess(type, sc, mins, usedIds){
+    const rank = rankCats(sc);
+    let alloc = {};
+
+    if(type==='spotlight'){
+        const top = rank[0]?.cat || 'drive';
+        alloc[top] = 0.70;
+        rank.slice(1,4).forEach((r,i)=>{ alloc[r.cat]=[0.15,0.10,0.05][i]||0; });
+    } else if(type==='balance'){
+        rank.slice(0,3).forEach((r,i)=>{ alloc[r.cat]=[0.40,0.35,0.25][i]; });
+    } else if(type==='full'){
+        const tot = rank.reduce((s,r)=>s+r.score+5,0);
+        rank.forEach(r=>{ alloc[r.cat]=(r.score+5)/tot; });
+    } else { // gamesim
+        alloc = {drive:0.15, approach:0.20, chip:0.30, puttShort:0.10, puttMedium:0.15, puttLong:0.10};
+    }
+
+    const bycat = {};
+    Object.keys(CAT_LBL).forEach(cat=>{
+        bycat[cat] = shuffle(EX.filter(e=>e.cat===cat));
+    });
+
+    const result = [];
+
+    for(const [cat, frac] of Object.entries(alloc)){
+        if(!frac || frac<=0) continue;
+        const target = Math.round(mins * frac);
+        const pool = bycat[cat]||[];
+        let filled = 0;
+
+        // Prefer unused exercises first
+        for(const ex of pool){
+            if(filled>=target) break;
+            if(!usedIds.has(ex.id) && filled+ex.dur <= target+3){
+                result.push({...ex}); filled+=ex.dur; usedIds.add(ex.id);
+            }
+        }
+        // Backfill with used ones if needed
+        for(const ex of pool){
+            if(filled>=target) break;
+            if(usedIds.has(ex.id) && filled+ex.dur <= target+3 && !result.find(r=>r.id===ex.id)){
+                result.push({...ex}); filled+=ex.dur;
+            }
+        }
+    }
+
+    return result;
+}
+
+/* ════════════════════════════════════════════════════
+   UI – TAB NAV
+════════════════════════════════════════════════════ */
+function showTab(t){
+    document.querySelectorAll('.tab').forEach(el=>el.classList.remove('active'));
+    document.querySelectorAll('.nbtn').forEach(el=>el.classList.remove('active'));
+    document.getElementById('tab-'+t).classList.add('active');
+    document.getElementById('nav-'+t).classList.add('active');
+    if(t==='analyse')    renderAnalyse();
+    if(t==='progressie') renderProg();
+}
+
+function setMode(m){
+    mode=m;
+    document.getElementById('btn-garmin').classList.toggle('active', m==='garmin');
+    document.getElementById('btn-manual').classList.toggle('active', m==='manual');
+    document.getElementById('help-g').style.display = m==='garmin'?'block':'none';
+    document.getElementById('help-m').style.display = m==='manual'?'block':'none';
+}
+
+function updDur(){
+    const v=document.getElementById('dur-slider').value;
+    document.getElementById('dur-disp').innerHTML=v+' <span>min</span>';
+}
+
+function toast(msg){
+    const t=document.getElementById('toast');
+    t.textContent=msg; t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'),2400);
+}
+
+/* ════════════════════════════════════════════════════
+   SAVE DATA
+════════════════════════════════════════════════════ */
+function saveData(){
+    const s = {
+        drive:    document.getElementById('s-drv').value  ||null,
+        approach: document.getElementById('s-gir').value  ||null,
+        chip:     document.getElementById('s-uad').value  ||null,
+        scrambling:document.getElementById('s-scr').value ||null,
+        puttAvg:  document.getElementById('s-pavg').value ||null,
+        puttOneP: document.getElementById('s-p1').value   ||null,
+        puttShort:document.getElementById('s-ps').value   ||null,
+        puttMedium:document.getElementById('s-pm').value  ||null,
+        puttLong: document.getElementById('s-pl').value   ||null
+    };
+
+    if(!Object.values(s).some(v=>v!==null&&v!=='')){
+        toast('❌ Vul minstens één statistiek in'); return;
+    }
+
+    const ws = calcScores(s);
+    const entry = { id:Date.now(), ts:Date.now(), mode, stats:s, ws };
+    persistEntry(entry);
+
+    updHeader(entry);
+    document.getElementById('te').style.display='none';
+    document.getElementById('tc').style.display='block';
+
+    toast('✅ Opgeslagen!');
+    setTimeout(()=>showTab('analyse'), 700);
+}
+
+function updHeader(e){
+    const top = Object.entries(e.ws).sort((a,b)=>b[1]-a[1])[0];
+    if(top && top[1]>0)
+        document.getElementById('hdr-sub').textContent='Aandacht: '+(CAT_LBL[top[0]]||top[0]);
+    else
+        document.getElementById('hdr-sub').textContent='Stats zien er gebalanceerd uit ✅';
+}
+
+/* ════════════════════════════════════════════════════
+   RENDER ANALYSE
+════════════════════════════════════════════════════ */
+function renderAnalyse(){
+    const lat = getLatest();
+    if(!lat){
+        document.getElementById('ae').style.display='block';
+        document.getElementById('ac').style.display='none';
+        return;
+    }
+    document.getElementById('ae').style.display='none';
+    document.getElementById('ac').style.display='block';
+
+    const sc = lat.ws;
+    const rank = rankCats(sc);
+    const maxSc = Math.max(...Object.values(sc), 1);
+    const d = fmtDate(lat.ts);
+
+    let top = rank[0];
+    let hlHtml = '';
+    if(top && top.score > 5){
+        const cls = top.score>30?'hl-r':'hl-o';
+        hlHtml=`<div class="hl ${cls}"><div class="hlt">⚠️ Grootste aandachtspunt: ${CAT_LBL[top.cat]}</div>
+            <div class="hld">Zwaktescore: ${top.score.toFixed(0)} — geef hier de meeste trainingstijd aan.</div></div>`;
+    } else {
+        hlHtml=`<div class="hl hl-g"><div class="hlt">✅ Goede stats!</div>
+            <div class="hld">Je zit boven benchmark in de meeste categorieën. Focus op onderhoud.</div></div>`;
+    }
+
+    let barsHtml = rank.map(({cat,score})=>{
+        const pct = Math.min(100, (score/maxSc)*100);
+        const bc  = score>30?'b-crit':score>15?'b-wk':score>5?'b-att':'b-ok';
+        const lbl = score>30?'🔴 Kritiek':score>15?'🟠 Zwak':score>5?'🟡 Aandacht':'🟢 Goed';
+        const raw = statRaw(cat,lat.stats);
+        return `<div class="wbc">
+            <div class="wbh"><span class="wbl">${CAT_LBL[cat]}</span>
+            <span class="wbv">${lbl} ${raw}</span></div>
+            <div class="wbt"><div class="wbf ${bc}" style="width:${pct}%"></div></div>
+        </div>`;
+    }).join('');
+
+    let tblRows = [
+        {lbl:'🏌️ Fairways Hit',  v:lat.stats.drive,     bm:BM.drive,       u:'%', hi:true},
+        {lbl:'🎯 GIR',           v:lat.stats.approach,  bm:BM.approach,    u:'%', hi:true},
+        {lbl:'🏌 Up-and-Down',   v:lat.stats.chip,      bm:BM.chip,        u:'%', hi:true},
+        {lbl:'🎱 Putts/hole',    v:lat.stats.puttAvg,   bm:BM.puttAvg,     u:'',  hi:false},
+        {lbl:'🎱 3-putt Kort',   v:lat.stats.puttShort, bm:BM.puttShort,   u:'%', hi:false},
+        {lbl:'🎱 3-putt Medium', v:lat.stats.puttMedium,bm:BM.puttMedium,  u:'%', hi:false},
+        {lbl:'🎱 3-putt Lang',   v:lat.stats.puttLong,  bm:BM.puttLong,    u:'%', hi:false},
+    ].filter(r=>r.v!==null&&r.v!=='').map(r=>{
+        const num=+r.v;
+        const good = r.hi ? num>=r.bm : num<=r.bm;
+        return `<tr><td>${r.lbl}</td>
+            <td style="text-align:center;font-weight:700;color:${good?'var(--green-med)':'var(--red)'};">${num}${r.u}</td>
+            <td style="text-align:center;color:var(--muted);">${good?'✅':'❌'} ${r.bm}${r.u}</td></tr>`;
+    }).join('');
+
+    document.getElementById('ac').innerHTML=`
+        <div class="card">
+            <div class="ctit">📅 Meting: ${d}</div>
+            ${hlHtml}
+            ${barsHtml}
+        </div>
+        <div class="card">
+            <div class="ctit">📏 Jouw stats vs Benchmark</div>
+            <table class="stbl">
+                <thead><tr><th>Categorie</th><th style="text-align:center;">Jij</th><th style="text-align:center;">Doel</th></tr></thead>
+                <tbody>${tblRows}</tbody>
+            </table>
+        </div>`;
+}
+
+function statRaw(cat, s){
+    const m={drive:s.drive?s.drive+'%':'—', approach:s.approach?s.approach+'%':'—',
+             chip:s.chip?s.chip+'%':'—',
+             puttShort:s.puttShort?s.puttShort+'%':s.puttAvg?s.puttAvg+' p/h':'—',
+             puttMedium:s.puttMedium?s.puttMedium+'%':'—',
+             puttLong:s.puttLong?s.puttLong+'%':'—'};
+    return m[cat]||'—';
+}
+
+/* ════════════════════════════════════════════════════
+   GENERATE SESSIONS
+════════════════════════════════════════════════════ */
+function genSessions(){
+    const lat=getLatest(); if(!lat) return;
+    const mins=+document.getElementById('dur-slider').value;
+    const sc=lat.ws;
+    const used=new Set();
+
+    genSessData = SESS_TYPES.map(st=>({
+        ...st,
+        exs: buildSess(st.id, sc, mins, used),
+        mins
+    }));
+
+    renderSessions();
+    toast('🎯 4 sessies klaar!');
+}
+
+function renderSessions(){
+    let html = genSessData.map((sess,i)=>{
+        const tot = sess.exs.reduce((s,e)=>s+e.dur,0);
+        return `<div class="sc">
+            <div class="sh" onclick="togSess(${i})">
+                <div class="shl">
+                    <div class="sbadge ${sess.bc}">${sess.icon}</div>
+                    <div>
+                        <div class="stit">Sessie ${i+1}: ${sess.lbl}</div>
+                        <div class="smeta">${sess.desc} &middot; ${tot} min &middot; ${sess.exs.length} oef.</div>
+                    </div>
+                </div>
+                <div class="schev" id="chev-${i}">▼</div>
+            </div>
+            <div class="sb" id="sb-${i}">
+                ${renderExList(sess.exs)}
+            </div>
+        </div>`;
+    }).join('');
+
+    document.getElementById('sess-container').innerHTML=html;
+}
+
+function renderExList(exs){
+    if(!exs.length) return '<p style="color:var(--muted);font-size:13px;padding:10px 0;">Geen oefeningen voor deze configuratie.</p>';
+    return exs.map(e=>`
+        <div class="ei">
+            <div class="eih">
+                <div class="ein">${e.name}</div>
+                <div class="eid">${e.dur} min</div>
+            </div>
+            <div class="eidesc">${e.desc}</div>
+            <div class="eitip">${e.tip}</div>
+            <span class="eicat" style="background:${CAT_COL[e.cat]||'#f5f5f5'};color:#333;">${CAT_LBL[e.cat]||e.cat} &middot; ${e.dif}</span>
+        </div>`).join('');
+}
+
+function togSess(i){
+    const b=document.getElementById('sb-'+i);
+    const c=document.getElementById('chev-'+i);
+    const open=b.classList.contains('open');
+    b.classList.toggle('open',!open);
+    c.classList.toggle('open',!open);
+}
+
+/* ════════════════════════════════════════════════════
+   RENDER PROGRESSIE
+════════════════════════════════════════════════════ */
+function renderProg(){
+    const entries=getEntries();
+    if(!entries.length){
+        document.getElementById('pe').style.display='block';
+        document.getElementById('pc').style.display='none';
+        return;
+    }
+    document.getElementById('pe').style.display='none';
+    document.getElementById('pc').style.display='block';
+
+    let html='';
+
+    // Chart
+    if(entries.length>=2){
+        html+=`<div class="card"><div class="ctit">📈 Zwakte Score Verloop</div>
+            ${buildChart(entries)}
+            <p style="font-size:11px;color:var(--muted);margin-top:8px;">Lager = beter. Score 0 = je zit boven de benchmark.</p>
+        </div>`;
+    }
+
+    // Entry list
+    html+=`<div class="card"><div class="ctit">📋 Metingen (max 10)</div>`;
+    entries.forEach((e,idx)=>{
+        const top=Object.entries(e.ws||{}).sort((a,b)=>b[1]-a[1])[0];
+        const s=e.stats||{};
+        html+=`<div class="ent">
+            <div class="entd">${fmtDate(e.ts)} ${idx===0?'<span style="font-size:10px;background:var(--green-dark);color:#fff;padding:2px 7px;border-radius:8px;margin-left:4px;">Nieuwste</span>':''}</div>
+            <div class="entchips">
+                ${s.drive    ?`<span class="chip">🏌️ ${s.drive}% FH</span>`:''}
+                ${s.approach ?`<span class="chip">🎯 ${s.approach}% GIR</span>`:''}
+                ${s.chip     ?`<span class="chip">🏌 ${s.chip}% U&D</span>`:''}
+                ${s.puttAvg  ?`<span class="chip">🎱 ${s.puttAvg} p/h</span>`:''}
+                ${top        ?`<span class="chip chip-r">Focus: ${CAT_LBL[top[0]]}</span>`:''}
+            </div>
+        </div>`;
+    });
+    html+='</div>';
+
+    html+=`<div style="text-align:center;margin-top:4px;">
+        <button class="btn btn-s" onclick="confirmReset()" style="max-width:220px;font-size:13px;">🗑️ Alle data verwijderen</button>
+    </div>`;
+
+    document.getElementById('pc').innerHTML=html;
+}
+
+function buildChart(entries){
+    const data=[...entries].reverse().slice(-10);
+    const cats=['drive','approach','chip','puttMedium'];
+    const cols=['#1565C0','#2e7d32','#6a1b9a','#e65100'];
+    const lbls=['Drive','Approach','Chip','Putt M'];
+
+    const W=320,H=150,PL=32,PB=28,PR=10,PT=10;
+    const cW=W-PL-PR, cH=H-PB-PT;
+    const allSc=data.flatMap(e=>cats.map(c=>e.ws?.[c]||0));
+    const maxSc=Math.max(...allSc,20);
+    const xS=data.length>1?cW/(data.length-1):cW;
+
+    let svg=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;display:block;margin:auto;">`;
+
+    // Grid
+    for(let i=0;i<=4;i++){
+        const y=PT+(cH/4)*i;
+        const v=Math.round(maxSc-(maxSc/4)*i);
+        svg+=`<line x1="${PL}" y1="${y}" x2="${W-PR}" y2="${y}" stroke="#e0e0e0" stroke-width="1"/>
+              <text x="${PL-3}" y="${y+4}" text-anchor="end" font-size="9" fill="#aaa">${v}</text>`;
+    }
+
+    // X labels
+    data.forEach((e,i)=>{
+        const x=PL+(data.length>1?i*xS:cW/2);
+        const d=new Date(e.ts);
+        svg+=`<text x="${x}" y="${H-4}" text-anchor="middle" font-size="9" fill="#aaa">${d.getDate()}/${d.getMonth()+1}</text>`;
+    });
+
+    // Lines
+    cats.forEach((cat,ci)=>{
+        let path='';
+        data.forEach((e,i)=>{
+            const sc=e.ws?.[cat]||0;
+            const x=PL+(data.length>1?i*xS:cW/2);
+            const y=PT+cH-(sc/maxSc)*cH;
+            path+=(i===0?`M${x},${y}`:`L${x},${y}`);
+        });
+        svg+=`<path d="${path}" fill="none" stroke="${cols[ci]}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`;
+        data.forEach((e,i)=>{
+            const sc=e.ws?.[cat]||0;
+            const x=PL+(data.length>1?i*xS:cW/2);
+            const y=PT+cH-(sc/maxSc)*cH;
+            svg+=`<circle cx="${x}" cy="${y}" r="3.5" fill="${cols[ci]}" stroke="#fff" stroke-width="1.5"/>`;
+        });
+    });
+
+    svg+='</svg>';
+
+    let leg='<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;">';
+    cats.forEach((c,i)=>{ leg+=`<div style="display:flex;align-items:center;gap:4px;font-size:11px;">
+        <div style="width:14px;height:3px;background:${cols[i]};border-radius:2px;"></div>
+        <span style="color:var(--muted);">${lbls[i]}</span></div>`; });
+    leg+='</div>';
+
+    return svg+leg;
+}
+
+function confirmReset(){
+    if(confirm('Weet je zeker dat je alle opgeslagen data wilt verwijderen?')){
+        localStorage.removeItem(LS_ENT);
+        localStorage.removeItem(LS_LAT);
+        toast('🗑️ Data verwijderd');
+        document.getElementById('te').style.display='block';
+        document.getElementById('tc').style.display='none';
+        document.getElementById('hdr-sub').textContent='Voer je data in om te beginnen';
+        renderProg();
+    }
+}
+
+/* ════════════════════════════════════════════════════
+   HELPERS
+════════════════════════════════════════════════════ */
+function fmtDate(ts){
+    return new Date(ts).toLocaleDateString('nl-NL',{day:'2-digit',month:'2-digit',year:'numeric'});
+}
+
+/* ════════════════════════════════════════════════════
+   INIT
+════════════════════════════════════════════════════ */
+(function init(){
+    const lat=getLatest();
+    if(!lat) return;
+
+    const s=lat.stats;
+    const ids={drive:'s-drv',approach:'s-gir',chip:'s-uad',scrambling:'s-scr',
+               puttAvg:'s-pavg',puttOneP:'s-p1',puttShort:'s-ps',puttMedium:'s-pm',puttLong:'s-pl'};
+    Object.entries(ids).forEach(([k,id])=>{ if(s[k]) document.getElementById(id).value=s[k]; });
+
+    updHeader(lat);
+    document.getElementById('te').style.display='none';
+    document.getElementById('tc').style.display='block';
+})();
+</script>
+</body>
+</html>
