@@ -6,7 +6,6 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#1b5e20">
-    <link rel="manifest" href="manifest.json">
     <title>Golf Buddy</title>
     <style>
         :root{--gd:#1b5e20;--g:#2e7d32;--gm:#388e3c;--gl:#43a047;--gp:#e8f5e9;--gx:#f1f8f0;
@@ -17,9 +16,18 @@
         body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;background:var(--gx);color:var(--tx);padding-bottom:var(--nav);}
 
         /* Header */
-        .hdr{position:sticky;top:0;z-index:100;background:var(--gd);color:#fff;padding:14px 18px 10px;box-shadow:0 2px 10px rgba(0,0,0,.25);}
-        .hdr h1{font-size:19px;font-weight:800;}
+        .hdr{position:sticky;top:0;z-index:100;background:var(--gd);color:#fff;padding:14px 18px 10px;box-shadow:0 2px 10px rgba(0,0,0,.25);display:flex;justify-content:space-between;align-items:center;}
+        .hdr h1{font-size:19px;font-weight:800;margin:0;}
         .hdr-sub{font-size:11px;opacity:.75;margin-top:2px;}
+        .logout-btn{background:rgba(255,255,255,0.2);border:none;color:#fff;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;}
+
+        /* Auth Screen */
+        #auth-screen{padding:30px 20px;text-align:center;max-width:400px;margin:0 auto;}
+        .auth-logo{font-size:50px;margin-bottom:10px;}
+        .auth-tit{font-size:24px;font-weight:800;color:var(--gd);margin-bottom:8px;}
+        .auth-sub{font-size:13px;color:var(--mu);margin-bottom:24px;line-height:1.4;}
+        .auth-input{width:100%;padding:14px;border:1.5px solid var(--bd);border-radius:10px;font-size:15px;margin-bottom:12px;background:var(--wh);}
+        .auth-input:focus{outline:none;border-color:var(--gm);}
 
         /* Bottom nav */
         .bnav{position:fixed;bottom:0;left:0;right:0;height:var(--nav);background:var(--wh);border-top:1px solid var(--bd);display:flex;z-index:100;box-shadow:0 -2px 12px rgba(0,0,0,.07);}
@@ -62,16 +70,17 @@
         .btn:active{opacity:.82;}
         .btn-p{background:var(--gd);color:#fff;}
         .btn-s{background:var(--gp);color:var(--gd);}
+        .btn:disabled{opacity:0.5;cursor:not-allowed;}
 
         /* Manual focus cards */
-        .mcc{background:var(--gx);border:1.5px solid var(--bd);border-radius:10px;padding:10px 12px;margin-bottom:8px;transition:border-color .2s,background .2s;}
+        .mcc{background:var(--gx);border:1.5px solid var(--bd);border-radius:10px;padding:10px 12px;margin-bottom:8px;}
         .mcc.sel-hoofd{border-color:var(--rd);background:var(--rl);}
         .mcc.sel-bij{border-color:var(--or);background:var(--ol);}
         .mcc.sel-ond{border-color:var(--yw);background:var(--yl);}
         .mcc-head{display:flex;align-items:center;margin-bottom:8px;}
         .mcc-name{font-size:14px;font-weight:700;flex:1;}
         .mcc-btns{display:flex;gap:5px;}
-        .mcb{padding:6px 8px;border:1.5px solid var(--bd);border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;background:var(--wh);color:var(--mu);transition:all .15s;white-space:nowrap;}
+        .mcb{padding:6px 8px;border:1.5px solid var(--bd);border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;background:var(--wh);color:var(--mu);}
         .mcb.active-hoofd{background:var(--rd);color:#fff;border-color:var(--rd);}
         .mcb.active-bij{background:var(--or);color:#fff;border-color:var(--or);}
         .mcb.active-ond{background:var(--yw);color:#7b5e00;border-color:var(--yw);}
@@ -82,7 +91,7 @@
         .wbl{font-size:13px;font-weight:600;}
         .wbv{font-size:11px;color:var(--mu);}
         .wbt{height:10px;background:#eee;border-radius:5px;overflow:hidden;}
-        .wbf{height:100%;border-radius:5px;transition:width .6s ease;}
+        .wbf{height:100%;border-radius:5px;}
         .b-ok{background:var(--gl);} .b-att{background:var(--yw);} .b-wk{background:var(--or);} .b-crit{background:var(--rd);}
 
         /* Highlight */
@@ -129,25 +138,17 @@
         .dif-badge{display:inline-block;font-size:10px;padding:1px 6px;border-radius:4px;margin-left:4px;font-weight:600;}
         .dif-e{background:#e8f5e9;color:#2e7d32;} .dif-m{background:#fff3e0;color:#e65100;} .dif-h{background:#ffebee;color:#c62828;}
 
-        /* Voortgang */
-        .ent{padding:10px 0;border-bottom:1px solid var(--bd);}
-        .ent:last-child{border-bottom:none;}
-        .entd{font-size:13px;font-weight:700;color:var(--gd);}
-        .entchips{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;}
-        .chip{font-size:11px;padding:2px 8px;border-radius:10px;background:var(--gp);color:var(--gd);font-weight:600;}
-        .chip-r{background:var(--rl);color:var(--rd);} .chip-o{background:var(--ol);color:var(--or);} .chip-y{background:var(--yl);color:#7b5e00;}
-
         /* Clubs */
-        .club-row{display:grid;grid-template-columns:1fr 60px 60px 34px;gap:6px;align-items:center;padding:7px 0;border-bottom:1px solid var(--bd);}
+        .club-row{display:grid;grid-template-columns:1.5fr 60px 60px 34px;gap:6px;align-items:center;padding:7px 0;border-bottom:1px solid var(--bd);}
         .club-row:last-child{border-bottom:none;}
-        .club-name,.club-carry,.club-total{padding:8px 8px;border:1.5px solid var(--bd);border-radius:8px;font-size:14px;background:var(--wh);}
+        .club-sel,.club-carry,.club-total{padding:8px 4px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px;background:var(--wh);}
         .club-carry,.club-total{text-align:center;}
-        .club-name:focus,.club-carry:focus,.club-total:focus{outline:none;border-color:var(--gm);}
+        .club-sel:focus,.club-carry:focus,.club-total:focus{outline:none;border-color:var(--gm);}
         .club-del{width:34px;height:34px;border:none;background:var(--rl);color:var(--rd);border-radius:8px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
 
         /* Table */
         .stbl{width:100%;border-collapse:collapse;font-size:13px;}
-        .stbl th{text-align:left;padding:6px 0;color:var(--mu);border-bottom:2px solid var(--bd);font-size:11px;text-transform:uppercase;letter-spacing:.3px;}
+        .stbl th{text-align:left;padding:6px 0;color:var(--mu);border-bottom:2px solid var(--bd);font-size:11px;text-transform:uppercase;}
         .stbl td{padding:7px 4px;border-bottom:1px solid var(--bd);}
         .stbl tr:last-child td{border-bottom:none;}
 
@@ -160,472 +161,325 @@
         /* Toast */
         .toast{position:fixed;bottom:calc(var(--nav)+12px);left:50%;transform:translateX(-50%) translateY(16px);background:var(--gd);color:#fff;padding:9px 18px;border-radius:20px;font-size:13px;font-weight:700;opacity:0;transition:all .28s;z-index:200;white-space:nowrap;pointer-events:none;}
         .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+        
+        .loader{border:3px solid #f3f3f3;border-top:3px solid var(--gd);border-radius:50%;width:20px;height:20px;animation:spin 1s linear infinite;display:inline-block;vertical-align:middle;margin-right:8px;}
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
-<div class="hdr">
-    <h1>⛳ Golf Buddy</h1>
-    <div class="hdr-sub" id="hdr-sub">Voer je data in om te beginnen</div>
+<!-- AUTH SCREEN -->
+<div id="auth-screen" style="display:none;">
+    <div class="auth-logo">⛳</div>
+    <div class="auth-tit">Golf Buddy</div>
+    <div class="auth-sub">Log in of maak een account aan om je voortgang overal op te slaan.</div>
+    <form id="auth-form" onsubmit="event.preventDefault();">
+        <input type="email" id="auth-email" class="auth-input" placeholder="E-mailadres" required>
+        <input type="password" id="auth-pass" class="auth-input" placeholder="Wachtwoord (min. 6 tekens)" required>
+        <div id="auth-err" style="color:var(--rd);font-size:12px;margin-bottom:10px;font-weight:600;"></div>
+        <button type="button" class="btn btn-p" id="btn-login" onclick="handleLogin()" style="margin-bottom:10px;">Inloggen</button>
+        <button type="button" class="btn btn-s" id="btn-reg" onclick="handleRegister()">Account Aanmaken</button>
+    </form>
 </div>
 
-<!-- ══════════ DATA ══════════ -->
-<div id="tab-data" class="tab active">
-    <div class="card">
-        <div class="ctit">📋 Data Invoer</div>
-
-        <!-- HCP – always visible -->
-        <div class="hcp-row">
-            <div class="hcp-lbl">🏅 Handicap Index</div>
-            <input class="hcp-in" type="number" id="s-hcp" placeholder="—" step="0.1" min="0" max="54">
+<!-- MAIN APP -->
+<div id="main-app" style="display:none;">
+    <div class="hdr">
+        <div>
+            <h1>⛳ Golf Buddy</h1>
+            <div class="hdr-sub" id="hdr-sub">Laden...</div>
         </div>
-
-        <!-- Mode toggle -->
-        <div class="tog">
-            <button class="tbtn active" id="tb-garmin" onclick="setMode('garmin')">📡 Garmin Stats</button>
-            <button class="tbtn"        id="tb-manual" onclick="setMode('manual')">✏️ Handmatig</button>
-        </div>
-
-        <!-- ─ GARMIN FORM ─ -->
-        <div id="garmin-form">
-            <div class="info-strip">ℹ️ Stats komen uit Garmin Golf app → Slagoverzicht</div>
-
-            <div class="slbl">🏌️ Drive – Vanaf de tee</div>
-            <div class="fg">
-                <label class="fl">Fairway %</label>
-                <input class="fi" type="number" id="s-drv" placeholder="bijv. 37" min="0" max="100">
-            </div>
-            <label class="fl" style="margin-bottom:6px;">Richtingsverdeling</label>
-            <div class="gr3">
-                <div class="fg"><label class="fl">Links %</label><input class="fi fi-sm" type="number" id="s-drl" placeholder="18" min="0" max="100"></div>
-                <div class="fg"><label class="fl">Fairway %</label><input class="fi fi-sm" type="number" id="s-drf" placeholder="37" min="0" max="100"></div>
-                <div class="fg"><label class="fl">Rechts %</label><input class="fi fi-sm" type="number" id="s-drr" placeholder="45" min="0" max="100"></div>
-            </div>
-
-            <div class="slbl">🎯 Approach – Naar de green</div>
-            <div class="fg">
-                <label class="fl">GIR – Green in Regulation %</label>
-                <input class="fi" type="number" id="s-gir" placeholder="bijv. 26" min="0" max="100">
-            </div>
-
-            <div class="slbl">🏌 Chip – Korte game</div>
-            <div class="gr2">
-                <div class="fg"><label class="fl">Chip Miss %</label><input class="fi" type="number" id="s-cgem" placeholder="bijv. 27" min="0" max="100"></div>
-                <div class="fg"><label class="fl">Up-and-Down %</label><input class="fi" type="number" id="s-cuad" placeholder="bijv. 9" min="0" max="100"></div>
-            </div>
-            <div class="fg"><label class="fl">Sand Save % (Sandies)</label><input class="fi" type="number" id="s-csan" placeholder="bijv. 0" min="0" max="100"></div>
-
-            <div class="slbl">🎱 Putt – Op de golfbaan</div>
-            <div class="fg"><label class="fl">Gem. putts per hole</label><input class="fi" type="number" id="s-pavg" placeholder="bijv. 2.1" step="0.1" min="1" max="5"></div>
-            <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-bottom:4px;">
-                <div></div>
-                <div style="font-size:10px;font-weight:700;color:var(--mu);text-align:center;padding-top:6px;">KORT</div>
-                <div style="font-size:10px;font-weight:700;color:var(--mu);text-align:center;padding-top:6px;">MEDIUM</div>
-                <div style="font-size:10px;font-weight:700;color:var(--mu);text-align:center;padding-top:6px;">LANG</div>
-            </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-bottom:6px;">
-                <div style="font-size:11px;font-weight:700;color:var(--mu);display:flex;align-items:center;">1 putt %</div>
-                <input class="fi fi-sm" type="number" id="s-p1s" placeholder="33" min="0" max="100">
-                <input class="fi fi-sm" type="number" id="s-p1m" placeholder="8"  min="0" max="100">
-                <input class="fi fi-sm" type="number" id="s-p1l" placeholder="7"  min="0" max="100">
-            </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-bottom:6px;">
-                <div style="font-size:11px;font-weight:700;color:var(--mu);display:flex;align-items:center;">3+ putts %</div>
-                <input class="fi fi-sm" type="number" id="s-ps" placeholder="0"  min="0" max="100">
-                <input class="fi fi-sm" type="number" id="s-pm" placeholder="38" min="0" max="100">
-                <input class="fi fi-sm" type="number" id="s-pl" placeholder="21" min="0" max="100">
-            </div>
-        </div>
-
-        <!-- ─ MANUAL FORM ─ -->
-        <div id="manual-form" style="display:none;">
-            <div class="info-strip">✏️ Geen Garmin? Kies zelf je trainingsgebieden. De sessies worden hierop gebouwd.</div>
-            <div class="slbl">🏋️ Trainingsprioriteiten</div>
-            <p style="font-size:12px;color:var(--mu);margin-bottom:10px;">Kies per gebied je prioriteit. Je kunt meerdere gebieden op Hoofdfocus zetten.</p>
-
-            <div id="mcc-drive" class="mcc">
-                <div class="mcc-head"><div class="mcc-name">🏌️ Drive</div></div>
-                <div class="mcc-btns">
-                    <button class="mcb" id="mc-drive-hoofd" onclick="setManFocus('drive','hoofd')">Hoofdfocus</button>
-                    <button class="mcb" id="mc-drive-bij"   onclick="setManFocus('drive','bij')">Bijfocus</button>
-                    <button class="mcb" id="mc-drive-ond"   onclick="setManFocus('drive','ond')">Onderhoud</button>
-                </div>
-            </div>
-            <div id="mcc-approach" class="mcc">
-                <div class="mcc-head"><div class="mcc-name">🎯 Approach</div></div>
-                <div class="mcc-btns">
-                    <button class="mcb" id="mc-approach-hoofd" onclick="setManFocus('approach','hoofd')">Hoofdfocus</button>
-                    <button class="mcb" id="mc-approach-bij"   onclick="setManFocus('approach','bij')">Bijfocus</button>
-                    <button class="mcb" id="mc-approach-ond"   onclick="setManFocus('approach','ond')">Onderhoud</button>
-                </div>
-            </div>
-            <div id="mcc-chip" class="mcc">
-                <div class="mcc-head"><div class="mcc-name">🏌 Chip / Pitch</div></div>
-                <div class="mcc-btns">
-                    <button class="mcb" id="mc-chip-hoofd" onclick="setManFocus('chip','hoofd')">Hoofdfocus</button>
-                    <button class="mcb" id="mc-chip-bij"   onclick="setManFocus('chip','bij')">Bijfocus</button>
-                    <button class="mcb" id="mc-chip-ond"   onclick="setManFocus('chip','ond')">Onderhoud</button>
-                </div>
-            </div>
-            <div id="mcc-puttShort" class="mcc">
-                <div class="mcc-head"><div class="mcc-name">🎱 Putt Kort (0–2m)</div></div>
-                <div class="mcc-btns">
-                    <button class="mcb" id="mc-puttShort-hoofd" onclick="setManFocus('puttShort','hoofd')">Hoofdfocus</button>
-                    <button class="mcb" id="mc-puttShort-bij"   onclick="setManFocus('puttShort','bij')">Bijfocus</button>
-                    <button class="mcb" id="mc-puttShort-ond"   onclick="setManFocus('puttShort','ond')">Onderhoud</button>
-                </div>
-            </div>
-            <div id="mcc-puttMedium" class="mcc">
-                <div class="mcc-head"><div class="mcc-name">🎱 Putt Medium (3–6m)</div></div>
-                <div class="mcc-btns">
-                    <button class="mcb" id="mc-puttMedium-hoofd" onclick="setManFocus('puttMedium','hoofd')">Hoofdfocus</button>
-                    <button class="mcb" id="mc-puttMedium-bij"   onclick="setManFocus('puttMedium','bij')">Bijfocus</button>
-                    <button class="mcb" id="mc-puttMedium-ond"   onclick="setManFocus('puttMedium','ond')">Onderhoud</button>
-                </div>
-            </div>
-            <div id="mcc-puttLong" class="mcc">
-                <div class="mcc-head"><div class="mcc-name">🎱 Putt Lang (6m+)</div></div>
-                <div class="mcc-btns">
-                    <button class="mcb" id="mc-puttLong-hoofd" onclick="setManFocus('puttLong','hoofd')">Hoofdfocus</button>
-                    <button class="mcb" id="mc-puttLong-bij"   onclick="setManFocus('puttLong','bij')">Bijfocus</button>
-                    <button class="mcb" id="mc-puttLong-ond"   onclick="setManFocus('puttLong','ond')">Onderhoud</button>
-                </div>
-            </div>
-            <div class="info-strip" style="margin-top:4px;">🔴 Hoofdfocus = meeste oefeningen &nbsp;·&nbsp; 🟠 Bijfocus = gemiddeld &nbsp;·&nbsp; 🟡 Onderhoud = 1 oefening</div>
-        </div>
-
-        <button class="btn btn-p" onclick="saveData()" style="margin-top:12px;">💾 Opslaan &amp; Analyseer</button>
+        <button class="logout-btn" onclick="handleLogout()">Uitloggen</button>
     </div>
-</div>
 
-<!-- ══════════ ANALYSE ══════════ -->
-<div id="tab-analyse" class="tab">
-    <div class="empty" id="ae"><div class="eico">📊</div><p>Voer eerst je data in op het Data-tabblad.</p></div>
-    <div id="ac" style="display:none;"></div>
-</div>
-
-<!-- ══════════ TRAINING ══════════ -->
-<div id="tab-training" class="tab">
-    <div class="empty" id="te"><div class="eico">🏌️</div><p>Sla eerst je data op voordat je een training genereert.</p></div>
-    <div id="tc" style="display:none;">
+    <!-- DATA TAB -->
+    <div id="tab-data" class="tab active">
         <div class="card">
-            <div class="ctit">⏱️ Beschikbare tijd</div>
-            <div class="dur" id="dur-disp">60 <span>min</span></div>
-            <input type="range" id="dur-slider" min="30" max="120" step="5" value="60" oninput="updDur()">
-            <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--mu);margin-top:4px;"><span>30 min</span><span>120 min</span></div>
-            <div class="info-strip" style="margin-top:12px;margin-bottom:0;">ℹ️ Meer tijd = meer oefeningen. Echte zwaktes krijgen altijd extra oefeningen. Moeilijkheid past zich aan je HCP aan.</div>
-            <button class="btn btn-p" onclick="genSessions()" style="margin-top:12px;">🎯 Genereer 4 Sessies</button>
+            <div class="ctit">📋 Data Invoer</div>
+            <div class="hcp-row">
+                <div class="hcp-lbl">🏅 Handicap Index</div>
+                <input class="hcp-in" type="number" id="s-hcp" placeholder="—" step="0.1" min="0" max="54">
+            </div>
+            <div class="tog">
+                <button class="tbtn active" id="tb-garmin" onclick="setMode('garmin')">📡 Garmin Stats</button>
+                <button class="tbtn"        id="tb-manual" onclick="setMode('manual')">✏️ Handmatig</button>
+            </div>
+
+            <!-- GARMIN FORM -->
+            <div id="garmin-form">
+                <div class="info-strip">ℹ️ Stats komen uit Garmin Golf app → Slagoverzicht</div>
+                <div class="slbl">🏌️ Drive – Vanaf de tee</div>
+                <div class="fg"><label class="fl">Fairway %</label><input class="fi" type="number" id="s-drv" placeholder="37" min="0" max="100"></div>
+                <label class="fl" style="margin-bottom:6px;">Richtingsverdeling</label>
+                <div class="gr3">
+                    <div class="fg"><label class="fl">Links %</label><input class="fi fi-sm" type="number" id="s-drl" placeholder="18" min="0" max="100"></div>
+                    <div class="fg"><label class="fl">Fairway %</label><input class="fi fi-sm" type="number" id="s-drf" placeholder="37" min="0" max="100"></div>
+                    <div class="fg"><label class="fl">Rechts %</label><input class="fi fi-sm" type="number" id="s-drr" placeholder="45" min="0" max="100"></div>
+                </div>
+
+                <div class="slbl">🎯 Approach – Naar de green</div>
+                <div class="fg"><label class="fl">GIR – Green in Regulation %</label><input class="fi" type="number" id="s-gir" placeholder="26" min="0" max="100"></div>
+
+                <div class="slbl">🏌 Chip – Korte game</div>
+                <div class="gr2">
+                    <div class="fg"><label class="fl">Chip Miss %</label><input class="fi" type="number" id="s-cgem" placeholder="27" min="0" max="100"></div>
+                    <div class="fg"><label class="fl">Up-and-Down %</label><input class="fi" type="number" id="s-cuad" placeholder="9" min="0" max="100"></div>
+                </div>
+                <div class="fg"><label class="fl">Sand Save % (Sandies)</label><input class="fi" type="number" id="s-csan" placeholder="0" min="0" max="100"></div>
+
+                <div class="slbl">🎱 Putt – Op de golfbaan</div>
+                <div class="fg"><label class="fl">Gem. putts per hole</label><input class="fi" type="number" id="s-pavg" placeholder="2.1" step="0.1" min="1" max="5"></div>
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-bottom:4px;">
+                    <div></div>
+                    <div style="font-size:10px;font-weight:700;color:var(--mu);text-align:center;">KORT</div>
+                    <div style="font-size:10px;font-weight:700;color:var(--mu);text-align:center;">MEDIUM</div>
+                    <div style="font-size:10px;font-weight:700;color:var(--mu);text-align:center;">LANG</div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-bottom:6px;">
+                    <div style="font-size:11px;font-weight:700;color:var(--mu);display:flex;align-items:center;">1 putt %</div>
+                    <input class="fi fi-sm" type="number" id="s-p1s" placeholder="33" min="0" max="100">
+                    <input class="fi fi-sm" type="number" id="s-p1m" placeholder="8"  min="0" max="100">
+                    <input class="fi fi-sm" type="number" id="s-p1l" placeholder="7"  min="0" max="100">
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-bottom:6px;">
+                    <div style="font-size:11px;font-weight:700;color:var(--mu);display:flex;align-items:center;">3+ putts %</div>
+                    <input class="fi fi-sm" type="number" id="s-ps" placeholder="0"  min="0" max="100">
+                    <input class="fi fi-sm" type="number" id="s-pm" placeholder="38" min="0" max="100">
+                    <input class="fi fi-sm" type="number" id="s-pl" placeholder="21" min="0" max="100">
+                </div>
+            </div>
+
+            <!-- MANUAL FORM -->
+            <div id="manual-form" style="display:none;">
+                <div class="info-strip">✏️ Geen Garmin? Kies zelf je prioriteiten. Sessies worden hierop gebouwd.</div>
+                <div class="slbl">🏋️ Trainingsprioriteiten</div>
+                <p style="font-size:12px;color:var(--mu);margin-bottom:10px;">Je kunt meerdere gebieden op Hoofdfocus zetten.</p>
+                <div id="mcc-drive" class="mcc"><div class="mcc-head"><div class="mcc-name">🏌️ Drive</div></div><div class="mcc-btns"><button class="mcb" id="mc-drive-hoofd" onclick="setManFocus('drive','hoofd')">Hoofdfocus</button><button class="mcb" id="mc-drive-bij" onclick="setManFocus('drive','bij')">Bijfocus</button><button class="mcb" id="mc-drive-ond" onclick="setManFocus('drive','ond')">Onderhoud</button></div></div>
+                <div id="mcc-approach" class="mcc"><div class="mcc-head"><div class="mcc-name">🎯 Approach</div></div><div class="mcc-btns"><button class="mcb" id="mc-approach-hoofd" onclick="setManFocus('approach','hoofd')">Hoofdfocus</button><button class="mcb" id="mc-approach-bij" onclick="setManFocus('approach','bij')">Bijfocus</button><button class="mcb" id="mc-approach-ond" onclick="setManFocus('approach','ond')">Onderhoud</button></div></div>
+                <div id="mcc-chip" class="mcc"><div class="mcc-head"><div class="mcc-name">🏌 Chip / Pitch</div></div><div class="mcc-btns"><button class="mcb" id="mc-chip-hoofd" onclick="setManFocus('chip','hoofd')">Hoofdfocus</button><button class="mcb" id="mc-chip-bij" onclick="setManFocus('chip','bij')">Bijfocus</button><button class="mcb" id="mc-chip-ond" onclick="setManFocus('chip','ond')">Onderhoud</button></div></div>
+                <div id="mcc-puttShort" class="mcc"><div class="mcc-head"><div class="mcc-name">🎱 Putt Kort (0–2m)</div></div><div class="mcc-btns"><button class="mcb" id="mc-puttShort-hoofd" onclick="setManFocus('puttShort','hoofd')">Hoofdfocus</button><button class="mcb" id="mc-puttShort-bij" onclick="setManFocus('puttShort','bij')">Bijfocus</button><button class="mcb" id="mc-puttShort-ond" onclick="setManFocus('puttShort','ond')">Onderhoud</button></div></div>
+                <div id="mcc-puttMedium" class="mcc"><div class="mcc-head"><div class="mcc-name">🎱 Putt Medium (3–6m)</div></div><div class="mcc-btns"><button class="mcb" id="mc-puttMedium-hoofd" onclick="setManFocus('puttMedium','hoofd')">Hoofdfocus</button><button class="mcb" id="mc-puttMedium-bij" onclick="setManFocus('puttMedium','bij')">Bijfocus</button><button class="mcb" id="mc-puttMedium-ond" onclick="setManFocus('puttMedium','ond')">Onderhoud</button></div></div>
+                <div id="mcc-puttLong" class="mcc"><div class="mcc-head"><div class="mcc-name">🎱 Putt Lang (6m+)</div></div><div class="mcc-btns"><button class="mcb" id="mc-puttLong-hoofd" onclick="setManFocus('puttLong','hoofd')">Hoofdfocus</button><button class="mcb" id="mc-puttLong-bij" onclick="setManFocus('puttLong','bij')">Bijfocus</button><button class="mcb" id="mc-puttLong-ond" onclick="setManFocus('puttLong','ond')">Onderhoud</button></div></div>
+                <div class="info-strip" style="margin-top:4px;">🔴 Hoofd = meeste oefeningen &nbsp;·&nbsp; 🟠 Bij = gemiddeld &nbsp;·&nbsp; 🟡 Onderhoud = 1 oefening</div>
+            </div>
+
+            <button class="btn btn-p" id="btn-save-data" onclick="saveData()" style="margin-top:12px;">💾 Opslaan &amp; Analyseer</button>
         </div>
-        <div id="sess-container"></div>
     </div>
-</div>
 
-<!-- ══════════ VOORTGANG ══════════ -->
-<div id="tab-voortgang" class="tab">
-    <div class="empty" id="pe"><div class="eico">📈</div><p>Hier zie je je voortgang zodra je meerdere metingen hebt.</p></div>
-    <div id="pc" style="display:none;"></div>
-</div>
+    <!-- ANALYSE TAB -->
+    <div id="tab-analyse" class="tab">
+        <div class="empty" id="ae"><div class="eico">📊</div><p>Voer eerst je data in op het Data-tabblad.</p></div>
+        <div id="ac" style="display:none;"></div>
+    </div>
 
-<!-- ══════════ CLUBS ══════════ -->
-<div id="tab-clubs" class="tab">
-    <div class="card">
-        <div class="ctit">🏌 Mijn Clubs</div>
-        <div class="info-strip">ℹ️ Carry = afstand door de lucht (uit Garmin). Total = werkelijke eindafstand op de baan.</div>
-        <div style="display:grid;grid-template-columns:1fr 60px 60px 34px;gap:6px;padding-bottom:6px;border-bottom:2px solid var(--bd);margin-bottom:4px;">
-            <span style="font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;">Club</span>
-            <span style="font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;text-align:center;">Carry</span>
-            <span style="font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;text-align:center;">Total</span>
-            <span></span>
+    <!-- TRAINING TAB -->
+    <div id="tab-training" class="tab">
+        <div class="empty" id="te"><div class="eico">🏌️</div><p>Sla eerst je data op voordat je een training genereert.</p></div>
+        <div id="tc" style="display:none;">
+            <div class="card">
+                <div class="ctit">⏱️ Beschikbare tijd</div>
+                <div class="dur" id="dur-disp">60 <span>min</span></div>
+                <input type="range" id="dur-slider" min="30" max="120" step="5" value="60" oninput="updDur()">
+                <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--mu);margin-top:4px;"><span>30 min</span><span>120 min</span></div>
+                <button class="btn btn-p" onclick="genSessions()" style="margin-top:12px;">🎯 Genereer 4 Sessies</button>
+            </div>
+            <div id="sess-container"></div>
         </div>
-        <div id="clubs-list"></div>
-        <button class="btn btn-s" onclick="addClub()" style="margin-top:12px;">+ Club toevoegen</button>
-        <button class="btn btn-p" onclick="saveClubs()" style="margin-top:8px;">💾 Clubs opslaan</button>
     </div>
-</div>
 
-<nav class="bnav">
-    <button class="nbtn active" id="nav-data"      onclick="showTab('data')">      <span class="ico">📋</span>Data</button>
-    <button class="nbtn"        id="nav-analyse"   onclick="showTab('analyse')">   <span class="ico">📊</span>Analyse</button>
-    <button class="nbtn"        id="nav-training"  onclick="showTab('training')">  <span class="ico">🏌️</span>Training</button>
-    <button class="nbtn"        id="nav-voortgang" onclick="showTab('voortgang')"> <span class="ico">📈</span>Voortgang</button>
-    <button class="nbtn"        id="nav-clubs"     onclick="showTab('clubs')">     <span class="ico">🏌</span>Clubs</button>
-</nav>
+    <!-- VOORTGANG TAB -->
+    <div id="tab-voortgang" class="tab">
+        <div class="empty" id="pe"><div class="eico">📈</div><p>Hier zie je je voortgang zodra je meerdere metingen hebt.</p></div>
+        <div id="pc" style="display:none;"></div>
+    </div>
+
+    <!-- CLUBS TAB -->
+    <div id="tab-clubs" class="tab">
+        <div class="card">
+            <div class="ctit">🏌 Mijn Clubs</div>
+            <div class="info-strip">ℹ️ Kies je club uit de lijst. Carry = afstand door de lucht. Total = werkelijke eindafstand op de baan. De app gebruikt dit voor clubadvies in je training!</div>
+            <div style="display:grid;grid-template-columns:1.5fr 60px 60px 34px;gap:6px;padding-bottom:6px;border-bottom:2px solid var(--bd);margin-bottom:4px;">
+                <span style="font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;">Club</span>
+                <span style="font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;text-align:center;">Carry</span>
+                <span style="font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;text-align:center;">Total</span>
+                <span></span>
+            </div>
+            <div id="clubs-list"></div>
+            <button class="btn btn-s" onclick="addClub()" style="margin-top:12px;">+ Club toevoegen</button>
+            <button class="btn btn-p" id="btn-save-clubs" onclick="saveClubs()" style="margin-top:8px;">💾 Clubs opslaan</button>
+        </div>
+    </div>
+
+    <nav class="bnav">
+        <button class="nbtn active" id="nav-data"      onclick="showTab('data')">      <span class="ico">📋</span>Data</button>
+        <button class="nbtn"        id="nav-analyse"   onclick="showTab('analyse')">   <span class="ico">📊</span>Analyse</button>
+        <button class="nbtn"        id="nav-training"  onclick="showTab('training')">  <span class="ico">🏌️</span>Training</button>
+        <button class="nbtn"        id="nav-voortgang" onclick="showTab('voortgang')"> <span class="ico">📈</span>Voortgang</button>
+        <button class="nbtn"        id="nav-clubs"     onclick="showTab('clubs')">     <span class="ico">🏌</span>Clubs</button>
+    </nav>
+</div>
 <div class="toast" id="toast"></div>
 
-<script>
+<!-- FIREBASE & APP SCRIPT -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
+// Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyAargrgsT3dl6XR0ENwL6NSRMQXq6jvbac",
+  authDomain: "golf-buddy-3a213.firebaseapp.com",
+  projectId: "golf-buddy-3a213",
+  storageBucket: "golf-buddy-3a213.firebasestorage.app",
+  messagingSenderId: "258029958782",
+  appId: "1:258029958782:web:66718a8fef2d07b6a2ca2f"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let currentUser = null;
+let entriesData = [];
+let clubsData = [];
+
 /* ═══════════════════════════════════════════════════════
-   OEFENINGEN DATABASE – 62 oefeningen
-   distHint: target carry-afstand in meters (approach only)
+   AUTH LOGIC
+═══════════════════════════════════════════════════════ */
+onAuthStateChanged(auth, async (user) => {
+    if (user) {
+        currentUser = user;
+        document.getElementById('auth-screen').style.display = 'none';
+        document.getElementById('main-app').style.display = 'block';
+        await loadUserData();
+        initAppUI();
+    } else {
+        currentUser = null;
+        entriesData = [];
+        clubsData = [];
+        document.getElementById('auth-screen').style.display = 'block';
+        document.getElementById('main-app').style.display = 'none';
+    }
+});
+
+window.handleLogin = async () => {
+    const e=document.getElementById('auth-email').value, p=document.getElementById('auth-pass').value;
+    const btn=document.getElementById('btn-login'); const err=document.getElementById('auth-err');
+    if(!e||!p) return err.textContent="Vul e-mail en wachtwoord in.";
+    try{ btn.innerHTML='<div class="loader"></div>'; btn.disabled=true; err.textContent=""; await signInWithEmailAndPassword(auth, e, p); }
+    catch(er){ err.textContent="Fout bij inloggen: " + er.message; btn.innerHTML='Inloggen'; btn.disabled=false; }
+};
+
+window.handleRegister = async () => {
+    const e=document.getElementById('auth-email').value, p=document.getElementById('auth-pass').value;
+    const btn=document.getElementById('btn-reg'); const err=document.getElementById('auth-err');
+    if(!e||!p) return err.textContent="Vul e-mail en wachtwoord in.";
+    try{ btn.innerHTML='<div class="loader"></div>'; btn.disabled=true; err.textContent=""; await createUserWithEmailAndPassword(auth, e, p); }
+    catch(er){ err.textContent="Fout bij registreren: " + er.message; btn.innerHTML='Account Aanmaken'; btn.disabled=false; }
+};
+
+window.handleLogout = async () => {
+    await signOut(auth);
+    window.location.reload();
+};
+
+async function loadUserData(){
+    try {
+        const docSnap = await getDoc(doc(db, "users", currentUser.uid));
+        if(docSnap.exists()){
+            const d = docSnap.data();
+            entriesData = d.entries || [];
+            clubsData = d.clubs || [];
+        }
+    } catch(e){ console.error("Error loading data:", e); toast("Fout bij laden data"); }
+}
+
+async function saveToDb(){
+    try {
+        await setDoc(doc(db, "users", currentUser.uid), { entries: entriesData, clubs: clubsData });
+    } catch(e){ console.error("Error saving data:", e); toast("Fout bij opslaan in cloud"); throw e; }
+}
+
+/* ═══════════════════════════════════════════════════════
+   OEFENINGEN DATABASE (62 stuks)
 ═══════════════════════════════════════════════════════ */
 const EX=[
- // ── DRIVE (15) ──
- {id:'d1',cat:'drive',name:'Alignment Stick – Swinglijn',dur:8,dif:'Gemakkelijk',
-  balls:20,ballType:'range',sets:1,goal:null,
-  desc:'Leg een alignment stick parallel aan je doellijn. Sla 20 ballen en let op dat je clubpad langs de stick loopt.',
-  tip:'💡 Sla met 70% kracht. Vorm gaat boven snelheid.'},
- {id:'d2',cat:'drive',name:'Slow Motion Herhaling',dur:6,dif:'Gemakkelijk',
-  balls:20,ballType:'range',sets:5,goal:null,
-  desc:'Sla in slow motion (±20% snelheid). 5 sets van 4 ballen. Focus op elke fase: grip → takeaway → top → impact → follow-through.',
-  tip:'💡 Traint spiergeheugen beter dan 20 volle snelle swings.'},
- {id:'d3',cat:'drive',name:'Tee Hoogte Variaties',dur:7,dif:'Gemakkelijk',
-  balls:15,ballType:'range',sets:1,goal:null,
-  desc:'5 ballen hoge tee → 5 lage tee → 5 mix. Voel het verschil in aanslaan (upswing vs flat contact).',
-  tip:'💡 Ideale driver: bovenste rand clubface = equator van de bal.'},
- {id:'d4',cat:'drive',name:'Voeten Bij Elkaar Drill',dur:6,dif:'Gemakkelijk',
-  balls:15,ballType:'range',sets:1,goal:null,
-  desc:'Sla 15 ballen met voeten vlak naast elkaar. Dwingt balans en rotatie af.',
-  tip:'💡 Wiebel je? Dan roteer je heupen te weinig.'},
- {id:'d5',cat:'drive',name:'¾ Swing Controle',dur:8,dif:'Gemiddeld',
-  balls:20,ballType:'range',sets:1,goal:null,
-  desc:'Gebruik slechts ¾ backswing. Focus op consistente impact en rechte balvlucht. 20 ballen.',
-  tip:'💡 Veel amateurs treffen de bal beter met ¾ swing.'},
- {id:'d6',cat:'drive',name:'Step-Through Drill',dur:7,dif:'Gemiddeld',
-  balls:15,ballType:'range',sets:3,goal:null,
-  desc:'Begin met gewicht op rechtervoet. Terwijl je neerswingt, stap voorwaarts met linkervoet. 3 sets van 5.',
-  tip:'💡 Goed als je "achterop blijft" met je gewicht bij impact.'},
- {id:'d7',cat:'drive',name:'Bucket Challenge: 5 Op Rij',dur:10,dif:'Gemiddeld',
-  balls:25,ballType:'range',sets:null,goal:'5 drives op rij in de fairway',
-  desc:'5 ballen moeten achter elkaar een imaginaire fairway (30m breed) raken. Bij een miss begin je opnieuw.',
-  tip:'💡 Simuleert echte rondedruk op de eerste tee.'},
- {id:'d8',cat:'drive',name:'Gate Drill',dur:7,dif:'Gemiddeld',
-  balls:20,ballType:'range',sets:1,goal:null,
-  desc:'Zet twee tees vlak naast de bal, net iets breder dan je club. Club mag ze niet raken = rechte swinglijn. 20 ballen.',
-  tip:'💡 Begin met tees verder en breng ze dichterbij naarmate je beter wordt.'},
- {id:'d9',cat:'drive',name:'Pause At Top Drill',dur:6,dif:'Gemakkelijk',
-  balls:15,ballType:'range',sets:1,goal:null,
-  desc:'Pauzeer 1 volle seconde bovenin je backswing. Voorkomt haast bij het neerkomen. 15 ballen.',
-  tip:'💡 Meest voorkomende fout: te snel neerkomen vanuit de top.'},
- {id:'d10',cat:'drive',name:'Eén-Hand Drill (Links)',dur:7,dif:'Moeilijk',
-  balls:20,ballType:'range',sets:2,goal:null,
-  desc:'2 sets van 10 ballen met alleen je linkerhand (gebruik een 7-ijzer of hybride). Traint de leidende hand.',
-  tip:'💡 De linkerhand stuurt de swing – de rechter geeft kracht.'},
- {id:'d11',cat:'drive',name:'Eén-Hand Drill (Rechts)',dur:7,dif:'Moeilijk',
-  balls:20,ballType:'range',sets:2,goal:null,
-  desc:'2 sets van 10 ballen met alleen je rechterhand. Traint kracht en rotatie. Korte backswing, volle follow-through.',
-  tip:'💡 Rechterhand te dominant? Dit oefent een evenwichtige bijdrage.'},
- {id:'d12',cat:'drive',name:'Afstandsdoelwit Series',dur:9,dif:'Gemiddeld',
-  balls:15,ballType:'range',sets:1,goal:null,
-  desc:'5 ballen naar 100m → 5 naar 150m → 5 naar 200m. Let op consistentie per doelwit.',
-  tip:'💡 Kalibreer je afstandsgevoel elke sessie opnieuw.'},
- {id:'d13',cat:'drive',name:'Fairway Nauwkeurigheid Test',dur:8,dif:'Gemiddeld',
-  balls:20,ballType:'range',sets:null,goal:'≥ 10/20 ballen in de fairway',
-  desc:'Sla 20 ballen en houdt bij hoeveel een imaginaire fairway (30m breed) raken. Streef naar ≥ 10/20.',
-  tip:'💡 Nauwkeurigheid > afstand op de meeste holes.'},
- {id:'d14',cat:'drive',name:'Impact Bag Training',dur:6,dif:'Gemakkelijk',
-  balls:0,ballType:'none',sets:3,goal:null,
-  desc:'Geen ballen nodig. Sla met hands-first positie tegen een opgerolde handdoek. 3 sets van 10 herhalingen.',
-  tip:'💡 Meest onderschatte trainingshulp voor de volle swing.'},
- {id:'d15',cat:'drive',name:'Hips Lead Challenge',dur:7,dif:'Moeilijk',
-  balls:15,ballType:'range',sets:3,goal:null,
-  desc:'3 sets van 5 ballen. Start de downswing bewust met heupdraai (NIET schouders). Heupen gaan altijd eerst.',
-  tip:'💡 Heupen leiden = meer power + minder slice.'},
+ {id:'d1',cat:'drive',name:'Alignment Stick – Swinglijn',dur:8,dif:'Gemakkelijk',balls:20,ballType:'range',sets:1,goal:null,desc:'Leg een alignment stick parallel aan je doellijn. Sla 20 ballen en let op dat je clubpad langs de stick loopt.',tip:'💡 Sla met 70% kracht. Vorm gaat boven snelheid.'},
+ {id:'d2',cat:'drive',name:'Slow Motion Herhaling',dur:6,dif:'Gemakkelijk',balls:20,ballType:'range',sets:5,goal:null,desc:'Sla in slow motion (±20% snelheid). 5 sets van 4 ballen. Focus op elke fase: grip → takeaway → top → impact → follow-through.',tip:'💡 Traint spiergeheugen beter dan 20 volle snelle swings.'},
+ {id:'d3',cat:'drive',name:'Tee Hoogte Variaties',dur:7,dif:'Gemakkelijk',balls:15,ballType:'range',sets:1,goal:null,desc:'5 ballen hoge tee → 5 lage tee → 5 mix. Voel het verschil in aanslaan (upswing vs flat contact).',tip:'💡 Ideale driver: bovenste rand clubface = equator van de bal.'},
+ {id:'d4',cat:'drive',name:'Voeten Bij Elkaar Drill',dur:6,dif:'Gemakkelijk',balls:15,ballType:'range',sets:1,goal:null,desc:'Sla 15 ballen met voeten vlak naast elkaar. Dwingt balans en rotatie af.',tip:'💡 Wiebel je? Dan roteer je heupen te weinig.'},
+ {id:'d5',cat:'drive',name:'¾ Swing Controle',dur:8,dif:'Gemiddeld',balls:20,ballType:'range',sets:1,goal:null,desc:'Gebruik slechts ¾ backswing. Focus op consistente impact en rechte balvlucht. 20 ballen.',tip:'💡 Veel amateurs treffen de bal beter met ¾ swing.'},
+ {id:'d6',cat:'drive',name:'Step-Through Drill',dur:7,dif:'Gemiddeld',balls:15,ballType:'range',sets:3,goal:null,desc:'Begin met gewicht op rechtervoet. Terwijl je neerswingt, stap voorwaarts met linkervoet. 3 sets van 5.',tip:'💡 Goed als je "achterop blijft" met je gewicht bij impact.'},
+ {id:'d7',cat:'drive',name:'Bucket Challenge: 5 Op Rij',dur:10,dif:'Gemiddeld',balls:25,ballType:'range',sets:null,goal:'5 drives op rij in de fairway',desc:'5 ballen moeten achter elkaar een imaginaire fairway (30m breed) raken. Bij een miss begin je opnieuw.',tip:'💡 Simuleert echte rondedruk op de eerste tee.'},
+ {id:'d8',cat:'drive',name:'Gate Drill',dur:7,dif:'Gemiddeld',balls:20,ballType:'range',sets:1,goal:null,desc:'Zet twee tees vlak naast de bal, net iets breder dan je club. Club mag ze niet raken = rechte swinglijn. 20 ballen.',tip:'💡 Begin met tees verder en breng ze dichterbij naarmate je beter wordt.'},
+ {id:'d9',cat:'drive',name:'Pause At Top Drill',dur:6,dif:'Gemakkelijk',balls:15,ballType:'range',sets:1,goal:null,desc:'Pauzeer 1 volle seconde bovenin je backswing. Voorkomt haast bij het neerkomen. 15 ballen.',tip:'💡 Meest voorkomende fout: te snel neerkomen vanuit de top.'},
+ {id:'d10',cat:'drive',name:'Eén-Hand Drill (Links)',dur:7,dif:'Moeilijk',balls:20,ballType:'range',sets:2,goal:null,desc:'2 sets van 10 ballen met alleen je linkerhand (gebruik een 7-ijzer of hybride). Traint de leidende hand.',tip:'💡 De linkerhand stuurt de swing – de rechter geeft kracht.'},
+ {id:'d11',cat:'drive',name:'Eén-Hand Drill (Rechts)',dur:7,dif:'Moeilijk',balls:20,ballType:'range',sets:2,goal:null,desc:'2 sets van 10 ballen met alleen je rechterhand. Traint kracht en rotatie. Korte backswing, volle follow-through.',tip:'💡 Rechterhand te dominant? Dit oefent een evenwichtige bijdrage.'},
+ {id:'d12',cat:'drive',name:'Afstandsdoelwit Series',dur:9,dif:'Gemiddeld',balls:15,ballType:'range',sets:1,goal:null,desc:'5 ballen naar 100m → 5 naar 150m → 5 naar 200m. Let op consistentie per doelwit.',tip:'💡 Kalibreer je afstandsgevoel elke sessie opnieuw.'},
+ {id:'d13',cat:'drive',name:'Fairway Nauwkeurigheid Test',dur:8,dif:'Gemiddeld',balls:20,ballType:'range',sets:null,goal:'≥ 10/20 ballen in de fairway',desc:'Sla 20 ballen en houdt bij hoeveel een imaginaire fairway (30m breed) raken. Streef naar ≥ 10/20.',tip:'💡 Nauwkeurigheid > afstand op de meeste holes.'},
+ {id:'d14',cat:'drive',name:'Impact Bag Training',dur:6,dif:'Gemakkelijk',balls:0,ballType:'none',sets:3,goal:null,desc:'Geen ballen nodig. Sla met hands-first positie tegen een opgerolde handdoek. 3 sets van 10 herhalingen.',tip:'💡 Meest onderschatte trainingshulp voor de volle swing.'},
+ {id:'d15',cat:'drive',name:'Hips Lead Challenge',dur:7,dif:'Moeilijk',balls:15,ballType:'range',sets:3,goal:null,desc:'3 sets van 5 ballen. Start de downswing bewust met heupdraai (NIET schouders). Heupen gaan altijd eerst.',tip:'💡 Heupen leiden = meer power + minder slice.'},
 
- // ── APPROACH (12) ──
- {id:'a1',cat:'approach',distHint:null,name:'9-to-9 Drill',dur:8,dif:'Gemakkelijk',
-  balls:20,ballType:'range',sets:1,goal:null,
-  desc:'Korte swing: backswing tot handenhoogte (9 uur), follow-through tot handenhoogte (3 uur). 20 ballen. Focus: zuivere impact vóór de bal.',
-  tip:'💡 Profis beginnen elke sessie hier. Gevoel voor "hitting down".'},
- {id:'a2',cat:'approach',distHint:null,name:'Divot Before Ball Drill',dur:7,dif:'Gemiddeld',
-  balls:15,ballType:'range',sets:1,goal:null,
-  desc:'Plak een stuk tape 5cm vóór de bal. Je impact moet beginnen nadat je over de tape bent. 15 ballen.',
-  tip:'💡 Ijzers zijn bedoeld om naar beneden te slaan – nooit te "scoopen".'},
- {id:'a3',cat:'approach',distHint:150,name:'7-IJzer Afstandscontrole',dur:9,dif:'Gemiddeld',
-  balls:20,ballType:'range',sets:null,goal:'spreiding van 20 ballen < 15m',
-  desc:'Sla 20 ballen op ±150m en noteer de spreiding. Streef naar een spreidingszone < 15m. Elke sessie bijhouden.',
-  tip:'💡 Ken je exacte afstanden per club – cruciaal voor lay-ups.'},
- {id:'a4',cat:'approach',distHint:null,name:'Vlag als Doelwit',dur:8,dif:'Gemiddeld',
-  balls:10,ballType:'range',sets:null,goal:'gemiddeld < 10m van de vlag',
-  desc:'Kies een specifieke vlag. 10 ballen, noteer gemiddelde afstand tot de vlag.',
-  tip:'💡 Train altijd naar een specifiek doelwit – nooit "zomaar slaan".'},
- {id:'a5',cat:'approach',distHint:91,name:'100 Yard Benchmark',dur:8,dif:'Gemiddeld',
-  balls:10,ballType:'range',sets:null,goal:'≥ 7/10 ballen binnen 15m van vlag',
-  desc:'Elke sessie: 10 ballen van 100 yard (91m). Noteer score. Dit is je vaste ijkmeter over weken.',
-  tip:'💡 De 100-yard shot is de meest gespeelde approach.'},
- {id:'a6',cat:'approach',distHint:130,name:'Punch Shot (Lage Vlucht)',dur:7,dif:'Gemiddeld',
-  balls:15,ballType:'range',sets:1,goal:null,
-  desc:'Korte follow-through, handen voor de bal, gewicht links. Bal vliegt laag. 15 ballen. Essentieel bij wind.',
-  tip:'💡 Punch = minder backswing + 70% kracht + gewicht altijd links.'},
- {id:'a7',cat:'approach',distHint:150,name:'Fade / Draw Controle',dur:9,dif:'Moeilijk',
-  balls:20,ballType:'range',sets:2,goal:null,
-  desc:'2 sets: 5 ballen bewuste fade + 5 ballen bewuste draw. Curvecontrole is essentieel voor doelwitbendering.',
-  tip:'💡 Fade: open stance + open face. Draw: gesloten stance + inside-out pad.'},
- {id:'a8',cat:'approach',distHint:100,name:'Half Swing Nauwkeurigheid',dur:7,dif:'Gemakkelijk',
-  balls:15,ballType:'range',sets:1,goal:null,
-  desc:'Half swing (backswing tot schouderhoogte). 15 ballen. Welke afstand en spreiding geeft dit?',
-  tip:'💡 Half swing = meer controle in krappe situaties.'},
- {id:'a9',cat:'approach',distHint:180,name:'Hybride Approach (180m)',dur:8,dif:'Gemiddeld',
-  balls:15,ballType:'range',sets:1,goal:null,
-  desc:'Sla 15 ballen met hybride of hout van ±180m. Focus op contact en nauwkeurigheid.',
-  tip:'💡 Vervang lange ijzers door hybriden als je GIR laag is.'},
- {id:'a10',cat:'approach',distHint:null,name:'Iron Consistency Tracker',dur:10,dif:'Gemiddeld',
-  balls:30,ballType:'range',sets:1,goal:null,
-  desc:'10 ballen per club: 7-ijzer → 8-ijzer → 9-ijzer (30 ballen). Noteer je beste 7/10 per club.',
-  tip:'💡 Consistentie bouw je alleen door meting en herhaling.'},
- {id:'a11',cat:'approach',distHint:120,name:'GIR Simulatie',dur:9,dif:'Moeilijk',
-  balls:9,ballType:'range',sets:null,goal:'3/3 greens geraakt per set',
-  desc:'3 scenarios: 150m, 125m, 90m (3 ballen elk). Noteer: green geraakt? Ja/Nee. Herhaal de set.',
-  tip:'💡 Game-realistische oefening geeft het meeste transfereffect.'},
- {id:'a12',cat:'approach',distHint:135,name:'Cirkel van 6 Meter',dur:8,dif:'Gemiddeld',
-  balls:10,ballType:'range',sets:null,goal:'≥ 7/10 ballen binnen 6m van vlag',
-  desc:'Sla 10 approach shots naar een doelgebied van 6m rondom een vlag.',
-  tip:'💡 6 meter is een realistische GIR-definitie voor amateurs.'},
+ {id:'a1',cat:'approach',distHint:null,name:'9-to-9 Drill',dur:8,dif:'Gemakkelijk',balls:20,ballType:'range',sets:1,goal:null,desc:'Korte swing: backswing tot handenhoogte (9 uur), follow-through tot handenhoogte (3 uur). 20 ballen. Focus: zuivere impact vóór de bal.',tip:'💡 Profis beginnen elke sessie hier. Gevoel voor "hitting down".'},
+ {id:'a2',cat:'approach',distHint:null,name:'Divot Before Ball Drill',dur:7,dif:'Gemiddeld',balls:15,ballType:'range',sets:1,goal:null,desc:'Plak een stuk tape 5cm vóór de bal. Je impact moet beginnen nadat je over de tape bent. 15 ballen.',tip:'💡 Ijzers zijn bedoeld om naar beneden te slaan – nooit te "scoopen".'},
+ {id:'a3',cat:'approach',distHint:150,name:'7-IJzer Afstandscontrole',dur:9,dif:'Gemiddeld',balls:20,ballType:'range',sets:null,goal:'spreiding van 20 ballen < 15m',desc:'Sla 20 ballen op ±150m en noteer de spreiding. Streef naar een spreidingszone < 15m. Elke sessie bijhouden.',tip:'💡 Ken je exacte afstanden per club – cruciaal voor lay-ups.'},
+ {id:'a4',cat:'approach',distHint:null,name:'Vlag als Doelwit',dur:8,dif:'Gemiddeld',balls:10,ballType:'range',sets:null,goal:'gemiddeld < 10m van de vlag',desc:'Kies een specifieke vlag. 10 ballen, noteer gemiddelde afstand tot de vlag.',tip:'💡 Train altijd naar een specifiek doelwit – nooit "zomaar slaan".'},
+ {id:'a5',cat:'approach',distHint:91,name:'100 Yard Benchmark',dur:8,dif:'Gemiddeld',balls:10,ballType:'range',sets:null,goal:'≥ 7/10 ballen binnen 15m van vlag',desc:'Elke sessie: 10 ballen van 100 yard (91m). Noteer score. Dit is je vaste ijkmeter over weken.',tip:'💡 De 100-yard shot is de meest gespeelde approach.'},
+ {id:'a6',cat:'approach',distHint:130,name:'Punch Shot (Lage Vlucht)',dur:7,dif:'Gemiddeld',balls:15,ballType:'range',sets:1,goal:null,desc:'Korte follow-through, handen voor de bal, gewicht links. Bal vliegt laag. 15 ballen. Essentieel bij wind.',tip:'💡 Punch = minder backswing + 70% kracht + gewicht altijd links.'},
+ {id:'a7',cat:'approach',distHint:150,name:'Fade / Draw Controle',dur:9,dif:'Moeilijk',balls:20,ballType:'range',sets:2,goal:null,desc:'2 sets: 5 ballen bewuste fade + 5 ballen bewuste draw. Curvecontrole is essentieel voor doelwitbendering.',tip:'💡 Fade: open stance + open face. Draw: gesloten stance + inside-out pad.'},
+ {id:'a8',cat:'approach',distHint:100,name:'Half Swing Nauwkeurigheid',dur:7,dif:'Gemakkelijk',balls:15,ballType:'range',sets:1,goal:null,desc:'Half swing (backswing tot schouderhoogte). 15 ballen. Welke afstand en spreiding geeft dit?',tip:'💡 Half swing = meer controle in krappe situaties.'},
+ {id:'a9',cat:'approach',distHint:180,name:'Hybride Approach (180m)',dur:8,dif:'Gemiddeld',balls:15,ballType:'range',sets:1,goal:null,desc:'Sla 15 ballen met hybride of hout van ±180m. Focus op contact en nauwkeurigheid.',tip:'💡 Vervang lange ijzers door hybriden als je GIR laag is.'},
+ {id:'a10',cat:'approach',distHint:null,name:'Iron Consistency Tracker',dur:10,dif:'Gemiddeld',balls:30,ballType:'range',sets:1,goal:null,desc:'10 ballen per club: 7-ijzer → 8-ijzer → 9-ijzer (30 ballen). Noteer je beste 7/10 per club.',tip:'💡 Consistentie bouw je alleen door meting en herhaling.'},
+ {id:'a11',cat:'approach',distHint:120,name:'GIR Simulatie',dur:9,dif:'Moeilijk',balls:9,ballType:'range',sets:null,goal:'3/3 greens geraakt per set',desc:'3 scenarios: 150m, 125m, 90m (3 ballen elk). Noteer: green geraakt? Ja/Nee. Herhaal de set.',tip:'💡 Game-realistische oefening geeft het meeste transfereffect.'},
+ {id:'a12',cat:'approach',distHint:135,name:'Cirkel van 6 Meter',dur:8,dif:'Gemiddeld',balls:10,ballType:'range',sets:null,goal:'≥ 7/10 ballen binnen 6m van vlag',desc:'Sla 10 approach shots naar een doelgebied van 6m rondom een vlag.',tip:'💡 6 meter is een realistische GIR-definitie voor amateurs.'},
 
- // ── CHIP/PITCH (15) ──
- {id:'c1',cat:'chip',name:'Bump-and-Run (8-IJzer)',dur:7,dif:'Gemakkelijk',
-  balls:20,ballType:'own',sets:1,goal:null,
-  desc:'Chip met 8-ijzer. Lagere balvlucht, meer roll. 20 chips vanuit verschillende posities rondom de practice green.',
-  tip:'💡 Bump-and-run is de veiligste chip – minder risico dan lob-wedge.'},
- {id:'c2',cat:'chip',name:'Lob Wedge Precisie',dur:8,dif:'Gemiddeld',
-  balls:20,ballType:'own',sets:1,goal:null,
-  desc:'Korte precisie chips met lob-wedge (60°). Focus op een specifieke landingszone. 20 chips.',
-  tip:'💡 Chip naar een landingszone – de bal rolt daarna vanzelf.'},
- {id:'c3',cat:'chip',name:'Cirkel van 3 Meter',dur:8,dif:'Gemiddeld',
-  balls:15,ballType:'own',sets:null,goal:'≥ 10/15 ballen binnen 3m van hole',
-  desc:'Chip 15 ballen – allemaal moeten binnen 3 meter van de hole stoppen. Noteer score.',
-  tip:'💡 3 meter = tap-in zone. Dit is je veiligheidszone voor up-and-downs.'},
- {id:'c4',cat:'chip',name:'Flop Shot Training',dur:9,dif:'Moeilijk',
-  balls:10,ballType:'own',sets:1,goal:null,
-  desc:'Open stance, open face, bal vooraan. Sla 10 hoge chips over een denkbeeldig obstakel.',
-  tip:'💡 Flop shot = open face + extra acceleratie. Nooit decelereren!'},
- {id:'c5',cat:'chip',name:'Tight Lie Chip',dur:7,dif:'Moeilijk',
-  balls:15,ballType:'own',sets:1,goal:null,
-  desc:'Chip van harde mat of kaal gras (tight lie). 15 chips. Bal iets achteraan in stance, handen voor de bal.',
-  tip:'💡 Tight lie = bal achteraan + handen altijd voor.'},
- {id:'c6',cat:'chip',name:'Helling Chips (Op/Neer)',dur:8,dif:'Moeilijk',
-  balls:10,ballType:'own',sets:2,goal:null,
-  desc:'Set 1: 5 chips van opgaande helling. Set 2: 5 chips van neergaande helling. Pas stand en balpositionering aan.',
-  tip:'💡 Opgaand: bal voor in stance. Neergaand: bal achter in stance.'},
- {id:'c7',cat:'chip',name:'Up-and-Down Game (9 Holes)',dur:12,dif:'Gemiddeld',
-  balls:3,ballType:'own',sets:null,goal:'9 holes spelen, up-and-down score bijhouden',
-  desc:'Speel een 9-hole chip-putt ronde rondom de practice green (3 eigen ballen).',
-  tip:'💡 Dit is de meest game-realistische oefening voor de korte game.'},
- {id:'c8',cat:'chip',name:'Landing Zone Drill',dur:7,dif:'Gemiddeld',
-  balls:15,ballType:'own',sets:null,goal:'chip landt IN de gemarkeerde zone',
-  desc:'Markeer een 1×1m landingszone met tees. Chip 15 ballen. Doel: bal moet IN die zone landen.',
-  tip:'💡 Landingspuntcontrole is de sleutel tot consistente chipping.'},
- {id:'c9',cat:'chip',name:'Clockwork Chip',dur:10,dif:'Gemiddeld',
-  balls:12,ballType:'own',sets:1,goal:null,
-  desc:'Chip vanuit 12 posities rondom de hole (als klokwijzers, 2m afstand). Elke positie = andere hoek.',
-  tip:'💡 Elke positie heeft andere break en ligkans – traint aanpassingsvermogen.'},
- {id:'c10',cat:'chip',name:'Rough Chip Oefening',dur:7,dif:'Moeilijk',
-  balls:15,ballType:'own',sets:1,goal:null,
-  desc:'Leg de bal op langere mat (rough simulatie). Oefen 15 chips. Open face en meer acceleratie vereist.',
-  tip:'💡 Rough = meer loft + meer kracht + kortere follow-through.'},
- {id:'c11',cat:'chip',name:'60° vs 56° Vergelijking',dur:8,dif:'Gemiddeld',
-  balls:10,ballType:'own',sets:2,goal:null,
-  desc:'Set 1: 5 chips met 60° (lob). Set 2: 5 chips met 56° (sand wedge). Zelfde situatie. Voel het verschil.',
-  tip:'💡 Ken welke club welke roll geeft – dan kies je bewuster.'},
- {id:'c12',cat:'chip',name:'Pitch Afstandsreeks',dur:9,dif:'Gemiddeld',
-  balls:15,ballType:'own',sets:3,goal:null,
-  desc:'3 sets: 5 ballen van 10m → 5 van 20m → 5 van 30m. Afstandscontrole bij pitches.',
-  tip:'💡 Afstand controleer je met armlengte, niet met zwingsnelheid.'},
- {id:'c13',cat:'chip',name:'Eén-Arm Chip (Links)',dur:6,dif:'Moeilijk',
-  balls:10,ballType:'own',sets:1,goal:null,
-  desc:'Chip met alleen je linkerhand. 10 ballen. Kleine, beheerste beweging.',
-  tip:'💡 Verbetert de non-dominante hand die bij veel golfers passief is.'},
- {id:'c14',cat:'chip',name:'Fringe: Chippen of Putten?',dur:7,dif:'Gemiddeld',
-  balls:8,ballType:'own',sets:1,goal:null,
-  desc:'Leg 8 ballen op de fringe. Oefen de beslissing: chippen of putten? Probeer beide methodes.',
-  tip:'💡 Helder pad → putter. Ongelijk gras → chip.'},
- {id:'c15',cat:'chip',name:'Bunker Basisoefening',dur:8,dif:'Moeilijk',
-  balls:0,ballType:'none',sets:null,goal:'12 bunkerswings met juiste techniek',
-  desc:'Geen ballen nodig. Open face, open stance, swingoefening 3cm achter denkbeeldige bal. 12 herhalingen.',
-  tip:'💡 Denk "zand tussen club en bal" bij elke bunkerslag.'},
+ {id:'c1',cat:'chip',name:'Bump-and-Run (8-IJzer)',dur:7,dif:'Gemakkelijk',balls:20,ballType:'own',sets:1,goal:null,desc:'Chip met 8-ijzer. Lagere balvlucht, meer roll. 20 chips vanuit verschillende posities rondom de practice green.',tip:'💡 Bump-and-run is de veiligste chip – minder risico dan lob-wedge.'},
+ {id:'c2',cat:'chip',name:'Lob Wedge Precisie',dur:8,dif:'Gemiddeld',balls:20,ballType:'own',sets:1,goal:null,desc:'Korte precisie chips met lob-wedge (60°). Focus op een specifieke landingszone. 20 chips.',tip:'💡 Chip naar een landingszone – de bal rolt daarna vanzelf.'},
+ {id:'c3',cat:'chip',name:'Cirkel van 3 Meter',dur:8,dif:'Gemiddeld',balls:15,ballType:'own',sets:null,goal:'≥ 10/15 ballen binnen 3m van hole',desc:'Chip 15 ballen – allemaal moeten binnen 3 meter van de hole stoppen. Noteer score.',tip:'💡 3 meter = tap-in zone. Dit is je veiligheidszone voor up-and-downs.'},
+ {id:'c4',cat:'chip',name:'Flop Shot Training',dur:9,dif:'Moeilijk',balls:10,ballType:'own',sets:1,goal:null,desc:'Open stance, open face, bal vooraan. Sla 10 hoge chips over een denkbeeldig obstakel.',tip:'💡 Flop shot = open face + extra acceleratie. Nooit decelereren!'},
+ {id:'c5',cat:'chip',name:'Tight Lie Chip',dur:7,dif:'Moeilijk',balls:15,ballType:'own',sets:1,goal:null,desc:'Chip van harde mat of kaal gras (tight lie). 15 chips. Bal iets achteraan in stance, handen voor de bal.',tip:'💡 Tight lie = bal achteraan + handen altijd voor.'},
+ {id:'c6',cat:'chip',name:'Helling Chips (Op/Neer)',dur:8,dif:'Moeilijk',balls:10,ballType:'own',sets:2,goal:null,desc:'Set 1: 5 chips van opgaande helling. Set 2: 5 chips van neergaande helling. Pas stand en balpositionering aan.',tip:'💡 Opgaand: bal voor in stance. Neergaand: bal achter in stance.'},
+ {id:'c7',cat:'chip',name:'Up-and-Down Game (9 Holes)',dur:12,dif:'Gemiddeld',balls:3,ballType:'own',sets:null,goal:'9 holes spelen, up-and-down score bijhouden',desc:'Speel een 9-hole chip-putt ronde rondom de practice green (3 eigen ballen).',tip:'💡 Dit is de meest game-realistische oefening voor de korte game.'},
+ {id:'c8',cat:'chip',name:'Landing Zone Drill',dur:7,dif:'Gemiddeld',balls:15,ballType:'own',sets:null,goal:'chip landt IN de gemarkeerde zone',desc:'Markeer een 1×1m landingszone met tees. Chip 15 ballen. Doel: bal moet IN die zone landen.',tip:'💡 Landingspuntcontrole is de sleutel tot consistente chipping.'},
+ {id:'c9',cat:'chip',name:'Clockwork Chip',dur:10,dif:'Gemiddeld',balls:12,ballType:'own',sets:1,goal:null,desc:'Chip vanuit 12 posities rondom de hole (als klokwijzers, 2m afstand). Elke positie = andere hoek.',tip:'💡 Elke positie heeft andere break en ligkans – traint aanpassingsvermogen.'},
+ {id:'c10',cat:'chip',name:'Rough Chip Oefening',dur:7,dif:'Moeilijk',balls:15,ballType:'own',sets:1,goal:null,desc:'Leg de bal op langere mat (rough simulatie). Oefen 15 chips. Open face en meer acceleratie vereist.',tip:'💡 Rough = meer loft + meer kracht + kortere follow-through.'},
+ {id:'c11',cat:'chip',name:'60° vs 56° Vergelijking',dur:8,dif:'Gemiddeld',balls:10,ballType:'own',sets:2,goal:null,desc:'Set 1: 5 chips met 60° (lob). Set 2: 5 chips met 56° (sand wedge). Zelfde situatie. Voel het verschil.',tip:'💡 Ken welke club welke roll geeft – dan kies je bewuster.'},
+ {id:'c12',cat:'chip',name:'Pitch Afstandsreeks',dur:9,dif:'Gemiddeld',balls:15,ballType:'own',sets:3,goal:null,desc:'3 sets: 5 ballen van 10m → 5 van 20m → 5 van 30m. Afstandscontrole bij pitches.',tip:'💡 Afstand controleer je met armlengte, niet met zwingsnelheid.'},
+ {id:'c13',cat:'chip',name:'Eén-Arm Chip (Links)',dur:6,dif:'Moeilijk',balls:10,ballType:'own',sets:1,goal:null,desc:'Chip met alleen je linkerhand. 10 ballen. Kleine, beheerste beweging.',tip:'💡 Verbetert de non-dominante hand die bij veel golfers passief is.'},
+ {id:'c14',cat:'chip',name:'Fringe: Chippen of Putten?',dur:7,dif:'Gemiddeld',balls:8,ballType:'own',sets:1,goal:null,desc:'Leg 8 ballen op de fringe. Oefen de beslissing: chippen of putten? Probeer beide methodes.',tip:'💡 Helder pad → putter. Ongelijk gras → chip.'},
+ {id:'c15',cat:'chip',name:'Bunker Basisoefening',dur:8,dif:'Moeilijk',balls:0,ballType:'none',sets:null,goal:'12 bunkerswings met juiste techniek',desc:'Geen ballen nodig. Open face, open stance, swingoefening 3cm achter denkbeeldige bal. 12 herhalingen.',tip:'💡 Denk "zand tussen club en bal" bij elke bunkerslag.'},
 
- // ── PUTT KORT 0-2m (8) ──
- {id:'ps1',cat:'puttShort',name:'1-Meter Cirkel',dur:8,dif:'Gemakkelijk',
-  balls:6,ballType:'own',sets:3,goal:null,
-  desc:'Set 1: 6 ballen op 1m cirkel (maak alle 6). Set 2: 1,5m. Set 3: 2m. Stop zodra je er een mist.',
-  tip:'💡 Basistest voor korte putt-zekerheid. Profis maken 100% van 1m.'},
- {id:'ps2',cat:'puttShort',name:'Gate Drill (Tees als Poortje)',dur:7,dif:'Gemakkelijk',
-  balls:9,ballType:'own',sets:null,goal:'putter raakt de tees niet',
-  desc:'Zet twee tees iets breder dan je putter face op weg naar de hole. 9 putts van 1–1,5m.',
-  tip:'💡 Als je de tees raakt, beweegt je putter niet recht door de bal.'},
- {id:'ps3',cat:'puttShort',name:'String Line Training',dur:8,dif:'Gemiddeld',
-  balls:10,ballType:'own',sets:1,goal:null,
-  desc:'Span een stukje draad van bal naar hole. Sla 10 putts langs de draad voor perfecte lijnvisualisatie.',
-  tip:'💡 String Line is het meest effectieve hulpmiddel voor putterlijngevoel.'},
- {id:'ps4',cat:'puttShort',name:'Make 10 Op Rij Challenge',dur:9,dif:'Moeilijk',
-  balls:10,ballType:'own',sets:null,goal:'10 putts op rij van 1m (bij miss: opnieuw)',
-  desc:'10 putts achter elkaar van 1m. Elke miss = opnieuw bij 0 beginnen. Simuleert druk van korte putts.',
-  tip:'💡 Routine is de sleutel. Pre-shot routine moet altijd identiek zijn.'},
- {id:'ps5',cat:'puttShort',name:'Pre-Shot Routine Herhaling',dur:6,dif:'Gemakkelijk',
-  balls:20,ballType:'own',sets:4,goal:null,
-  desc:'4 sets van 5 putts. Focus puur op vaste routine: aanlijn → 2 blikken → stance → sla.',
-  tip:'💡 Routine verwijdert twijfel. Twijfel verstoort het tempo.'},
- {id:'ps6',cat:'puttShort',name:'Ogen Dicht Putt',dur:6,dif:'Gemiddeld',
-  balls:10,ballType:'own',sets:1,goal:null,
-  desc:'Lees de lijn, sla de putt met ogen dicht. Hoor de bal. 10 putts. Ontwikkelt puur gevoel.',
-  tip:'💡 Ogen dicht = meer intuïtie, minder technische over-analyse.'},
- {id:'ps7',cat:'puttShort',name:'Metronoom Tempo',dur:7,dif:'Gemiddeld',
-  balls:20,ballType:'own',sets:1,goal:null,
-  desc:'Gebruik een metronoom-app (80 BPM). Backswing op beat 1, impact op beat 2. 20 putts.',
-  tip:'💡 Ideale puttverhouding: backswing en follow-through even lang (1:1).'},
- {id:'ps8',cat:'puttShort',name:'Face Impact Check',dur:6,dif:'Gemakkelijk',
-  balls:15,ballType:'own',sets:1,goal:null,
-  desc:'Plak tape op het midden van je putter face. Sla 15 putts. Zie je exact waar je impact valt.',
-  tip:'💡 Impact buiten het sweetspot = verlies van afstandscontrole en lijn.'},
+ {id:'ps1',cat:'puttShort',name:'1-Meter Cirkel',dur:8,dif:'Gemakkelijk',balls:6,ballType:'own',sets:3,goal:null,desc:'Set 1: 6 ballen op 1m cirkel (maak alle 6). Set 2: 1,5m. Set 3: 2m. Stop zodra je er een mist.',tip:'💡 Basistest voor korte putt-zekerheid. Profis maken 100% van 1m.'},
+ {id:'ps2',cat:'puttShort',name:'Gate Drill (Tees als Poortje)',dur:7,dif:'Gemakkelijk',balls:9,ballType:'own',sets:null,goal:'putter raakt de tees niet',desc:'Zet twee tees iets breder dan je putter face op weg naar de hole. 9 putts van 1–1,5m.',tip:'💡 Als je de tees raakt, beweegt je putter niet recht door de bal.'},
+ {id:'ps3',cat:'puttShort',name:'String Line Training',dur:8,dif:'Gemiddeld',balls:10,ballType:'own',sets:1,goal:null,desc:'Span een stukje draad van bal naar hole. Sla 10 putts langs de draad voor perfecte lijnvisualisatie.',tip:'💡 String Line is het meest effectieve hulpmiddel voor putterlijngevoel.'},
+ {id:'ps4',cat:'puttShort',name:'Make 10 Op Rij Challenge',dur:9,dif:'Moeilijk',balls:10,ballType:'own',sets:null,goal:'10 putts op rij van 1m (bij miss: opnieuw)',desc:'10 putts achter elkaar van 1m. Elke miss = opnieuw bij 0 beginnen. Simuleert druk van korte putts.',tip:'💡 Routine is de sleutel. Pre-shot routine moet altijd identiek zijn.'},
+ {id:'ps5',cat:'puttShort',name:'Pre-Shot Routine Herhaling',dur:6,dif:'Gemakkelijk',balls:20,ballType:'own',sets:4,goal:null,desc:'4 sets van 5 putts. Focus puur op vaste routine: aanlijn → 2 blikken → stance → sla.',tip:'💡 Routine verwijdert twijfel. Twijfel verstoort het tempo.'},
+ {id:'ps6',cat:'puttShort',name:'Ogen Dicht Putt',dur:6,dif:'Gemiddeld',balls:10,ballType:'own',sets:1,goal:null,desc:'Lees de lijn, sla de putt met ogen dicht. Hoor de bal. 10 putts. Ontwikkelt puur gevoel.',tip:'💡 Ogen dicht = meer intuïtie, minder technische over-analyse.'},
+ {id:'ps7',cat:'puttShort',name:'Metronoom Tempo',dur:7,dif:'Gemiddeld',balls:20,ballType:'own',sets:1,goal:null,desc:'Gebruik een metronoom-app (80 BPM). Backswing op beat 1, impact op beat 2. 20 putts.',tip:'💡 Ideale puttverhouding: backswing en follow-through even lang (1:1).'},
+ {id:'ps8',cat:'puttShort',name:'Face Impact Check',dur:6,dif:'Gemakkelijk',balls:15,ballType:'own',sets:1,goal:null,desc:'Plak tape op het midden van je putter face. Sla 15 putts. Zie je exact waar je impact valt.',tip:'💡 Impact buiten het sweetspot = verlies van afstandscontrole en lijn.'},
 
- // ── PUTT MEDIUM 3-6m (6) ──
- {id:'pm1',cat:'puttMedium',name:'Ladder Drill (3-6m)',dur:9,dif:'Gemiddeld',
-  balls:4,ballType:'own',sets:null,goal:'elk in 1 putt (3m → 4m → 5m → 6m)',
-  desc:'4 ballen op 3m, 4m, 5m en 6m. Probeer elk in één putt. Als het lukt: herhaal de ladder.',
-  tip:'💡 Ladder drill is dé klassieke oefening voor afstandsgevoel bij medium putts.'},
- {id:'pm2',cat:'puttMedium',name:'2-Putt Zone Training',dur:8,dif:'Gemiddeld',
-  balls:10,ballType:'own',sets:null,goal:'≥ 8/10 putts stoppen binnen 1m van 5m',
-  desc:'Van 5m: eerste putt moet stoppen binnen 1m van hole. 10 pogingen.',
-  tip:'💡 Eerste putt op "tap-in afstand" = 3-putt voorkomen.'},
- {id:'pm3',cat:'puttMedium',name:'Break Lezen Training',dur:9,dif:'Moeilijk',
-  balls:8,ballType:'own',sets:1,goal:null,
-  desc:'Lees de lijn van achter de hole (laagste kant). Maak een voorspelling. Sla dan en vergelijk. 8 putts.',
-  tip:'💡 Lees altijd van de laagste kant. De bal breekt altijd naar het laagste punt.'},
- {id:'pm4',cat:'puttMedium',name:'9-Hole Putting Ronde',dur:15,dif:'Gemiddeld',
-  balls:1,ballType:'own',sets:null,goal:'9-hole ronde ≤ 9 putts totaal',
-  desc:'Speel een volledige 9-hole ronde op de practice green van ±4m. Score bijhouden.',
-  tip:'💡 Competitieve context traint beter dan losse oefening.'},
- {id:'pm5',cat:'puttMedium',name:'Target Putt (Poortje)',dur:8,dif:'Gemiddeld',
-  balls:15,ballType:'own',sets:null,goal:'putts door het poortje van 4m',
-  desc:'Zet twee tees 30cm van de hole als poortje. Van 4m: sla 15 putts door het poortje.',
-  tip:'💡 Maak het poortje smaller naarmate je beter wordt.'},
- {id:'pm6',cat:'puttMedium',name:'Afstandsgevoel Test',dur:7,dif:'Gemiddeld',
-  balls:10,ballType:'own',sets:1,goal:null,
-  desc:'Sluit ogen na het lezen, sla een putt van 5m. Open ogen: hoe ver over/kort? 10 herhalingen.',
-  tip:'💡 Dwingt je brein om afstandsgevoel intern te kalibreren.'},
+ {id:'pm1',cat:'puttMedium',name:'Ladder Drill (3-6m)',dur:9,dif:'Gemiddeld',balls:4,ballType:'own',sets:null,goal:'elk in 1 putt (3m → 4m → 5m → 6m)',desc:'4 ballen op 3m, 4m, 5m en 6m. Probeer elk in één putt. Als het lukt: herhaal de ladder.',tip:'💡 Ladder drill is dé klassieke oefening voor afstandsgevoel bij medium putts.'},
+ {id:'pm2',cat:'puttMedium',name:'2-Putt Zone Training',dur:8,dif:'Gemiddeld',balls:10,ballType:'own',sets:null,goal:'≥ 8/10 putts stoppen binnen 1m van 5m',desc:'Van 5m: eerste putt moet stoppen binnen 1m van hole. 10 pogingen.',tip:'💡 Eerste putt op "tap-in afstand" = 3-putt voorkomen.'},
+ {id:'pm3',cat:'puttMedium',name:'Break Lezen Training',dur:9,dif:'Moeilijk',balls:8,ballType:'own',sets:1,goal:null,desc:'Lees de lijn van achter de hole (laagste kant). Maak een voorspelling. Sla dan en vergelijk. 8 putts.',tip:'💡 Lees altijd van de laagste kant. De bal breekt altijd naar het laagste punt.'},
+ {id:'pm4',cat:'puttMedium',name:'9-Hole Putting Ronde',dur:15,dif:'Gemiddeld',balls:1,ballType:'own',sets:null,goal:'9-hole ronde ≤ 9 putts totaal',desc:'Speel een volledige 9-hole ronde op de practice green van ±4m. Score bijhouden.',tip:'💡 Competitieve context traint beter dan losse oefening.'},
+ {id:'pm5',cat:'puttMedium',name:'Target Putt (Poortje)',dur:8,dif:'Gemiddeld',balls:15,ballType:'own',sets:null,goal:'putts door het poortje van 4m',desc:'Zet twee tees 30cm van de hole als poortje. Van 4m: sla 15 putts door het poortje.',tip:'💡 Maak het poortje smaller naarmate je beter wordt.'},
+ {id:'pm6',cat:'puttMedium',name:'Afstandsgevoel Test',dur:7,dif:'Gemiddeld',balls:10,ballType:'own',sets:1,goal:null,desc:'Sluit ogen na het lezen, sla een putt van 5m. Open ogen: hoe ver over/kort? 10 herhalingen.',tip:'💡 Dwingt je brein om afstandsgevoel intern te kalibreren.'},
 
- // ── PUTT LANG 6m+ (6) ──
- {id:'pl1',cat:'puttLong',name:'Distance Ladder (6-12m)',dur:10,dif:'Gemiddeld',
-  balls:4,ballType:'own',sets:null,goal:'elke putt eindigt binnen 1m (6→8→10→12m)',
-  desc:'4 ballen op 6m, 8m, 10m, 12m. Elke putt moet eindigen binnen 1m van hole.',
-  tip:'💡 Van ver: focus op "stoppen dichtbij" – niet op "erin putten".'},
- {id:'pl2',cat:'puttLong',name:'Bucket Challenge (10m)',dur:8,dif:'Gemiddeld',
-  balls:10,ballType:'own',sets:null,goal:'alle 10 ballen eindigen binnen 1m van 10m',
-  desc:'Van 10m: alle 10 ballen moeten eindigen binnen 1m van hole.',
-  tip:'💡 Minder dan 1m = tap-in = 3-putt voorkomen.'},
- {id:'pl3',cat:'puttLong',name:'Cross-Slope Lag Putting',dur:9,dif:'Moeilijk',
-  balls:8,ballType:'own',sets:1,goal:null,
-  desc:'Sla 8 putts diagonaal over een helling. Combineer afstandscontrole met break-lezen.',
-  tip:'💡 Schuine greens zijn de moeilijkste situatie – train dit actief.'},
- {id:'pl4',cat:'puttLong',name:'Twee-Putt Garantie',dur:9,dif:'Gemiddeld',
-  balls:10,ballType:'own',sets:null,goal:'≥ 8/10 twee-putts (5 van 10m + 5 van 12m)',
-  desc:'5 ballen van 10m → 5 van 12m. Eerste putt moet eindigen op tap-in afstand.',
-  tip:'💡 3-putt voorkomen begint bij de eerste putt – niet bij de tweede.'},
- {id:'pl5',cat:'puttLong',name:'Links/Rechts Afwisseling',dur:8,dif:'Moeilijk',
-  balls:8,ballType:'own',sets:2,goal:null,
-  desc:'2 sets van 4: afwisselend links en rechts brekende putt van 8m. Leer bewust te compenseren.',
-  tip:'💡 Rechtshandige golfers struikelen vaker over rechts-brekende putts.'},
- {id:'pl6',cat:'puttLong',name:'Grote Green Simulatie',dur:8,dif:'Gemiddeld',
-  balls:8,ballType:'own',sets:1,goal:null,
-  desc:'Sla 8 putts van extreem ver (12m+). Focus puur op stoppen dichtbij.',
-  tip:'💡 Lag conservatief van ver – met de ambitie om dichtbij te stoppen.'}
+ {id:'pl1',cat:'puttLong',name:'Distance Ladder (6-12m)',dur:10,dif:'Gemiddeld',balls:4,ballType:'own',sets:null,goal:'elke putt eindigt binnen 1m (6→8→10→12m)',desc:'4 ballen op 6m, 8m, 10m, 12m. Elke putt moet eindigen binnen 1m van hole.',tip:'💡 Van ver: focus op "stoppen dichtbij" – niet op "erin putten".'},
+ {id:'pl2',cat:'puttLong',name:'Bucket Challenge (10m)',dur:8,dif:'Gemiddeld',balls:10,ballType:'own',sets:null,goal:'alle 10 ballen eindigen binnen 1m van 10m',desc:'Van 10m: alle 10 ballen moeten eindigen binnen 1m van hole.',tip:'💡 Minder dan 1m = tap-in = 3-putt voorkomen.'},
+ {id:'pl3',cat:'puttLong',name:'Cross-Slope Lag Putting',dur:9,dif:'Moeilijk',balls:8,ballType:'own',sets:1,goal:null,desc:'Sla 8 putts diagonaal over een helling. Combineer afstandscontrole met break-lezen.',tip:'💡 Schuine greens zijn de moeilijkste situatie – train dit actief.'},
+ {id:'pl4',cat:'puttLong',name:'Twee-Putt Garantie',dur:9,dif:'Gemiddeld',balls:10,ballType:'own',sets:null,goal:'≥ 8/10 twee-putts (5 van 10m + 5 van 12m)',desc:'5 ballen van 10m → 5 van 12m. Eerste putt moet eindigen op tap-in afstand.',tip:'💡 3-putt voorkomen begint bij de eerste putt – niet bij de tweede.'},
+ {id:'pl5',cat:'puttLong',name:'Links/Rechts Afwisseling',dur:8,dif:'Moeilijk',balls:8,ballType:'own',sets:2,goal:null,desc:'2 sets van 4: afwisselend links en rechts brekende putt van 8m. Leer bewust te compenseren.',tip:'💡 Rechtshandige golfers struikelen vaker over rechts-brekende putts.'},
+ {id:'pl6',cat:'puttLong',name:'Grote Green Simulatie',dur:8,dif:'Gemiddeld',balls:8,ballType:'own',sets:1,goal:null,desc:'Sla 8 putts van extreem ver (12m+). Focus puur op stoppen dichtbij.',tip:'💡 Lag conservatief van ver – met de ambitie om dichtbij te stoppen.'}
 ];
 
 /* ═══════════════════════════════════════════════════════
-   CONSTANTEN & HCP FUNCTIES
+   CONSTANTS & UTILS
 ═══════════════════════════════════════════════════════ */
-const CAT_LBL={drive:'🏌️ Drive',approach:'🎯 Approach',chip:'🏌 Chip/Pitch',
-               puttShort:'🎱 Putt Kort',puttMedium:'🎱 Putt Medium',puttLong:'🎱 Putt Lang'};
-const CAT_COL={drive:'#e3f2fd',approach:'#e8f5e9',chip:'#f3e5f5',
-               puttShort:'#fce4ec',puttMedium:'#fff3e0',puttLong:'#e0f2f1'};
+const CAT_LBL={drive:'🏌️ Drive',approach:'🎯 Approach',chip:'🏌 Chip/Pitch',puttShort:'🎱 Putt Kort',puttMedium:'🎱 Putt Medium',puttLong:'🎱 Putt Lang'};
+const CAT_COL={drive:'#e3f2fd',approach:'#e8f5e9',chip:'#f3e5f5',puttShort:'#fce4ec',puttMedium:'#fff3e0',puttLong:'#e0f2f1'};
 
 const SESS=[
     {id:'spotlight',lbl:'Spotlight Focus',     icon:'🎯',bc:'bd1',desc:'Maximale focus op je zwakste punt'},
@@ -634,17 +488,12 @@ const SESS=[
     {id:'gamesim',  lbl:'Game Simulatie',      icon:'🏆',bc:'bd4',desc:'Verdeling zoals een echte ronde'}
 ];
 
-const DEFAULT_CLUBS=[
-    {id:'cl1',name:'Driver',carry:'',total:''},{id:'cl2',name:'Hout 3',carry:'',total:''},
-    {id:'cl3',name:'Hout 5',carry:'',total:''},{id:'cl4',name:'Hybride 3',carry:'',total:''},
-    {id:'cl5',name:'Hybride 4',carry:'',total:''},{id:'cl6',name:'IJzer 5',carry:'',total:''},
-    {id:'cl7',name:'IJzer 6',carry:'',total:''},{id:'cl8',name:'IJzer 7',carry:'',total:''},
-    {id:'cl9',name:'IJzer 8',carry:'',total:''},{id:'cl10',name:'IJzer 9',carry:'',total:''},
-    {id:'cl11',name:'Pitching Wedge',carry:'',total:''},{id:'cl12',name:'Gap Wedge',carry:'',total:''},
-    {id:'cl13',name:'Sand Wedge',carry:'',total:''},{id:'cl14',name:'Lob Wedge',carry:'',total:''}
+const STD_CLUBS=[
+    'Kies Club...','Driver','Hout 3','Hout 5','Hout 7','Hybride 3','Hybride 4','Hybride 5',
+    'IJzer 3','IJzer 4','IJzer 5','IJzer 6','IJzer 7','IJzer 8','IJzer 9',
+    'Pitching Wedge (46°-48°)','Gap Wedge (50°-52°)','Sand Wedge (54°-56°)','Lob Wedge (58°-60°)','Putter'
 ];
 
-/* Benchmarks per HCP-klasse */
 function getBM(hcp){
     const h=hcp?+hcp:14;
     if(h<=9)  return{drive:60,approach:50,chipGem:10,chipUaD:40,puttAvg:1.7,puttShort:2, puttMedium:15,puttLong:10};
@@ -662,24 +511,8 @@ function getHcpClass(hcp){
     return           {lbl:'🌱 Beginner (28+)',       color:'#7b5e00',bg:'var(--yl)'};
 }
 
-/* Storage */
-const LS_ENT='gb_entries',LS_LAT='gb_latest',LS_CLUBS='gb_clubs';
-function getEntries(){try{return JSON.parse(localStorage.getItem(LS_ENT)||'[]');}catch{return[];}}
-function getLatest() {try{return JSON.parse(localStorage.getItem(LS_LAT)||'null');}catch{return null;}}
-function getClubs()  {try{return JSON.parse(localStorage.getItem(LS_CLUBS)||'null');}catch{return null;}}
-function persistEntry(e){const a=getEntries();a.unshift(e);if(a.length>10)a.pop();
-    localStorage.setItem(LS_ENT,JSON.stringify(a));localStorage.setItem(LS_LAT,JSON.stringify(e));}
+function getLatest() { return entriesData.length ? entriesData[0] : null; }
 
-function migrateClub(c){
-    // Migrate old {dist} format to {carry, total}
-    if(c.dist!==undefined&&c.carry===undefined) return{...c,carry:c.dist,total:''};
-    if(c.carry===undefined) return{...c,carry:'',total:''};
-    return c;
-}
-
-/* ═══════════════════════════════════════════════════════
-   WEAKNESS ALGORITHMS
-═══════════════════════════════════════════════════════ */
 function calcScores(s){
     const bm=getBM(s.hcp);
     const sc={};
@@ -698,10 +531,7 @@ function calcScores(s){
 
 function manualScores(focus){
     const sc={};
-    Object.keys(CAT_LBL).forEach(cat=>{
-        const f=focus[cat];
-        sc[cat]=f==='hoofd'?60:f==='bij'?30:f==='ond'?10:0;
-    });
+    Object.keys(CAT_LBL).forEach(cat=>{ const f=focus[cat]; sc[cat]=f==='hoofd'?60:f==='bij'?30:f==='ond'?10:0; });
     return sc;
 }
 
@@ -711,35 +541,39 @@ function rankCats(sc){return Object.entries(sc).sort((a,b)=>b[1]-a[1]).map(([cat
    CLUB ADVICE
 ═══════════════════════════════════════════════════════ */
 function getClubAdvice(ex){
-    const clubs=(getClubs()||[]).map(migrateClub).filter(c=>+c.carry>0);
-    if(!clubs.length) return null;
-    const cat=ex.cat;
+    let c = null;
+    let catStr = 'Club';
+    const validClubs = clubsData.filter(x => x.name && x.name !== 'Kies Club...');
 
-    if(cat==='drive'){
-        const c=clubs.slice().sort((a,b)=>+b.carry - +a.carry)[0];
-        return`${c.name} (carry: ${c.carry}m${c.total?`, total: ${c.total}m`:''})`;
+    if(ex.cat==='drive'){
+        catStr = 'Driver';
+        c = validClubs.find(x=>x.name.includes('Driver'));
     }
-    if(cat==='approach'){
-        const dist=ex.distHint;
-        if(dist){
-            // Only clubs that can reach this distance (carry ≤ dist + 20m)
-            const reachable=clubs.filter(c=>+c.carry<=dist+20)
-                                  .sort((a,b)=>Math.abs(+a.carry-dist)-Math.abs(+b.carry-dist))
-                                  .slice(0,2);
-            if(!reachable.length) return null;
-            return reachable.map(c=>`${c.name} (${c.carry}m carry)`).join(' of ');
+    else if(ex.cat==='approach'){
+        if(ex.distHint){
+            catStr = 'Mid/Long Iron';
+            let valid = validClubs.filter(x=>+x.carry>0 && !x.name.includes('Putter') && !x.name.includes('Driver'));
+            if(valid.length) c = valid.sort((a,b)=>Math.abs(+a.carry-ex.distHint)-Math.abs(+b.carry-ex.distHint))[0];
         } else {
-            // General: mid-range clubs 80-160m carry
-            const mid=clubs.filter(c=>+c.carry>=80&&+c.carry<=160)
-                           .sort((a,b)=>+b.carry - +a.carry).slice(0,2);
-            return mid.length?mid.map(c=>`${c.name} (${c.carry}m)`).join(' / '):null;
+            catStr = 'Short Iron';
+            c = validClubs.find(x=>x.name.includes('IJzer 7') || x.name.includes('IJzer 8') || x.name.includes('IJzer 9'));
         }
     }
-    if(cat==='chip'){
-        const wedges=clubs.filter(c=>/wedge|sand|lob|gap|pitching|\bsw\b|\blw\b|\bgw\b|\bpw\b/i.test(c.name));
-        return wedges.length?wedges.slice(0,3).map(c=>c.name+(c.carry?` (${c.carry}m)`:'')).join(' / '):null;
+    else if(ex.cat==='chip'){
+        catStr = 'Wedge';
+        let wedges = validClubs.filter(x=>x.name.includes('Wedge'));
+        c = wedges.find(x=>x.name.includes('Sand')) || wedges[0];
     }
-    return null;
+    else if(ex.cat.includes('putt')){
+        catStr = 'Putter';
+        c = validClubs.find(x=>x.name.includes('Putter'));
+    }
+
+    if(c){
+        // Only show name if we have a match, otherwise just show category
+        return `${catStr}: Gebruik jouw ${c.name}${c.carry ? ` (${c.carry}m)` : ''}`;
+    }
+    return `Categorie: ${catStr}`;
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -751,8 +585,8 @@ function buildSess(type,sc,mins,usedIds,hcp){
     const h=hcp?+hcp:14;
     const base=mins<=45?1:mins<=80?2:3;
     const rank=rankCats(sc);
-
     let plan=[];
+    
     if(type==='spotlight'){
         const top=rank[0];
         const topMax=Math.min(base+(top.score>25?2:1),4);
@@ -767,19 +601,17 @@ function buildSess(type,sc,mins,usedIds,hcp){
             const mx=r.score>25?base+1:r.score>5?base:Math.max(1,base-1);
             plan.push({cat:r.cat,maxEx:mx});
         });
-    }else{ // gamesim
+    }else{
         ['drive','approach','chip','puttShort','puttMedium','puttLong'].forEach(cat=>{
             plan.push({cat,maxEx:(sc[cat]||0)>15?Math.min(base,2):1});
         });
     }
 
-    // Build pool per category, filtered by HCP difficulty
     const bycat={};
     Object.keys(CAT_LBL).forEach(cat=>{
         let pool=EX.filter(e=>e.cat===cat);
         if(h>27) pool=pool.filter(e=>e.dif==='Gemakkelijk');
         else if(h>18) pool=pool.filter(e=>e.dif!=='Moeilijk');
-        // HCP 10-18: max 1 Moeilijk per session (enforced below)
         bycat[cat]=shuffle(pool);
     });
 
@@ -813,23 +645,23 @@ function buildSess(type,sc,mins,usedIds,hcp){
 }
 
 /* ═══════════════════════════════════════════════════════
-   UI STATE
+   UI STATE & ACTIONS
 ═══════════════════════════════════════════════════════ */
 let currentMode='garmin';
 let manualFocus={drive:null,approach:null,chip:null,puttShort:null,puttMedium:null,puttLong:null};
 
-function setMode(m){
+window.setMode = (m) => {
     currentMode=m;
     document.getElementById('garmin-form').style.display=m==='garmin'?'block':'none';
     document.getElementById('manual-form').style.display=m==='manual'?'block':'none';
     document.getElementById('tb-garmin').classList.toggle('active',m==='garmin');
     document.getElementById('tb-manual').classList.toggle('active',m==='manual');
-}
+};
 
-function setManFocus(cat,prio){
+window.setManFocus = (cat,prio) => {
     manualFocus[cat]=manualFocus[cat]===prio?null:prio;
     drawManualFocus();
-}
+};
 
 function drawManualFocus(){
     Object.keys(CAT_LBL).forEach(cat=>{
@@ -842,7 +674,7 @@ function drawManualFocus(){
     });
 }
 
-function showTab(t){
+window.showTab = (t) => {
     document.querySelectorAll('.tab').forEach(el=>el.classList.remove('active'));
     document.querySelectorAll('.nbtn').forEach(el=>el.classList.remove('active'));
     document.getElementById('tab-'+t).classList.add('active');
@@ -850,12 +682,12 @@ function showTab(t){
     if(t==='analyse')   renderAnalyse();
     if(t==='voortgang') renderProg();
     if(t==='clubs')     renderClubs();
-}
+};
 
-function updDur(){
+window.updDur = () => {
     const v=document.getElementById('dur-slider').value;
     document.getElementById('dur-disp').innerHTML=v+' <span>min</span>';
-}
+};
 
 function toast(msg){
     const t=document.getElementById('toast');
@@ -868,7 +700,7 @@ function fmtDate(ts){return new Date(ts).toLocaleDateString('nl-NL',{day:'2-digi
 /* ═══════════════════════════════════════════════════════
    SAVE DATA
 ═══════════════════════════════════════════════════════ */
-function saveData(){
+window.saveData = async () => {
     const hcp=document.getElementById('s-hcp').value||null;
     const gv=id=>document.getElementById(id).value||null;
     let entry;
@@ -884,18 +716,27 @@ function saveData(){
                  puttAvg:gv('s-pavg'),p1s:gv('s-p1s'),p1m:gv('s-p1m'),p1l:gv('s-p1l'),
                  puttShort:gv('s-ps'),puttMedium:gv('s-pm'),puttLong:gv('s-pl')};
         const hasData=Object.entries(s).some(([k,v])=>k!=='hcp'&&v!==null);
-        if(!hasData&&!hcp){toast('❌ Vul minstens één statistiek in');return;}
+        if(!hasData){toast('❌ Vul minstens één Garmin statistiek in (of gebruik Handmatig)');return;}
         const ws=calcScores(s);
         entry={id:Date.now(),ts:Date.now(),mode:'garmin',stats:s,ws};
     }
 
-    persistEntry(entry);
-    updHeader(entry);
-    document.getElementById('te').style.display='none';
-    document.getElementById('tc').style.display='block';
-    toast('✅ Opgeslagen!');
-    setTimeout(()=>showTab('analyse'),700);
-}
+    // prepend entry
+    entriesData.unshift(entry);
+    if(entriesData.length>15) entriesData.pop();
+
+    const btn = document.getElementById('btn-save-data');
+    btn.innerHTML='<div class="loader"></div>'; btn.disabled=true;
+    try {
+        await saveToDb();
+        updHeader(entry);
+        document.getElementById('te').style.display='none';
+        document.getElementById('tc').style.display='block';
+        toast('✅ Opgeslagen in cloud!');
+        setTimeout(()=>window.showTab('analyse'),700);
+    } catch(e) { /* error handled in saveToDb */ }
+    btn.innerHTML='💾 Opslaan &amp; Analyseer'; btn.disabled=false;
+};
 
 function updHeader(e){
     const top=Object.entries(e.ws||{}).sort((a,b)=>b[1]-a[1])[0];
@@ -929,13 +770,8 @@ function hcpBadgeHtml(s){
 function renderManualAnalyse(lat){
     const s=lat.stats;
     const PLBL={hoofd:'🔴 Hoofdfocus',bij:'🟠 Bijfocus',ond:'🟡 Onderhoud'};
-    const PSTYLE={
-        hoofd:'background:var(--rl);border-left:4px solid var(--rd)',
-        bij:  'background:var(--ol);border-left:4px solid var(--or)',
-        ond:  'background:var(--yl);border-left:4px solid var(--yw)'
-    };
-    const items=Object.entries(lat.manualFocus||{}).filter(([,v])=>v!==null)
-        .sort((a,b)=>({hoofd:0,bij:1,ond:2}[a[1]]-({hoofd:0,bij:1,ond:2}[b[1]])));
+    const PSTYLE={hoofd:'background:var(--rl);border-left:4px solid var(--rd)',bij:'background:var(--ol);border-left:4px solid var(--or)',ond:'background:var(--yl);border-left:4px solid var(--yw)'};
+    const items=Object.entries(lat.manualFocus||{}).filter(([,v])=>v!==null).sort((a,b)=>({hoofd:0,bij:1,ond:2}[a[1]]-({hoofd:0,bij:1,ond:2}[b[1]])));
     const focusHtml=items.length
         ?items.map(([cat,prio])=>`<div style="${PSTYLE[prio]};padding:10px 12px;border-radius:0 8px 8px 0;margin-bottom:8px;">
             <div style="font-size:14px;font-weight:700;">${CAT_LBL[cat]}</div>
@@ -953,13 +789,11 @@ function renderManualAnalyse(lat){
 function renderGarminAnalyse(lat){
     const sc=lat.ws,s=lat.stats,rank=rankCats(sc),maxSc=Math.max(...Object.values(sc),1);
     const bm=getBM(s.hcp);
-
     const top=rank[0];
     const hlHtml=top&&top.score>5
         ?`<div class="hl ${top.score>30?'hl-r':'hl-o'}"><div class="hlt">⚠️ Grootste aandachtspunt: ${CAT_LBL[top.cat]}</div>
            <div class="hld">Zwaktescore: ${top.score.toFixed(0)} — benchmarks op basis van je HCP-klasse.</div></div>`
-        :`<div class="hl hl-g"><div class="hlt">✅ Goede stats!</div>
-           <div class="hld">Je zit boven benchmark in de meeste categorieën.</div></div>`;
+        :`<div class="hl hl-g"><div class="hlt">✅ Goede stats!</div><div class="hld">Je zit boven benchmark in de meeste categorieën.</div></div>`;
 
     const barsHtml=rank.map(({cat,score})=>{
         const pct=Math.min(100,(score/maxSc)*100);
@@ -1002,9 +836,7 @@ function renderGarminAnalyse(lat){
                 <div style="width:${r}%;background:#1565C0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;min-width:24px;">${r}%</div>
             </div>
             <div style="display:flex;gap:12px;font-size:11px;">
-                <span style="color:#e65100;">⬛ Links ${l}%</span>
-                <span style="color:var(--gm);">⬛ Fairway ${f}%</span>
-                <span style="color:#1565C0;">⬛ Rechts ${r}%</span>
+                <span style="color:#e65100;">⬛ Links ${l}%</span><span style="color:var(--gm);">⬛ Fairway ${f}%</span><span style="color:#1565C0;">⬛ Rechts ${r}%</span>
             </div>
             ${Math.abs(l-r)>20?`<div style="margin-top:8px;font-size:12px;color:var(--or);">⚠️ Je mist duidelijk vaker naar ${l>r?'links':'rechts'}.</div>`:''}
         </div>`;
@@ -1014,11 +846,7 @@ function renderGarminAnalyse(lat){
         <div class="card">${hcpBadgeHtml(s)}${hlHtml}${barsHtml}</div>
         ${dirHtml}
         <div class="card"><div class="ctit">📏 Stats vs Benchmark (jouw HCP-klasse)</div>
-            <table class="stbl">
-                <thead><tr><th>Stat</th><th style="text-align:center;">Jij</th><th style="text-align:center;">Doel</th></tr></thead>
-                <tbody>${rows}</tbody>
-            </table>
-            <p style="font-size:10px;color:var(--mu);margin-top:8px;">ℹ️ = informatief, geen benchmark</p>
+            <table class="stbl"><thead><tr><th>Stat</th><th style="text-align:center;">Jij</th><th style="text-align:center;">Doel</th></tr></thead><tbody>${rows}</tbody></table>
         </div>`;
 }
 
@@ -1027,7 +855,7 @@ function renderGarminAnalyse(lat){
 ═══════════════════════════════════════════════════════ */
 let genSessData=[];
 
-function genSessions(){
+window.genSessions = () => {
     const lat=getLatest();if(!lat)return;
     const mins=+document.getElementById('dur-slider').value;
     const hcp=lat.stats?.hcp;
@@ -1035,10 +863,33 @@ function genSessions(){
     genSessData=SESS.map(st=>({...st,exs:buildSess(st.id,lat.ws,mins,used,hcp),mins}));
     renderSessions();
     toast('🎯 4 sessies klaar!');
-}
+};
 
 function renderSessions(){
-    document.getElementById('sess-container').innerHTML=genSessData.map((sess,i)=>{
+    const warmupHtml = `
+        <div class="sc" style="background:var(--gp);border:1px solid var(--gl);">
+            <div class="sh" onclick="togSess('wu')">
+                <div class="shl">
+                    <div class="sbadge" style="background:var(--gl);color:#fff;">🧘</div>
+                    <div><div class="stit" style="color:var(--gd);">Warming-up (5 min)</div>
+                    <div class="smeta">Algemeen fysiek + ontspannen swings</div></div>
+                </div>
+                <div class="schev" id="chev-wu">▼</div>
+            </div>
+            <div class="ssb" id="sb-wu">
+                <div class="ei">
+                    <div class="eih"><div class="ein">1. Losdraaien (2 min)</div></div>
+                    <div class="eidesc">Draai je schouders, heupen, knieën en polsen zachtjes los. Geen clubs nodig.</div>
+                </div>
+                <div class="ei">
+                    <div class="eih"><div class="ein">2. Korte swings (3 min)</div></div>
+                    <div class="eidesc">Pak je favoriete wedge (bijv. Sand Wedge of Pitching Wedge). Sla 10-15 halve, ontspannen slagen om het ritme te voelen.</div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.getElementById('sess-container').innerHTML= warmupHtml + genSessData.map((sess,i)=>{
         const tot=sess.exs.reduce((s,e)=>s+e.dur,0);
         return`<div class="sc">
             <div class="sh" onclick="togSess(${i})">
@@ -1080,56 +931,38 @@ function renderExList(exs){
     </div>`).join('');
 }
 
-function togSess(i){document.getElementById('sb-'+i).classList.toggle('open');document.getElementById('chev-'+i).classList.toggle('open');}
+window.togSess = (i) => {
+    document.getElementById('sb-'+i).classList.toggle('open');
+    document.getElementById('chev-'+i).classList.toggle('open');
+};
 
 /* ═══════════════════════════════════════════════════════
    VOORTGANG
 ═══════════════════════════════════════════════════════ */
 function renderProg(){
-    const entries=getEntries();
-    if(!entries.length){document.getElementById('pe').style.display='block';document.getElementById('pc').style.display='none';return;}
+    if(!entriesData.length){document.getElementById('pe').style.display='block';document.getElementById('pc').style.display='none';return;}
     document.getElementById('pe').style.display='none';
     document.getElementById('pc').style.display='block';
     let html='';
-    const garminEntries=entries.filter(e=>e.mode!=='manual');
+    const garminEntries=entriesData.filter(e=>e.mode!=='manual');
     if(garminEntries.length>=2){
         html+=`<div class="card"><div class="ctit">📈 Zwakte Score Verloop</div>${buildChart(garminEntries)}
             <p style="font-size:11px;color:var(--mu);margin-top:8px;">Lager = beter. Score 0 = boven benchmark voor jouw HCP.</p></div>`;
     }
-    html+=`<div class="card"><div class="ctit">📋 Metingen (max 10)</div>`;
-    entries.forEach((e,idx)=>{
+    html+=`<div class="card"><div class="ctit">📋 Metingen (max 15)</div>`;
+    entriesData.forEach((e,idx)=>{
         const s=e.stats||{};
         const cls=getHcpClass(s.hcp);
         if(e.mode==='manual'){
-            const focusChips=Object.entries(e.manualFocus||{}).filter(([,v])=>v!==null)
-                .map(([cat,prio])=>{
-                    const chipCls=prio==='hoofd'?'chip-r':prio==='bij'?'chip-o':'chip-y';
-                    return`<span class="chip ${chipCls}">${CAT_LBL[cat]}</span>`;
-                }).join('');
-            html+=`<div class="ent">
-                <div class="entd">${fmtDate(e.ts)} <span style="font-size:10px;background:#e8eaf6;color:#283593;padding:2px 7px;border-radius:8px;margin-left:4px;">✏️ Handmatig</span>
-                ${s.hcp?`<span class="hcp-cls" style="background:${cls?cls.bg:'var(--gp)'};color:${cls?cls.color:'var(--gd)'};">HCP ${s.hcp}</span>`:''}
-                ${idx===0?' <span style="font-size:10px;background:var(--gd);color:#fff;padding:2px 7px;border-radius:8px;">Nieuwste</span>':''}</div>
-                <div class="entchips">${focusChips||'<span class="chip">Geen focus ingesteld</span>'}</div>
-            </div>`;
+            const focusChips=Object.entries(e.manualFocus||{}).filter(([,v])=>v!==null).map(([cat,prio])=>`<span class="chip ${prio==='hoofd'?'chip-r':prio==='bij'?'chip-o':'chip-y'}">${CAT_LBL[cat]}</span>`).join('');
+            html+=`<div class="ent"><div class="entd">${fmtDate(e.ts)} <span style="font-size:10px;background:#e8eaf6;color:#283593;padding:2px 7px;border-radius:8px;margin-left:4px;">✏️ Handmatig</span>${s.hcp?`<span class="hcp-cls" style="background:${cls?cls.bg:'var(--gp)'};color:${cls?cls.color:'var(--gd)'};">HCP ${s.hcp}</span>`:''}</div><div class="entchips">${focusChips||'<span class="chip">Geen focus ingesteld</span>'}</div></div>`;
         }else{
             const top=Object.entries(e.ws||{}).sort((a,b)=>b[1]-a[1])[0];
-            html+=`<div class="ent">
-                <div class="entd">${fmtDate(e.ts)}
-                ${s.hcp?`<span class="hcp-cls" style="background:${cls?cls.bg:'var(--gp)'};color:${cls?cls.color:'var(--gd)'};">HCP ${s.hcp}</span>`:''}
-                ${idx===0?' <span style="font-size:10px;background:var(--gd);color:#fff;padding:2px 7px;border-radius:8px;">Nieuwste</span>':''}</div>
-                <div class="entchips">
-                    ${s.drive?`<span class="chip">🏌️ ${s.drive}% FW</span>`:''}
-                    ${s.approach?`<span class="chip">🎯 ${s.approach}% GIR</span>`:''}
-                    ${s.cuad?`<span class="chip">🏌 ${s.cuad}% U&D</span>`:''}
-                    ${s.puttAvg?`<span class="chip">🎱 ${s.puttAvg} p/h</span>`:''}
-                    ${top?`<span class="chip chip-r">Focus: ${CAT_LBL[top[0]]}</span>`:''}
-                </div>
-            </div>`;
+            html+=`<div class="ent"><div class="entd">${fmtDate(e.ts)}${s.hcp?`<span class="hcp-cls" style="background:${cls?cls.bg:'var(--gp)'};color:${cls?cls.color:'var(--gd)'};">HCP ${s.hcp}</span>`:''}</div><div class="entchips">${s.drive?`<span class="chip">🏌️ ${s.drive}% FW</span>`:''}${s.approach?`<span class="chip">🎯 ${s.approach}% GIR</span>`:''}${s.cuad?`<span class="chip">🏌 ${s.cuad}% U&D</span>`:''}${s.puttAvg?`<span class="chip">🎱 ${s.puttAvg} p/h</span>`:''}${top?`<span class="chip chip-r">Focus: ${CAT_LBL[top[0]]}</span>`:''}</div></div>`;
         }
     });
     html+='</div>';
-    html+=`<div style="text-align:center;margin-top:4px;"><button class="btn btn-s" onclick="confirmReset()" style="max-width:220px;font-size:13px;">🗑️ Alle data verwijderen</button></div>`;
+    html+=`<div style="text-align:center;margin-top:4px;"><button class="btn btn-s" onclick="confirmReset()" style="max-width:220px;font-size:13px;background:var(--rl);color:var(--rd);">🗑️ Alle data verwijderen</button></div>`;
     document.getElementById('pc').innerHTML=html;
 }
 
@@ -1137,92 +970,97 @@ function buildChart(entries){
     const data=[...entries].reverse().slice(-10);
     const cats=['drive','approach','chip','puttMedium'],cols=['#1565C0','#2e7d32','#6a1b9a','#e65100'],lbls=['Drive','Approach','Chip','Putt M'];
     const W=320,H=150,PL=32,PB=28,PR=10,PT=10,cW=W-PL-PR,cH=H-PB-PT;
-    const allSc=data.flatMap(e=>cats.map(c=>e.ws?.[c]||0));
-    const maxSc=Math.max(...allSc,20);
+    const maxSc=Math.max(...data.flatMap(e=>cats.map(c=>e.ws?.[c]||0)), 20);
     const xS=data.length>1?cW/(data.length-1):cW;
     let svg=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;display:block;">`;
-    for(let i=0;i<=4;i++){const y=PT+(cH/4)*i;svg+=`<line x1="${PL}" y1="${y}" x2="${W-PR}" y2="${y}" stroke="#e0e0e0" stroke-width="1"/>
-        <text x="${PL-3}" y="${y+4}" text-anchor="end" font-size="9" fill="#aaa">${Math.round(maxSc-(maxSc/4)*i)}</text>`;}
-    data.forEach((e,i)=>{const x=PL+(data.length>1?i*xS:cW/2);const d=new Date(e.ts);
-        svg+=`<text x="${x}" y="${H-4}" text-anchor="middle" font-size="9" fill="#aaa">${d.getDate()}/${d.getMonth()+1}</text>`;});
+    for(let i=0;i<=4;i++){const y=PT+(cH/4)*i;svg+=`<line x1="${PL}" y1="${y}" x2="${W-PR}" y2="${y}" stroke="#e0e0e0" stroke-width="1"/><text x="${PL-3}" y="${y+4}" text-anchor="end" font-size="9" fill="#aaa">${Math.round(maxSc-(maxSc/4)*i)}</text>`;}
+    data.forEach((e,i)=>{const x=PL+(data.length>1?i*xS:cW/2);const d=new Date(e.ts);svg+=`<text x="${x}" y="${H-4}" text-anchor="middle" font-size="9" fill="#aaa">${d.getDate()}/${d.getMonth()+1}</text>`;});
     cats.forEach((cat,ci)=>{
         let path='';
         data.forEach((e,i)=>{const sc=e.ws?.[cat]||0;const x=PL+(data.length>1?i*xS:cW/2);const y=PT+cH-(sc/maxSc)*cH;path+=(i===0?`M${x},${y}`:`L${x},${y}`);});
         svg+=`<path d="${path}" fill="none" stroke="${cols[ci]}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`;
-        data.forEach((e,i)=>{const sc=e.ws?.[cat]||0;const x=PL+(data.length>1?i*xS:cW/2);const y=PT+cH-(sc/maxSc)*cH;
-            svg+=`<circle cx="${x}" cy="${y}" r="3.5" fill="${cols[ci]}" stroke="#fff" stroke-width="1.5"/>`;});
+        data.forEach((e,i)=>{const sc=e.ws?.[cat]||0;const x=PL+(data.length>1?i*xS:cW/2);const y=PT+cH-(sc/maxSc)*cH;svg+=`<circle cx="${x}" cy="${y}" r="3.5" fill="${cols[ci]}" stroke="#fff" stroke-width="1.5"/>`;});
     });
-    svg+='</svg>';
-    return svg+'<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;">'+
-        cats.map((c,i)=>`<div style="display:flex;align-items:center;gap:4px;font-size:11px;"><div style="width:14px;height:3px;background:${cols[i]};border-radius:2px;"></div><span style="color:var(--mu);">${lbls[i]}</span></div>`).join('')+'</div>';
+    return svg+'</svg><div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;">'+cats.map((c,i)=>`<div style="display:flex;align-items:center;gap:4px;font-size:11px;"><div style="width:14px;height:3px;background:${cols[i]};border-radius:2px;"></div><span style="color:var(--mu);">${lbls[i]}</span></div>`).join('')+'</div>';
 }
 
-function confirmReset(){
-    if(confirm('Weet je zeker dat je alle opgeslagen data wilt verwijderen?')){
-        localStorage.removeItem(LS_ENT);localStorage.removeItem(LS_LAT);
-        toast('🗑️ Data verwijderd');
-        document.getElementById('te').style.display='block';document.getElementById('tc').style.display='none';
-        document.getElementById('hdr-sub').textContent='Voer je data in om te beginnen';
-        renderProg();
+window.confirmReset = async () => {
+    if(confirm('Weet je zeker dat je alle opgeslagen data uit je cloud-profiel wilt verwijderen?')){
+        entriesData = [];
+        try { await saveToDb(); toast('🗑️ Data verwijderd uit cloud'); renderProg(); }
+        catch(e) { }
     }
-}
+};
 
 /* ═══════════════════════════════════════════════════════
    CLUBS
 ═══════════════════════════════════════════════════════ */
-let clubsData=[];
-
 function renderClubs(){
-    const saved=getClubs();
-    if(saved&&saved.length) clubsData=saved.map(migrateClub);
-    else if(!clubsData.length) clubsData=DEFAULT_CLUBS.map(c=>({...c,id:c.id+'_'+Date.now()+Math.random()}));
+    if(!clubsData.length) clubsData=[
+        {id:'cl1',name:'Driver',carry:'',total:''}, {id:'cl2',name:'Hout 3',carry:'',total:''},
+        {id:'cl3',name:'Hout 5',carry:'',total:''}, {id:'cl4',name:'Hybride 4',carry:'',total:''},
+        {id:'cl5',name:'IJzer 5',carry:'',total:''}, {id:'cl6',name:'IJzer 6',carry:'',total:''},
+        {id:'cl7',name:'IJzer 7',carry:'',total:''}, {id:'cl8',name:'IJzer 8',carry:'',total:''},
+        {id:'cl9',name:'IJzer 9',carry:'',total:''}, {id:'cl10',name:'Pitching Wedge (46°-48°)',carry:'',total:''},
+        {id:'cl11',name:'Sand Wedge (54°-56°)',carry:'',total:''}, {id:'cl12',name:'Putter',carry:'',total:''}
+    ];
     drawClubs();
 }
 
-function drawClubs(){
-    document.getElementById('clubs-list').innerHTML=clubsData.map((c,i)=>`
+window.drawClubs = () => {
+    document.getElementById('clubs-list').innerHTML=clubsData.map((c,i)=>{
+        const opts = STD_CLUBS.map(sc => `<option value="${sc}" ${c.name===sc?'selected':''}>${sc}</option>`).join('');
+        return `
         <div class="club-row">
-            <input class="club-name" type="text" value="${esc(c.name)}" placeholder="Club naam" oninput="clubsData[${i}].name=this.value">
-            <input class="club-carry" type="number" value="${c.carry||''}" placeholder="m" min="0" max="400" oninput="clubsData[${i}].carry=this.value">
-            <input class="club-total" type="number" value="${c.total||''}" placeholder="m" min="0" max="450" oninput="clubsData[${i}].total=this.value">
+            <select class="club-sel" onchange="window.updateClubName(${i}, this.value)">
+                ${!STD_CLUBS.includes(c.name) && c.name ? `<option value="${c.name}" selected>${c.name} (Aangepast)</option>` : ''}
+                ${opts}
+            </select>
+            <input class="club-carry" type="number" value="${c.carry||''}" placeholder="m" min="0" max="400" onchange="window.updateClubCarry(${i}, this.value)">
+            <input class="club-total" type="number" value="${c.total||''}" placeholder="m" min="0" max="450" onchange="window.updateClubTotal(${i}, this.value)">
             <button class="club-del" onclick="delClub(${i})" title="Verwijderen">🗑</button>
-        </div>`).join('');
-}
+        </div>`
+    }).join('');
+};
 
-function addClub(){
-    clubsData.push({id:'new_'+Date.now(),name:'',carry:'',total:''});
-    drawClubs();
-    setTimeout(()=>{const r=document.querySelectorAll('.club-name');if(r.length)r[r.length-1].focus();},50);
-}
+window.updateClubName = (i, val) => { clubsData[i].name = val; };
+window.updateClubCarry = (i, val) => { clubsData[i].carry = val; };
+window.updateClubTotal = (i, val) => { clubsData[i].total = val; };
 
-function delClub(i){clubsData.splice(i,1);drawClubs();}
+window.addClub = () => {
+    clubsData.push({id:'new_'+Date.now(),name:'Kies Club...',carry:'',total:''});
+    window.drawClubs();
+};
 
-function saveClubs(){
-    document.querySelectorAll('.club-row').forEach((row,i)=>{
-        if(clubsData[i]){
-            clubsData[i].name=row.querySelector('.club-name').value;
-            clubsData[i].carry=row.querySelector('.club-carry').value;
-            clubsData[i].total=row.querySelector('.club-total').value;
-        }
-    });
-    localStorage.setItem(LS_CLUBS,JSON.stringify(clubsData));
-    toast('💾 Clubs opgeslagen!');
-}
+window.delClub = (i) => { clubsData.splice(i,1); window.drawClubs(); };
 
-function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+window.saveClubs = async () => {
+    const btn = document.getElementById('btn-save-clubs');
+    btn.innerHTML='<div class="loader"></div>'; btn.disabled=true;
+    try {
+        await saveToDb();
+        toast('💾 Clubs opgeslagen in cloud!');
+    } catch(e) { }
+    btn.innerHTML='💾 Clubs opslaan'; btn.disabled=false;
+};
 
 /* ═══════════════════════════════════════════════════════
    INIT
 ═══════════════════════════════════════════════════════ */
-(function init(){
+function initAppUI(){
     const lat=getLatest();
-    if(!lat) return;
+    if(!lat) {
+        document.getElementById('hdr-sub').textContent='Voer je data in om te beginnen';
+        document.getElementById('te').style.display='block';
+        document.getElementById('tc').style.display='none';
+        return;
+    }
     if(lat.mode==='manual'){
-        setMode('manual');
+        window.setMode('manual');
         if(lat.stats?.hcp) document.getElementById('s-hcp').value=lat.stats.hcp;
         if(lat.manualFocus){manualFocus={...lat.manualFocus};drawManualFocus();}
     }else{
-        setMode('garmin');
+        window.setMode('garmin');
         const s=lat.stats;
         const map={hcp:'s-hcp',drive:'s-drv',drl:'s-drl',drf:'s-drf',drr:'s-drr',
                    approach:'s-gir',cgem:'s-cgem',cuad:'s-cuad',csan:'s-csan',
@@ -1233,7 +1071,7 @@ function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').repl
     updHeader(lat);
     document.getElementById('te').style.display='none';
     document.getElementById('tc').style.display='block';
-})();
+}
 </script>
 </body>
 </html>
