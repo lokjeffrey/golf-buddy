@@ -172,14 +172,30 @@
 <!-- AUTH SCREEN -->
 <div id="auth-screen" style="display:none;">
     <div class="auth-logo">⛳</div>
-    <div class="auth-tit">Golf Buddy</div>
-    <div class="auth-sub">Log in of maak een account aan om je voortgang overal op te slaan.</div>
+    <div class="auth-tit">Welkom bij Golf Buddy</div>
+    <div class="auth-sub">Log in of registreer om je data, clubs en resultaten veilig op te slaan.</div>
     <form id="auth-form" onsubmit="event.preventDefault();">
-        <input type="email" id="auth-email" class="auth-input" placeholder="E-mailadres" required>
-        <input type="password" id="auth-pass" class="auth-input" placeholder="Wachtwoord (min. 6 tekens)" required>
-        <div id="auth-err" style="color:var(--rd);font-size:12px;margin-bottom:10px;font-weight:600;"></div>
-        <button type="button" class="btn btn-p" id="btn-login" onclick="handleLogin()" style="margin-bottom:10px;">Inloggen</button>
-        <button type="button" class="btn btn-s" id="btn-reg" onclick="handleRegister()">Account Aanmaken</button>
+        <div style="background:#fff;border-radius:12px;padding:16px;box-shadow:var(--sh);">
+            <div style="display:flex;background:var(--gp);border-radius:8px;padding:4px;margin-bottom:16px;">
+                <button type="button" id="tab-login" class="tbtn active" onclick="setAuthMode('login')" style="flex:1;">Inloggen</button>
+                <button type="button" id="tab-reg" class="tbtn" onclick="setAuthMode('reg')" style="flex:1;">Nieuw Account</button>
+            </div>
+            
+            <div id="reg-name-field" style="display:none;margin-bottom:10px;">
+                <label style="font-size:11px;font-weight:700;color:var(--mu);">Naam (Voor Leaderboard)</label>
+                <input type="text" id="auth-name" class="auth-input" placeholder="Bijv. Tiger Woods" style="margin-top:4px;margin-bottom:0;">
+            </div>
+            
+            <label style="font-size:11px;font-weight:700;color:var(--mu);">E-mailadres</label>
+            <input type="email" id="auth-email" class="auth-input" placeholder="jouw@email.nl" required style="margin-top:4px;margin-bottom:10px;">
+            
+            <label style="font-size:11px;font-weight:700;color:var(--mu);">Wachtwoord</label>
+            <input type="password" id="auth-pass" class="auth-input" placeholder="Min. 6 tekens" required style="margin-top:4px;margin-bottom:16px;">
+            
+            <div id="auth-err" style="color:var(--rd);font-size:12px;margin-bottom:10px;font-weight:600;text-align:center;"></div>
+            
+            <button type="button" class="btn btn-p" id="btn-auth-submit" onclick="submitAuth()">Inloggen</button>
+        </div>
     </form>
 </div>
 
@@ -198,6 +214,14 @@
 
     <!-- DATA TAB -->
     <div id="tab-data" class="tab active">
+        <div style="background:var(--gd);color:#fff;padding:16px;border-radius:12px;margin-bottom:16px;box-shadow:var(--sh);">
+            <div style="font-size:16px;font-weight:800;margin-bottom:8px;">Welkom! Hoe het werkt:</div>
+            <ol style="margin:0;padding-left:20px;font-size:13px;line-height:1.6;">
+                <li>Vul je data in of kies je focus handmatig.</li>
+                <li>Klik op 'Opslaan & Analyseer'.</li>
+                <li>Ga naar <b>Train</b> voor je sessies!</li>
+            </ol>
+        </div>
         <div class="card">
             <div class="ctit">📋 Data Invoer</div>
             <div class="hcp-row">
@@ -279,15 +303,47 @@
 
     <!-- TRAINING TAB -->
     <div id="tab-training" class="tab">
-        <div class="empty" id="te"><div class="eico">🏌️</div><p>Sla eerst je data op voordat je een training genereert.</p></div>
-        <div id="tc" style="display:none;">
+        <div class="empty" id="te"><div class="eico">🏌️</div><p>Sla eerst je data op of log in.</p></div>
+        
+        <!-- Generate Plan UI -->
+        <div id="tc-generate" style="display:none;">
             <div class="card">
-                <div class="ctit">⏱️ Beschikbare tijd</div>
+                <div class="ctit">📅 Nieuw Trainingsblok Starten</div>
+                <div class="info-strip">Stel hier je komende reeks trainingen in op basis van je actuele zwaktes.</div>
+                
+                <label style="font-size:11px;font-weight:700;color:var(--mu);">Aantal Sessies in dit blok</label>
+                <select id="plan-len" class="fi" style="margin-top:4px;margin-bottom:12px;">
+                    <option value="2">2 Sessies</option>
+                    <option value="4" selected>4 Sessies (Aanbevolen)</option>
+                    <option value="6">6 Sessies (Actieve trainer)</option>
+                    <option value="8">8 Sessies</option>
+                </select>
+
+                <div class="ctit">⏱️ Standaard duur per sessie</div>
                 <div class="dur" id="dur-disp">60 <span>min</span></div>
                 <input type="range" id="dur-slider" min="30" max="120" step="5" value="60" oninput="updDur()">
                 <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--mu);margin-top:4px;"><span>30 min</span><span>120 min</span></div>
-                <button class="btn btn-p" onclick="genSessions()" style="margin-top:12px;">🎯 Genereer 4 Sessies</button>
+                
+                <button class="btn btn-p" onclick="genSessions()" style="margin-top:16px;">🚀 Start Trainingsblok</button>
             </div>
+        </div>
+
+        <!-- Active Plan UI -->
+        <div id="tc-active" style="display:none;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:12px; padding: 0 4px;">
+                <div style="font-size:19px;font-weight:800;color:var(--gd);">Je Trainingsblok</div>
+                <button class="btn btn-s" style="margin:0;padding:6px 12px;font-size:11px;width:auto;" onclick="cancelPlan()">🗑️ Wissen</button>
+            </div>
+            
+            <div style="background:#fff;border-radius:12px;padding:16px;margin-bottom:16px;box-shadow:var(--sh);">
+                <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:800;margin-bottom:8px;color:var(--gd);">
+                    <span>Voortgang</span><span id="plan-prog-text">0/4 Sessies</span>
+                </div>
+                <div style="width:100%;height:10px;background:var(--gp);border-radius:5px;overflow:hidden;">
+                    <div id="plan-prog-bar" style="width:0%;height:100%;background:var(--gm);transition:width 0.4s ease;"></div>
+                </div>
+            </div>
+
             <div id="sess-container"></div>
         </div>
     </div>
@@ -298,10 +354,25 @@
         <div id="pc" style="display:none;"></div>
     </div>
 
-    <!-- CLUBS TAB -->
-    <div id="tab-clubs" class="tab">
+    <!-- PROFIEL TAB -->
+    <div id="tab-profiel" class="tab">
+        <div class="card" style="margin-bottom:16px;">
+            <div class="ctit">👤 Mijn Account</div>
+            <div style="margin-bottom: 16px;">
+                <label style="font-size:11px;font-weight:700;color:var(--mu);">E-mailadres</label>
+                <div style="font-size:14px; padding-top:4px;" id="prof-email"></div>
+            </div>
+            <div>
+                <label style="font-size:11px;font-weight:700;color:var(--mu);">Weergavenaam (Leaderboard)</label>
+                <div style="display:flex;gap:8px;margin-top:4px;">
+                    <input type="text" id="prof-name" class="fi" style="flex:1;">
+                    <button class="btn btn-s" onclick="saveProfileName()" style="margin:0;">Opslaan</button>
+                </div>
+            </div>
+        </div>
+
         <div class="card">
-            <div class="ctit">🏌 Mijn Clubs</div>
+            <div class="ctit">⛳ Mijn Clubs</div>
             <div class="info-strip">ℹ️ Kies je club uit de lijst. Carry = afstand door de lucht. Total = werkelijke eindafstand op de baan. De app gebruikt dit voor clubadvies in je training!</div>
             <div style="display:grid;grid-template-columns:1.5fr 60px 60px 34px;gap:6px;padding-bottom:6px;border-bottom:2px solid var(--bd);margin-bottom:4px;">
                 <span style="font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;">Club</span>
@@ -344,7 +415,7 @@
         <button class="nbtn"        id="nav-training"  onclick="showTab('training')">  <span class="ico">🏌️</span>Train</button>
         <button class="nbtn"        id="nav-comm"      onclick="showTab('comm')">      <span class="ico">🏆</span>Comm</button>
         <button class="nbtn"        id="nav-voortgang" onclick="showTab('voortgang')"> <span class="ico">📈</span>Groei</button>
-        <button class="nbtn"        id="nav-clubs"     onclick="showTab('clubs')">     <span class="ico">⛳</span>Bag</button>
+        <button class="nbtn"        id="nav-clubs"     onclick="showTab('profiel')">   <span class="ico">👤</span>Profiel</button>
     </nav>
 </div>
 <div class="toast" id="toast"></div>
@@ -393,20 +464,44 @@ onAuthStateChanged(auth, async (user) => {
     }
 });
 
-window.handleLogin = async () => {
-    const e=document.getElementById('auth-email').value, p=document.getElementById('auth-pass').value;
-    const btn=document.getElementById('btn-login'); const err=document.getElementById('auth-err');
-    if(!e||!p) return err.textContent="Vul e-mail en wachtwoord in.";
-    try{ btn.innerHTML='<div class="loader"></div>'; btn.disabled=true; err.textContent=""; await signInWithEmailAndPassword(auth, e, p); }
-    catch(er){ err.textContent="Fout bij inloggen: " + er.message; btn.innerHTML='Inloggen'; btn.disabled=false; }
+let authMode = 'login';
+window.setAuthMode = (mode) => {
+    authMode = mode;
+    document.getElementById('tab-login').classList.toggle('active', mode === 'login');
+    document.getElementById('tab-reg').classList.toggle('active', mode === 'reg');
+    document.getElementById('reg-name-field').style.display = mode === 'reg' ? 'block' : 'none';
+    document.getElementById('btn-auth-submit').textContent = mode === 'login' ? 'Inloggen' : 'Account Aanmaken';
+    document.getElementById('auth-err').textContent = '';
 };
 
-window.handleRegister = async () => {
-    const e=document.getElementById('auth-email').value, p=document.getElementById('auth-pass').value;
-    const btn=document.getElementById('btn-reg'); const err=document.getElementById('auth-err');
-    if(!e||!p) return err.textContent="Vul e-mail en wachtwoord in.";
-    try{ btn.innerHTML='<div class="loader"></div>'; btn.disabled=true; err.textContent=""; await createUserWithEmailAndPassword(auth, e, p); }
-    catch(er){ err.textContent="Fout bij registreren: " + er.message; btn.innerHTML='Account Aanmaken'; btn.disabled=false; }
+window.submitAuth = async () => {
+    const e = document.getElementById('auth-email').value;
+    const p = document.getElementById('auth-pass').value;
+    const n = document.getElementById('auth-name').value;
+    const btn = document.getElementById('btn-auth-submit');
+    const err = document.getElementById('auth-err');
+    
+    if(!e || !p) return err.textContent = "Vul e-mail en wachtwoord in.";
+    if(authMode === 'reg' && !n) return err.textContent = "Vul je naam in voor het leaderboard.";
+    if(p.length < 6) return err.textContent = "Wachtwoord moet minimaal 6 tekens zijn.";
+
+    try {
+        btn.innerHTML = '<div class="loader"></div>';
+        btn.disabled = true;
+        err.textContent = "";
+        
+        if (authMode === 'login') {
+            await signInWithEmailAndPassword(auth, e, p);
+        } else {
+            const userCred = await createUserWithEmailAndPassword(auth, e, p);
+            // Save the display name to firestore right away
+            await setDoc(doc(db, "users", userCred.user.uid), { displayName: n }, { merge: true });
+        }
+    } catch(er) {
+        err.textContent = "Fout: " + (er.code === 'auth/invalid-credential' ? 'Verkeerd wachtwoord of account bestaat niet.' : er.message);
+        btn.innerHTML = authMode === 'login' ? 'Inloggen' : 'Account Aanmaken';
+        btn.disabled = false;
+    }
 };
 
 window.handleLogout = async () => {
@@ -414,14 +509,18 @@ window.handleLogout = async () => {
     window.location.reload();
 };
 
+let userData = {};
+let activePlan = null;
+
 async function loadUserData(){
     try {
         const docSnap = await getDoc(doc(db, "users", currentUser.uid));
         if(docSnap.exists()){
-            const d = docSnap.data();
-            entriesData = d.entries || [];
-            clubsData = d.clubs || [];
-            challengeScores = d.challengeScores || {};
+            userData = docSnap.data();
+            entriesData = userData.entries || [];
+            clubsData = userData.clubs || [];
+            challengeScores = userData.challengeScores || {};
+            activePlan = userData.activePlan || null;
         }
     } catch(e){ console.error("Error loading data:", e); toast("Fout bij laden data"); }
 }
@@ -431,10 +530,23 @@ async function saveToDb(){
         await setDoc(doc(db, "users", currentUser.uid), {
             entries: entriesData,
             clubs: clubsData,
-            challengeScores: challengeScores
-        });
+            challengeScores: challengeScores,
+            activePlan: activePlan
+        }, { merge: true });
     } catch(e){ console.error("Error saving data:", e); toast("Fout bij opslaan in cloud"); throw e; }
 }
+
+window.saveProfileName = async () => {
+    const newName = document.getElementById('prof-name').value;
+    if(!newName) return toast('Vul een naam in.');
+    try {
+        await setDoc(doc(db, "users", currentUser.uid), { displayName: newName }, { merge: true });
+        userData.displayName = newName;
+        toast('Naam opgeslagen!');
+    } catch(e) {
+        toast('Fout bij opslaan.');
+    }
+};
 
 // Debounced opslaan: wacht 1s na typen, dan pas naar Firebase
 window.saveChallengeScore = (exId, val) => {
@@ -760,7 +872,14 @@ window.showTab = (t) => {
     document.getElementById('nav-'+t).classList.add('active');
     if(t==='analyse')   renderAnalyse();
     if(t==='voortgang') renderProg();
-    if(t==='clubs')     renderClubs();
+    if(t==='profiel') {
+        renderClubs();
+        if(currentUser){
+            document.getElementById('prof-email').textContent = currentUser.email;
+            document.getElementById('prof-name').value = userData.displayName || '';
+        }
+    }
+    if(t==='training')  renderSessions();
     if(t==='comm')      initComm();
 };
 
@@ -1009,32 +1128,147 @@ const WARMUP_HTML = `
     </div>`;
 
 
-window.genSessions = () => {
-    const lat=getLatest();if(!lat)return;
-    const mins=+document.getElementById('dur-slider').value;
-    const hcp=lat.stats?.hcp;
-    const used=new Set();
-    genSessData=SESS.map(st=>({...st,exs:buildSess(st.id,lat.ws,mins,used,hcp),mins}));
+window.genSessions = async () => {
+    const lat = getLatest();
+    if(!lat) {
+        toast('Sla eerst je data op!');
+        return;
+    }
+    
+    const mins = +document.getElementById('dur-slider').value;
+    const hcp = lat.stats?.hcp;
+    const used = new Set();
+    const planLen = parseInt(document.getElementById('plan-len').value) || 4;
+    
+    // Create plan of selected length by repeating the 4 base focuses
+    const newPlan = [];
+    for(let i=0; i<planLen; i++) {
+        const base = SESS[i % SESS.length];
+        newPlan.push({
+            ...base,
+            id: base.id + '_' + i, // unique ID per block instance
+            exs: buildSess(base.id, lat.ws, mins, used, hcp),
+            mins,
+            completed: false
+        });
+    }
+
+    // Inject Weekly Challenge into Session 1
+    if (newPlan.length > 0 && currentWeekEx) {
+        if (!newPlan[0].exs.find(e => e.id === currentWeekEx.id)) {
+            newPlan[0].exs.unshift({...currentWeekEx, isWeeklyChallenge: true});
+        } else {
+            const ex = newPlan[0].exs.find(e => e.id === currentWeekEx.id);
+            if(ex) ex.isWeeklyChallenge = true;
+        }
+    }
+
+    activePlan = newPlan;
+    
+    document.getElementById('tc-generate').style.display = 'none';
+    document.getElementById('tc-active').style.display = 'block';
+    
     renderSessions();
-    toast('🎯 4 sessies klaar!');
+    toast(`🎯 Trainingsblok van ${planLen} sessies opgeslagen!`);
+    
+    // Save to firebase
+    if(currentUser) {
+        await saveToDb();
+    }
 };
 
 function renderSessions(){
-    document.getElementById('sess-container').innerHTML= genSessData.map((sess,i)=>{
-        const tot=sess.exs.reduce((s,e)=>s+e.dur,0);
-        return`<div class="sc">
+    if (!activePlan || activePlan.length === 0) {
+        document.getElementById('tc-generate').style.display = 'block';
+        document.getElementById('tc-active').style.display = 'none';
+        return;
+    }
+
+    document.getElementById('tc-generate').style.display = 'none';
+    document.getElementById('tc-active').style.display = 'block';
+
+    const completedCount = activePlan.filter(s => s.completed).length;
+    document.getElementById('plan-prog-text').textContent = `${completedCount}/${activePlan.length} Sessies`;
+    document.getElementById('plan-prog-bar').style.width = `${(completedCount/activePlan.length)*100}%`;
+
+    document.getElementById('sess-container').innerHTML = activePlan.map((sess,i)=>{
+        const tot = sess.exs.reduce((s,e)=>s+e.dur,0);
+        const done = sess.completed;
+        const opacity = done ? '0.6' : '1';
+        const bg = done ? 'background:#f5f5f5;' : '';
+        const badgeHtml = done ? `<div class="sbadge bg-gr">✅</div>` : `<div class="sbadge ${sess.bc}">${sess.icon}</div>`;
+        const btnHtml = !done 
+            ? `<div style="display:flex;gap:8px;margin-top:16px;">
+                 <button class="btn btn-s" style="flex:1;padding:8px 0;" onclick="recalcSession(${i})">⏱️ Tijd wijzigen</button>
+                 <button class="btn btn-p" style="flex:2;padding:8px 0;margin:0;" onclick="completeSession(${i})">✅ Afronden</button>
+               </div>`
+            : `<div style="text-align:center;color:var(--gm);font-weight:700;margin-top:16px;">Sessie Voltooid 🎉</div>`;
+
+        return `<div class="sc" style="${bg}opacity:${opacity};">
             <div class="sh" onclick="togSess(${i})">
                 <div class="shl">
-                    <div class="sbadge ${sess.bc}">${sess.icon}</div>
-                    <div><div class="stit">Sessie ${i+1}: ${sess.lbl}</div>
-                    <div class="smeta">${sess.desc} · ~${tot+5} min (incl. warming-up) · ${sess.exs.length} oefeningen</div></div>
+                    ${badgeHtml}
+                    <div><div class="stit" style="${done?'text-decoration:line-through;color:var(--mu);':''}">Sessie ${i+1}: ${sess.lbl}</div>
+                    <div class="smeta">${sess.desc} · ~${tot+5} min · ${sess.exs.length} oefeningen</div></div>
                 </div>
                 <div class="schev" id="chev-${i}">▼</div>
             </div>
-            <div class="ssb" id="sb-${i}">${WARMUP_HTML}${renderExList(sess.exs,i)}</div>
+            <div class="ssb" id="sb-${i}" style="${done?'display:none;':''}">${WARMUP_HTML}${renderExList(sess.exs,i)}${btnHtml}</div>
         </div>`;
     }).join('');
 }
+
+window.recalcSession = async (idx) => {
+    if(!activePlan || !activePlan[idx]) return;
+    const newMins = parseInt(prompt("Hoeveel minuten heb je voor deze sessie (excl. 5m warming-up)?", activePlan[idx].mins));
+    if(!newMins || isNaN(newMins) || newMins < 10) return;
+    
+    const lat = getLatest();
+    if(!lat) { toast('Geen data gevonden.'); return; }
+    
+    const baseId = activePlan[idx].id.split('_')[0];
+    activePlan[idx].mins = newMins;
+    activePlan[idx].exs = buildSess(baseId, lat.ws, newMins, new Set(), lat.stats?.hcp);
+    
+    if(idx === 0 && currentWeekEx) {
+         if (!activePlan[0].exs.find(e => e.id === currentWeekEx.id)) {
+            activePlan[0].exs.unshift({...currentWeekEx, isWeeklyChallenge: true});
+         }
+    }
+    
+    renderSessions();
+    if(currentUser) await saveToDb();
+    toast('Tijd en oefeningen succesvol aangepast!');
+};
+
+window.completeSession = async (idx) => {
+    if(!activePlan || !activePlan[idx]) return;
+    activePlan[idx].completed = true;
+    
+    // Check if all are done
+    const allDone = activePlan.every(s => s.completed);
+    
+    renderSessions();
+    if(currentUser) await saveToDb();
+
+    if(allDone) {
+        setTimeout(() => {
+            alert('🎉 Gefeliciteerd! Je hebt je trainingsblok afgerond. Tijd om je data bij te werken en een nieuw blok te genereren.');
+            activePlan = null;
+            if(currentUser) saveToDb();
+            renderSessions();
+            showTab('data');
+        }, 600);
+    }
+};
+
+window.cancelPlan = async () => {
+    if(confirm('Weet je zeker dat je dit trainingsblok wilt wissen?')) {
+        activePlan = null;
+        renderSessions();
+        if(currentUser) await saveToDb();
+    }
+};
 
 function exMetaHtml(ex){
     const bHtml=ex.ballType==='none'?`<span class="ex-tag ex-none">🏌️ Geen ballen</span>`:
@@ -1079,10 +1313,18 @@ function renderExList(exs, sessIdx=0){
     })();
 
     return reordered.map((e,i)=>{
-        const isChallenge = i === challengeIdx;
+        const isWeekly = e.isWeeklyChallenge;
+        const isChallenge = i === challengeIdx && !isWeekly; // Use standard challenge layout only if not weekly
         const savedScore = challengeScores[e.id] || '';
-        const challengeHtml = isChallenge
-            ? `<div style="background:#fff9c4;border:1.5px solid #f9a825;border-radius:8px;padding:8px 10px;margin-bottom:8px;">
+        
+        let challengeHtml = '';
+        if (isWeekly) {
+            challengeHtml = `<div style="background:#e3f2fd;border:1.5px solid #1565C0;border-radius:8px;padding:8px 10px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;">
+                <div><div style="font-size:12px;font-weight:800;color:#1565C0;margin-bottom:2px;">🏆 Challenge van de Week</div><div style="font-size:11px;color:#1565C0;">Speel deze oefening en vul je score in op het Leaderboard!</div></div>
+                <button class="btn btn-p" style="margin:0;padding:6px 10px;font-size:11px;min-width:70px;" onclick="showTab('comm')">Naar Leaderboard</button>
+            </div>`;
+        } else if (isChallenge) {
+            challengeHtml = `<div style="background:#fff9c4;border:1.5px solid #f9a825;border-radius:8px;padding:8px 10px;margin-bottom:8px;">
                 <div style="font-size:12px;font-weight:700;color:#7b5e00;margin-bottom:6px;">🏆 Sessie Challenge — noteer je score!</div>
                 <div style="display:flex;gap:8px;align-items:center;">
                     <input type="text" placeholder="Bijv. 7/10 of 3 pogingen..."
@@ -1091,11 +1333,13 @@ function renderExList(exs, sessIdx=0){
                         style="flex:1;padding:6px 10px;border:1.5px solid #f9a825;border-radius:8px;font-size:13px;background:#fff;">
                     <span id="save-status-${e.id}" style="font-size:10px;white-space:nowrap;font-weight:600;color:${savedScore?'var(--gm)':'#aaa'};">${savedScore ? '✔ Opgeslagen' : '—'}</span>
                 </div>
-               </div>`
-            : '';
-        const headerBg = isChallenge ? 'background:#fffde7;border-radius:8px;padding:4px 8px;' : '';
-        return `<div class="ei" ${isChallenge ? 'style="border-bottom:2px solid #f9a825;"' : ''}>
-        <div class="eih" style="${headerBg}"><div class="ein">${isChallenge ? '🏆 ' : ''}${e.name}</div><div class="eid">${e.dur} min</div></div>
+               </div>`;
+        }
+
+        const headerBg = isWeekly ? 'background:#e3f2fd;border-radius:8px;padding:4px 8px;' : isChallenge ? 'background:#fffde7;border-radius:8px;padding:4px 8px;' : '';
+        const borderStyle = isWeekly ? 'border-bottom:2px solid #1565C0;' : isChallenge ? 'border-bottom:2px solid #f9a825;' : '';
+        return `<div class="ei" style="${borderStyle}">
+        <div class="eih" style="${headerBg}"><div class="ein">${isWeekly||isChallenge ? '🏆 ' : ''}${e.name}</div><div class="eid">${e.dur} min</div></div>
         ${challengeHtml}${exMetaHtml(e)}
         <div class="eidesc">${e.desc}</div>
         <div class="eitip">${e.tip}</div>
@@ -1238,7 +1482,8 @@ function initAppUI(){
     if(!lat) {
         document.getElementById('hdr-sub').textContent='Voer je data in om te beginnen';
         document.getElementById('te').style.display='block';
-        document.getElementById('tc').style.display='none';
+        document.getElementById('tc-generate').style.display='none';
+        document.getElementById('tc-active').style.display='none';
         return;
     }
     if(lat.mode==='manual'){
@@ -1256,7 +1501,13 @@ function initAppUI(){
     }
     updHeader(lat);
     document.getElementById('te').style.display='none';
-    document.getElementById('tc').style.display='block';
+    if(activePlan && activePlan.length > 0) {
+        document.getElementById('tc-generate').style.display='none';
+        document.getElementById('tc-active').style.display='block';
+    } else {
+        document.getElementById('tc-generate').style.display='block';
+        document.getElementById('tc-active').style.display='none';
+    }
 }
 
 window.shareApp = () => {
