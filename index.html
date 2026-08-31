@@ -995,19 +995,32 @@ function renderClubs(){
         {id:'cl3',name:'Hout 5',carry:'',total:''}, {id:'cl4',name:'Hybride 4',carry:'',total:''},
         {id:'cl5',name:'IJzer 5',carry:'',total:''}, {id:'cl6',name:'IJzer 6',carry:'',total:''},
         {id:'cl7',name:'IJzer 7',carry:'',total:''}, {id:'cl8',name:'IJzer 8',carry:'',total:''},
-        {id:'cl9',name:'IJzer 9',carry:'',total:''}, {id:'cl10',name:'PW (44°)',carry:'',total:''},
+        {id:'cl9',name:'IJzer 9',carry:'',total:''}, {id:'cl10',name:'Wedge (44°)',carry:'',total:''},
         {id:'cl11',name:'Wedge (50°)',carry:'',total:''}, {id:'cl12',name:'Wedge (56°)',carry:'',total:''}
     ];
     drawClubs();
 }
 
 window.drawClubs = () => {
-    const presets = ['Driver','Hout 3','Hout 5','Hybride 3','Hybride 4','IJzer 4','IJzer 5','IJzer 6','IJzer 7','IJzer 8','IJzer 9','Pitching Wedge (PW)','Gap Wedge (GW)','Sand Wedge (SW)','Lob Wedge (LW)','44°','48°','52°','56°','60°','Putter'];
-    const dl = `<datalist id="dl-clubs">${presets.map(p=>`<option value="${p}">`).join('')}</datalist>`;
-    document.getElementById('clubs-list').innerHTML= dl + clubsData.map((c,i)=>{
+    const presets = [
+        'Kies Club...', 'Driver', 
+        'Hout 3', 'Hout 4', 'Hout 5', 'Hout 7', 
+        'Hybride 2', 'Hybride 3', 'Hybride 4', 'Hybride 5', 'Hybride 6',
+        'IJzer 2', 'IJzer 3', 'IJzer 4', 'IJzer 5', 'IJzer 6', 'IJzer 7', 'IJzer 8', 'IJzer 9',
+        'Pitching Wedge (PW)', 'Gap Wedge (GW)', 'Sand Wedge (SW)', 'Lob Wedge (LW)',
+        'Wedge (42°)', 'Wedge (44°)', 'Wedge (46°)', 'Wedge (48°)', 
+        'Wedge (50°)', 'Wedge (52°)', 'Wedge (54°)', 'Wedge (56°)', 
+        'Wedge (58°)', 'Wedge (60°)', 'Wedge (64°)', 
+        'Putter'
+    ];
+    document.getElementById('clubs-list').innerHTML= clubsData.map((c,i)=>{
+        const opts = presets.map(p=>`<option value="${p}" ${c.name===p?'selected':''}>${p}</option>`).join('');
         return `
         <div class="club-row">
-            <input class="club-sel" type="text" list="dl-clubs" value="${c.name||''}" placeholder="Typ naam of graden..." onchange="window.updateClubName(${i}, this.value)">
+            <select class="club-sel" onchange="window.updateClubName(${i}, this.value)">
+                ${!presets.includes(c.name) && c.name ? `<option value="${c.name}" selected>${c.name} (Aangepast)</option>` : ''}
+                ${opts}
+            </select>
             <input class="club-carry" type="number" value="${c.carry||''}" placeholder="m" min="0" max="400" onchange="window.updateClubCarry(${i}, this.value)">
             <input class="club-total" type="number" value="${c.total||''}" placeholder="m" min="0" max="450" onchange="window.updateClubTotal(${i}, this.value)">
             <button class="club-del" onclick="delClub(${i})" title="Verwijderen">🗑</button>
