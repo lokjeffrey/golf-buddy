@@ -6,6 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#1b5e20">
+    <link rel="manifest" href="manifest.json">
     <title>Golf Buddy</title>
     <style>
         :root{--gd:#1b5e20;--g:#2e7d32;--gm:#388e3c;--gl:#43a047;--gp:#e8f5e9;--gx:#f1f8f0;
@@ -703,6 +704,13 @@ window.setMode = (m) => {
 };
 
 window.setManFocus = (cat,prio) => {
+    if (prio === 'hoofd' && manualFocus[cat] !== 'hoofd') {
+        const hoofdCount = Object.values(manualFocus).filter(v => v === 'hoofd').length;
+        if (hoofdCount >= 2) {
+            toast('❌ Kies maximaal 2 hoofddoelen voor een effectieve training.');
+            return;
+        }
+    }
     manualFocus[cat]=manualFocus[cat]===prio?null:prio;
     drawManualFocus();
 };
@@ -905,6 +913,7 @@ const WARMUP_HTML = `
         <div class="eidesc"><strong>1. Losdraaien (2 min)</strong> — Draai je schouders, heupen, knieën en polsen zachtjes los. Geen clubs nodig.<br><strong>2. Korte swings (3 min)</strong> — Pak je Sand Wedge of Pitching Wedge. Sla 10–15 halve, ontspannen slagen om het ritme te voelen.</div>
     </div>`;
 
+
 window.genSessions = () => {
     const lat=getLatest();if(!lat)return;
     const mins=+document.getElementById('dur-slider').value;
@@ -938,7 +947,7 @@ function exMetaHtml(ex){
                 `<span class="ex-tag ex-own">⚪ ${ex.balls} eigen ballen</span>`;
     const sHtml=ex.goal?`<span class="ex-tag ex-goal">🎯 ${ex.goal}</span>`:`<span class="ex-tag ex-sets">${ex.sets}× herhalen</span>`;
     const adv=getClubAdvice(ex);
-    const cHtml=adv?`<span class="ex-tag ex-club">🏌️ ${adv}</span>`:'';
+    const cHtml=adv?`<span class="ex-tag ex-club">${adv}</span>`:''; // Emoji is al toegevoegd door getClubAdvice
     return`<div class="ex-meta">${bHtml}${sHtml}${cHtml}</div>`;
 }
 
@@ -947,16 +956,20 @@ function difBadge(dif){
     return`<span class="dif-badge ${cls}">${dif}</span>`;
 }
 
+// Volgorde voor afslag: kort naar lang
+const DRIVE_HINT_ORDER = {long_iron:0, hybrid:1, wood:2, driver:3};
 
 function renderExList(exs, sessIdx=0){
     if(!exs.length)return'<p style="color:var(--mu);font-size:13px;padding:10px 0;">Geen oefeningen voor deze configuratie.</p>';
 
-    // Sort drive exercises to alternate clubHints (avoid 3x driver in a row)
+    // Sorteer afslag-oefeningen (driver als laatste)
     const reordered = (() => {
         const drives = exs.filter(e => e.cat==='drive');
         const others = exs.filter(e => e.cat!=='drive');
         if(drives.length > 1){
-            const sorted = [...drives].sort((a,b)=>(a.clubHint||'').localeCompare(b.clubHint||''));
+            const sorted = [...drives].sort((a,b)=>
+                (DRIVE_HINT_ORDER[a.clubHint]??99) - (DRIVE_HINT_ORDER[b.clubHint]??99)
+            );
             return [...sorted, ...others];
         }
         return exs;
@@ -1150,6 +1163,17 @@ function initAppUI(){
     document.getElementById('te').style.display='none';
     document.getElementById('tc').style.display='block';
 }
+</script>
+<script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js').then(reg => {
+                console.log('ServiceWorker registered with scope:', reg.scope);
+            }).catch(err => {
+                console.error('ServiceWorker registration failed:', err);
+            });
+        });
+    }
 </script>
 </body>
 </html>
