@@ -344,6 +344,7 @@ const db = getFirestore(app);
 let currentUser = null;
 let entriesData = [];
 let clubsData = [];
+let challengeScores = {}; // scores per oefening-ID, gesynchroniseerd met Firebase
 
 /* ═══════════════════════════════════════════════════════
    AUTH LOGIC
@@ -392,15 +393,36 @@ async function loadUserData(){
             const d = docSnap.data();
             entriesData = d.entries || [];
             clubsData = d.clubs || [];
+            challengeScores = d.challengeScores || {};
         }
     } catch(e){ console.error("Error loading data:", e); toast("Fout bij laden data"); }
 }
 
 async function saveToDb(){
     try {
-        await setDoc(doc(db, "users", currentUser.uid), { entries: entriesData, clubs: clubsData });
+        await setDoc(doc(db, "users", currentUser.uid), {
+            entries: entriesData,
+            clubs: clubsData,
+            challengeScores: challengeScores
+        });
     } catch(e){ console.error("Error saving data:", e); toast("Fout bij opslaan in cloud"); throw e; }
 }
+
+// Debounced opslaan: wacht 1s na typen, dan pas naar Firebase
+window.saveChallengeScore = (exId, val) => {
+    challengeScores[exId] = val;
+    const statusEl = document.getElementById('save-status-' + exId);
+    if(statusEl){ statusEl.textContent = '⏳ Opslaan...'; statusEl.style.color = '#7b5e00'; }
+    clearTimeout(window.scoreTimeout);
+    window.scoreTimeout = setTimeout(async () => {
+        try {
+            await saveToDb();
+            if(statusEl){ statusEl.textContent = '✔ Opgeslagen'; statusEl.style.color = 'var(--gm)'; }
+        } catch(e) {
+            if(statusEl){ statusEl.textContent = '❌ Fout'; statusEl.style.color = 'var(--rd)'; }
+        }
+    }, 1000);
+};
 
 /* ═══════════════════════════════════════════════════════
    OEFENINGEN DATABASE (62 stuks)
@@ -951,17 +973,16 @@ function renderExList(exs, sessIdx=0){
 
     return reordered.map((e,i)=>{
         const isChallenge = i === challengeIdx;
-        const scoreKey = `score_s${sessIdx}_${e.id}`;
-        const savedScore = localStorage.getItem(scoreKey) || '';
+        const savedScore = challengeScores[e.id] || '';
         const challengeHtml = isChallenge
             ? `<div style="background:#fff9c4;border:1.5px solid #f9a825;border-radius:8px;padding:8px 10px;margin-bottom:8px;">
                 <div style="font-size:12px;font-weight:700;color:#7b5e00;margin-bottom:6px;">🏆 Sessie Challenge — noteer je score!</div>
                 <div style="display:flex;gap:8px;align-items:center;">
                     <input type="text" placeholder="Bijv. 7/10 of 3 pogingen..."
                         value="${savedScore}"
-                        oninput="localStorage.setItem('${scoreKey}', this.value)"
+                        oninput="window.saveChallengeScore('${e.id}', this.value); document.getElementById('save-status-${e.id}').textContent='⏳ Opslaan...'; document.getElementById('save-status-${e.id}').style.color='#7b5e00';"
                         style="flex:1;padding:6px 10px;border:1.5px solid #f9a825;border-radius:8px;font-size:13px;background:#fff;">
-                    <span style="font-size:10px;color:#7b5e00;white-space:nowrap;">✔ Auto-opgeslagen</span>
+                    <span id="save-status-${e.id}" style="font-size:10px;white-space:nowrap;font-weight:600;color:${savedScore?'var(--gm)':'#aaa'};">${savedScore ? '✔ Opgeslagen' : '—'}</span>
                 </div>
                </div>`
             : '';
