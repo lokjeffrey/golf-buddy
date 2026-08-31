@@ -488,12 +488,6 @@ const SESS=[
     {id:'gamesim',  lbl:'Game Simulatie',      icon:'🏆',bc:'bd4',desc:'Verdeling zoals een echte ronde'}
 ];
 
-const STD_CLUBS=[
-    'Kies Club...','Driver','Hout 3','Hout 5','Hout 7','Hybride 3','Hybride 4','Hybride 5',
-    'IJzer 3','IJzer 4','IJzer 5','IJzer 6','IJzer 7','IJzer 8','IJzer 9',
-    'Pitching Wedge (46°-48°)','Gap Wedge (50°-52°)','Sand Wedge (54°-56°)','Lob Wedge (58°-60°)','Putter'
-];
-
 function getBM(hcp){
     const h=hcp?+hcp:14;
     if(h<=9)  return{drive:60,approach:50,chipGem:10,chipUaD:40,puttAvg:1.7,puttShort:2, puttMedium:15,puttLong:10};
@@ -543,30 +537,30 @@ function rankCats(sc){return Object.entries(sc).sort((a,b)=>b[1]-a[1]).map(([cat
 function getClubAdvice(ex){
     let c = null;
     let catStr = 'Club';
-    const validClubs = clubsData.filter(x => x.name && x.name !== 'Kies Club...');
+    const validClubs = clubsData.filter(x => x.name && x.name.trim() !== '' && x.name !== 'Kies Club...');
 
     if(ex.cat==='drive'){
         catStr = 'Driver';
-        c = validClubs.find(x=>x.name.includes('Driver'));
+        c = validClubs.find(x=>x.name.match(/driver/i));
     }
     else if(ex.cat==='approach'){
         if(ex.distHint){
             catStr = 'Mid/Long Iron';
-            let valid = validClubs.filter(x=>+x.carry>0 && !x.name.includes('Putter') && !x.name.includes('Driver'));
+            let valid = validClubs.filter(x=>+x.carry>0 && !x.name.match(/putter|driver/i));
             if(valid.length) c = valid.sort((a,b)=>Math.abs(+a.carry-ex.distHint)-Math.abs(+b.carry-ex.distHint))[0];
         } else {
             catStr = 'Short Iron';
-            c = validClubs.find(x=>x.name.includes('IJzer 7') || x.name.includes('IJzer 8') || x.name.includes('IJzer 9'));
+            c = validClubs.find(x=>x.name.match(/ijzer\s*[789]|iron\s*[789]/i));
         }
     }
     else if(ex.cat==='chip'){
         catStr = 'Wedge';
-        let wedges = validClubs.filter(x=>x.name.includes('Wedge'));
-        c = wedges.find(x=>x.name.includes('Sand')) || wedges[0];
+        let wedges = validClubs.filter(x=>x.name.match(/wedge|pw|sw|lw|gw|aw|pitch|\b4[4-9]°?|\b5[0-9]°?|\b6[0-4]°?/i));
+        c = wedges.find(x=>x.name.match(/sand|sw|5[4-6]/i)) || wedges[0];
     }
     else if(ex.cat.includes('putt')){
         catStr = 'Putter';
-        c = validClubs.find(x=>x.name.includes('Putter'));
+        c = validClubs.find(x=>x.name.match(/putter/i));
     }
 
     if(c){
@@ -1001,21 +995,19 @@ function renderClubs(){
         {id:'cl3',name:'Hout 5',carry:'',total:''}, {id:'cl4',name:'Hybride 4',carry:'',total:''},
         {id:'cl5',name:'IJzer 5',carry:'',total:''}, {id:'cl6',name:'IJzer 6',carry:'',total:''},
         {id:'cl7',name:'IJzer 7',carry:'',total:''}, {id:'cl8',name:'IJzer 8',carry:'',total:''},
-        {id:'cl9',name:'IJzer 9',carry:'',total:''}, {id:'cl10',name:'Pitching Wedge (46°-48°)',carry:'',total:''},
-        {id:'cl11',name:'Sand Wedge (54°-56°)',carry:'',total:''}, {id:'cl12',name:'Putter',carry:'',total:''}
+        {id:'cl9',name:'IJzer 9',carry:'',total:''}, {id:'cl10',name:'PW (44°)',carry:'',total:''},
+        {id:'cl11',name:'Wedge (50°)',carry:'',total:''}, {id:'cl12',name:'Wedge (56°)',carry:'',total:''}
     ];
     drawClubs();
 }
 
 window.drawClubs = () => {
-    document.getElementById('clubs-list').innerHTML=clubsData.map((c,i)=>{
-        const opts = STD_CLUBS.map(sc => `<option value="${sc}" ${c.name===sc?'selected':''}>${sc}</option>`).join('');
+    const presets = ['Driver','Hout 3','Hout 5','Hybride 3','Hybride 4','IJzer 4','IJzer 5','IJzer 6','IJzer 7','IJzer 8','IJzer 9','Pitching Wedge (PW)','Gap Wedge (GW)','Sand Wedge (SW)','Lob Wedge (LW)','44°','48°','52°','56°','60°','Putter'];
+    const dl = `<datalist id="dl-clubs">${presets.map(p=>`<option value="${p}">`).join('')}</datalist>`;
+    document.getElementById('clubs-list').innerHTML= dl + clubsData.map((c,i)=>{
         return `
         <div class="club-row">
-            <select class="club-sel" onchange="window.updateClubName(${i}, this.value)">
-                ${!STD_CLUBS.includes(c.name) && c.name ? `<option value="${c.name}" selected>${c.name} (Aangepast)</option>` : ''}
-                ${opts}
-            </select>
+            <input class="club-sel" type="text" list="dl-clubs" value="${c.name||''}" placeholder="Typ naam of graden..." onchange="window.updateClubName(${i}, this.value)">
             <input class="club-carry" type="number" value="${c.carry||''}" placeholder="m" min="0" max="400" onchange="window.updateClubCarry(${i}, this.value)">
             <input class="club-total" type="number" value="${c.total||''}" placeholder="m" min="0" max="450" onchange="window.updateClubTotal(${i}, this.value)">
             <button class="club-del" onclick="delClub(${i})" title="Verwijderen">🗑</button>
