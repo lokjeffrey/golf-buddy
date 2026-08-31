@@ -966,4 +966,274 @@ function renderGarminAnalyse(lat){
         const bc=score>30?'b-crit':score>15?'b-wk':score>5?'b-att':'b-ok';
         const lbl=score>30?'🔴 Kritiek':score>15?'🟠 Zwak':score>5?'🟡 Aandacht':'🟢 Goed';
         return`<div class="wbc"><div class="wbh"><span class="wbl">${CAT_LBL[cat]}</span><span class="wbv">${lbl}</span></div>
-            <div class="wbt"><div class="wbf ${bc}" style="width:${pct}%"></div></d
+            <div class="wbt"><div class="wbf ${bc}" style="width:${pct}%"></div></div></div>`;
+    }).join('');
+
+    const rows=[
+        {lbl:'🏌️ Fairway Hit',v:s.drive,bm:bm.drive,u:'%',hi:true},
+        {lbl:'↖️ Richting Links',v:s.drl,bm:null,u:'%',info:true},
+        {lbl:'↗️ Richting Rechts',v:s.drr,bm:null,u:'%',info:true},
+        {lbl:'🎯 GIR',v:s.approach,bm:bm.approach,u:'%',hi:true},
+        {lbl:'🏌 Chip Miss %',v:s.cgem,bm:bm.chipGem,u:'%',hi:false},
+        {lbl:'🏌 Up-and-Down %',v:s.cuad,bm:bm.chipUaD,u:'%',hi:true},
+        {lbl:'🏖️ Sand Save %',v:s.csan,bm:null,u:'%',info:true},
+        {lbl:'🎱 Putts/hole',v:s.puttAvg,bm:bm.puttAvg,u:'',hi:false},
+        {lbl:'🎱 1-putt Kort',v:s.p1s,bm:null,u:'%',info:true},
+        {lbl:'🎱 1-putt Medium',v:s.p1m,bm:null,u:'%',info:true},
+        {lbl:'🎱 1-putt Lang',v:s.p1l,bm:null,u:'%',info:true},
+        {lbl:'🎱 3+ putt Kort',v:s.puttShort,bm:bm.puttShort,u:'%',hi:false},
+        {lbl:'🎱 3+ putt Medium',v:s.puttMedium,bm:bm.puttMedium,u:'%',hi:false},
+        {lbl:'🎱 3+ putt Lang',v:s.puttLong,bm:bm.puttLong,u:'%',hi:false},
+    ].filter(r=>r.v!==null&&r.v!=='').map(r=>{
+        if(r.info)return`<tr><td>${r.lbl}</td><td style="text-align:center;font-weight:700;">${+r.v}${r.u}</td><td style="text-align:center;color:var(--mu);">ℹ️</td></tr>`;
+        const good=r.hi?+r.v>=r.bm:+r.v<=r.bm;
+        return`<tr><td>${r.lbl}</td>
+            <td style="text-align:center;font-weight:700;color:${good?'var(--gm)':'var(--rd)'};">${+r.v}${r.u}</td>
+            <td style="text-align:center;color:var(--mu);">${good?'✅':'❌'} ${r.bm}${r.u}</td></tr>`;
+    }).join('');
+
+    let dirHtml='';
+    if(s.drl&&s.drf&&s.drr){
+        const l=+s.drl,f=+s.drf,r=+s.drr;
+        dirHtml=`<div class="card"><div class="ctit">📐 Rijrichting Verdeling</div>
+            <div style="display:flex;border-radius:8px;overflow:hidden;height:32px;margin-bottom:8px;">
+                <div style="width:${l}%;background:#e65100;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;min-width:24px;">${l}%</div>
+                <div style="width:${f}%;background:var(--gm);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;min-width:24px;">${f}%</div>
+                <div style="width:${r}%;background:#1565C0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;min-width:24px;">${r}%</div>
+            </div>
+            <div style="display:flex;gap:12px;font-size:11px;">
+                <span style="color:#e65100;">⬛ Links ${l}%</span>
+                <span style="color:var(--gm);">⬛ Fairway ${f}%</span>
+                <span style="color:#1565C0;">⬛ Rechts ${r}%</span>
+            </div>
+            ${Math.abs(l-r)>20?`<div style="margin-top:8px;font-size:12px;color:var(--or);">⚠️ Je mist duidelijk vaker naar ${l>r?'links':'rechts'}.</div>`:''}
+        </div>`;
+    }
+
+    document.getElementById('ac').innerHTML=`
+        <div class="card">${hcpBadgeHtml(s)}${hlHtml}${barsHtml}</div>
+        ${dirHtml}
+        <div class="card"><div class="ctit">📏 Stats vs Benchmark (jouw HCP-klasse)</div>
+            <table class="stbl">
+                <thead><tr><th>Stat</th><th style="text-align:center;">Jij</th><th style="text-align:center;">Doel</th></tr></thead>
+                <tbody>${rows}</tbody>
+            </table>
+            <p style="font-size:10px;color:var(--mu);margin-top:8px;">ℹ️ = informatief, geen benchmark</p>
+        </div>`;
+}
+
+/* ═══════════════════════════════════════════════════════
+   TRAINING
+═══════════════════════════════════════════════════════ */
+let genSessData=[];
+
+function genSessions(){
+    const lat=getLatest();if(!lat)return;
+    const mins=+document.getElementById('dur-slider').value;
+    const hcp=lat.stats?.hcp;
+    const used=new Set();
+    genSessData=SESS.map(st=>({...st,exs:buildSess(st.id,lat.ws,mins,used,hcp),mins}));
+    renderSessions();
+    toast('🎯 4 sessies klaar!');
+}
+
+function renderSessions(){
+    document.getElementById('sess-container').innerHTML=genSessData.map((sess,i)=>{
+        const tot=sess.exs.reduce((s,e)=>s+e.dur,0);
+        return`<div class="sc">
+            <div class="sh" onclick="togSess(${i})">
+                <div class="shl">
+                    <div class="sbadge ${sess.bc}">${sess.icon}</div>
+                    <div><div class="stit">Sessie ${i+1}: ${sess.lbl}</div>
+                    <div class="smeta">${sess.desc} · ~${tot} min · ${sess.exs.length} oefeningen</div></div>
+                </div>
+                <div class="schev" id="chev-${i}">▼</div>
+            </div>
+            <div class="ssb" id="sb-${i}">${renderExList(sess.exs)}</div>
+        </div>`;
+    }).join('');
+}
+
+function exMetaHtml(ex){
+    const bHtml=ex.ballType==='none'?`<span class="ex-tag ex-none">🏌️ Geen ballen</span>`:
+                ex.ballType==='range'?`<span class="ex-tag ex-range">🟡 ${ex.balls} range ballen</span>`:
+                `<span class="ex-tag ex-own">⚪ ${ex.balls} eigen ballen</span>`;
+    const sHtml=ex.goal?`<span class="ex-tag ex-goal">🎯 ${ex.goal}</span>`:`<span class="ex-tag ex-sets">${ex.sets}× herhalen</span>`;
+    const adv=getClubAdvice(ex);
+    const cHtml=adv?`<span class="ex-tag ex-club">🏌️ ${adv}</span>`:'';
+    return`<div class="ex-meta">${bHtml}${sHtml}${cHtml}</div>`;
+}
+
+function difBadge(dif){
+    const cls=dif==='Gemakkelijk'?'dif-e':dif==='Gemiddeld'?'dif-m':'dif-h';
+    return`<span class="dif-badge ${cls}">${dif}</span>`;
+}
+
+function renderExList(exs){
+    if(!exs.length)return'<p style="color:var(--mu);font-size:13px;padding:10px 0;">Geen oefeningen voor deze configuratie.</p>';
+    return exs.map(e=>`<div class="ei">
+        <div class="eih"><div class="ein">${e.name}</div><div class="eid">${e.dur} min</div></div>
+        ${exMetaHtml(e)}
+        <div class="eidesc">${e.desc}</div>
+        <div class="eitip">${e.tip}</div>
+        <span class="eicat" style="background:${CAT_COL[e.cat]||'#f5f5f5'};color:#333;">${CAT_LBL[e.cat]||e.cat}</span>${difBadge(e.dif)}
+    </div>`).join('');
+}
+
+function togSess(i){document.getElementById('sb-'+i).classList.toggle('open');document.getElementById('chev-'+i).classList.toggle('open');}
+
+/* ═══════════════════════════════════════════════════════
+   VOORTGANG
+═══════════════════════════════════════════════════════ */
+function renderProg(){
+    const entries=getEntries();
+    if(!entries.length){document.getElementById('pe').style.display='block';document.getElementById('pc').style.display='none';return;}
+    document.getElementById('pe').style.display='none';
+    document.getElementById('pc').style.display='block';
+    let html='';
+    const garminEntries=entries.filter(e=>e.mode!=='manual');
+    if(garminEntries.length>=2){
+        html+=`<div class="card"><div class="ctit">📈 Zwakte Score Verloop</div>${buildChart(garminEntries)}
+            <p style="font-size:11px;color:var(--mu);margin-top:8px;">Lager = beter. Score 0 = boven benchmark voor jouw HCP.</p></div>`;
+    }
+    html+=`<div class="card"><div class="ctit">📋 Metingen (max 10)</div>`;
+    entries.forEach((e,idx)=>{
+        const s=e.stats||{};
+        const cls=getHcpClass(s.hcp);
+        if(e.mode==='manual'){
+            const focusChips=Object.entries(e.manualFocus||{}).filter(([,v])=>v!==null)
+                .map(([cat,prio])=>{
+                    const chipCls=prio==='hoofd'?'chip-r':prio==='bij'?'chip-o':'chip-y';
+                    return`<span class="chip ${chipCls}">${CAT_LBL[cat]}</span>`;
+                }).join('');
+            html+=`<div class="ent">
+                <div class="entd">${fmtDate(e.ts)} <span style="font-size:10px;background:#e8eaf6;color:#283593;padding:2px 7px;border-radius:8px;margin-left:4px;">✏️ Handmatig</span>
+                ${s.hcp?`<span class="hcp-cls" style="background:${cls?cls.bg:'var(--gp)'};color:${cls?cls.color:'var(--gd)'};">HCP ${s.hcp}</span>`:''}
+                ${idx===0?' <span style="font-size:10px;background:var(--gd);color:#fff;padding:2px 7px;border-radius:8px;">Nieuwste</span>':''}</div>
+                <div class="entchips">${focusChips||'<span class="chip">Geen focus ingesteld</span>'}</div>
+            </div>`;
+        }else{
+            const top=Object.entries(e.ws||{}).sort((a,b)=>b[1]-a[1])[0];
+            html+=`<div class="ent">
+                <div class="entd">${fmtDate(e.ts)}
+                ${s.hcp?`<span class="hcp-cls" style="background:${cls?cls.bg:'var(--gp)'};color:${cls?cls.color:'var(--gd)'};">HCP ${s.hcp}</span>`:''}
+                ${idx===0?' <span style="font-size:10px;background:var(--gd);color:#fff;padding:2px 7px;border-radius:8px;">Nieuwste</span>':''}</div>
+                <div class="entchips">
+                    ${s.drive?`<span class="chip">🏌️ ${s.drive}% FW</span>`:''}
+                    ${s.approach?`<span class="chip">🎯 ${s.approach}% GIR</span>`:''}
+                    ${s.cuad?`<span class="chip">🏌 ${s.cuad}% U&D</span>`:''}
+                    ${s.puttAvg?`<span class="chip">🎱 ${s.puttAvg} p/h</span>`:''}
+                    ${top?`<span class="chip chip-r">Focus: ${CAT_LBL[top[0]]}</span>`:''}
+                </div>
+            </div>`;
+        }
+    });
+    html+='</div>';
+    html+=`<div style="text-align:center;margin-top:4px;"><button class="btn btn-s" onclick="confirmReset()" style="max-width:220px;font-size:13px;">🗑️ Alle data verwijderen</button></div>`;
+    document.getElementById('pc').innerHTML=html;
+}
+
+function buildChart(entries){
+    const data=[...entries].reverse().slice(-10);
+    const cats=['drive','approach','chip','puttMedium'],cols=['#1565C0','#2e7d32','#6a1b9a','#e65100'],lbls=['Drive','Approach','Chip','Putt M'];
+    const W=320,H=150,PL=32,PB=28,PR=10,PT=10,cW=W-PL-PR,cH=H-PB-PT;
+    const allSc=data.flatMap(e=>cats.map(c=>e.ws?.[c]||0));
+    const maxSc=Math.max(...allSc,20);
+    const xS=data.length>1?cW/(data.length-1):cW;
+    let svg=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;display:block;">`;
+    for(let i=0;i<=4;i++){const y=PT+(cH/4)*i;svg+=`<line x1="${PL}" y1="${y}" x2="${W-PR}" y2="${y}" stroke="#e0e0e0" stroke-width="1"/>
+        <text x="${PL-3}" y="${y+4}" text-anchor="end" font-size="9" fill="#aaa">${Math.round(maxSc-(maxSc/4)*i)}</text>`;}
+    data.forEach((e,i)=>{const x=PL+(data.length>1?i*xS:cW/2);const d=new Date(e.ts);
+        svg+=`<text x="${x}" y="${H-4}" text-anchor="middle" font-size="9" fill="#aaa">${d.getDate()}/${d.getMonth()+1}</text>`;});
+    cats.forEach((cat,ci)=>{
+        let path='';
+        data.forEach((e,i)=>{const sc=e.ws?.[cat]||0;const x=PL+(data.length>1?i*xS:cW/2);const y=PT+cH-(sc/maxSc)*cH;path+=(i===0?`M${x},${y}`:`L${x},${y}`);});
+        svg+=`<path d="${path}" fill="none" stroke="${cols[ci]}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`;
+        data.forEach((e,i)=>{const sc=e.ws?.[cat]||0;const x=PL+(data.length>1?i*xS:cW/2);const y=PT+cH-(sc/maxSc)*cH;
+            svg+=`<circle cx="${x}" cy="${y}" r="3.5" fill="${cols[ci]}" stroke="#fff" stroke-width="1.5"/>`;});
+    });
+    svg+='</svg>';
+    return svg+'<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;">'+
+        cats.map((c,i)=>`<div style="display:flex;align-items:center;gap:4px;font-size:11px;"><div style="width:14px;height:3px;background:${cols[i]};border-radius:2px;"></div><span style="color:var(--mu);">${lbls[i]}</span></div>`).join('')+'</div>';
+}
+
+function confirmReset(){
+    if(confirm('Weet je zeker dat je alle opgeslagen data wilt verwijderen?')){
+        localStorage.removeItem(LS_ENT);localStorage.removeItem(LS_LAT);
+        toast('🗑️ Data verwijderd');
+        document.getElementById('te').style.display='block';document.getElementById('tc').style.display='none';
+        document.getElementById('hdr-sub').textContent='Voer je data in om te beginnen';
+        renderProg();
+    }
+}
+
+/* ═══════════════════════════════════════════════════════
+   CLUBS
+═══════════════════════════════════════════════════════ */
+let clubsData=[];
+
+function renderClubs(){
+    const saved=getClubs();
+    if(saved&&saved.length) clubsData=saved.map(migrateClub);
+    else if(!clubsData.length) clubsData=DEFAULT_CLUBS.map(c=>({...c,id:c.id+'_'+Date.now()+Math.random()}));
+    drawClubs();
+}
+
+function drawClubs(){
+    document.getElementById('clubs-list').innerHTML=clubsData.map((c,i)=>`
+        <div class="club-row">
+            <input class="club-name" type="text" value="${esc(c.name)}" placeholder="Club naam" oninput="clubsData[${i}].name=this.value">
+            <input class="club-carry" type="number" value="${c.carry||''}" placeholder="m" min="0" max="400" oninput="clubsData[${i}].carry=this.value">
+            <input class="club-total" type="number" value="${c.total||''}" placeholder="m" min="0" max="450" oninput="clubsData[${i}].total=this.value">
+            <button class="club-del" onclick="delClub(${i})" title="Verwijderen">🗑</button>
+        </div>`).join('');
+}
+
+function addClub(){
+    clubsData.push({id:'new_'+Date.now(),name:'',carry:'',total:''});
+    drawClubs();
+    setTimeout(()=>{const r=document.querySelectorAll('.club-name');if(r.length)r[r.length-1].focus();},50);
+}
+
+function delClub(i){clubsData.splice(i,1);drawClubs();}
+
+function saveClubs(){
+    document.querySelectorAll('.club-row').forEach((row,i)=>{
+        if(clubsData[i]){
+            clubsData[i].name=row.querySelector('.club-name').value;
+            clubsData[i].carry=row.querySelector('.club-carry').value;
+            clubsData[i].total=row.querySelector('.club-total').value;
+        }
+    });
+    localStorage.setItem(LS_CLUBS,JSON.stringify(clubsData));
+    toast('💾 Clubs opgeslagen!');
+}
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+/* ═══════════════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════════════ */
+(function init(){
+    const lat=getLatest();
+    if(!lat) return;
+    if(lat.mode==='manual'){
+        setMode('manual');
+        if(lat.stats?.hcp) document.getElementById('s-hcp').value=lat.stats.hcp;
+        if(lat.manualFocus){manualFocus={...lat.manualFocus};drawManualFocus();}
+    }else{
+        setMode('garmin');
+        const s=lat.stats;
+        const map={hcp:'s-hcp',drive:'s-drv',drl:'s-drl',drf:'s-drf',drr:'s-drr',
+                   approach:'s-gir',cgem:'s-cgem',cuad:'s-cuad',csan:'s-csan',
+                   puttAvg:'s-pavg',p1s:'s-p1s',p1m:'s-p1m',p1l:'s-p1l',
+                   puttShort:'s-ps',puttMedium:'s-pm',puttLong:'s-pl'};
+        Object.entries(map).forEach(([k,id])=>{if(s&&s[k])document.getElementById(id).value=s[k];});
+    }
+    updHeader(lat);
+    document.getElementById('te').style.display='none';
+    document.getElementById('tc').style.display='block';
+})();
+</script>
+</body>
+</html>
