@@ -40,31 +40,14 @@
         }
 
         /* ── HEADER ── */
-        .hdr{
-            position:sticky;top:0;z-index:100;
-            background:var(--green-dark);color:#fff;
-            padding:14px 18px 10px;
-            box-shadow:0 2px 10px rgba(0,0,0,.25);
-        }
+        .hdr{position:sticky;top:0;z-index:100;background:var(--green-dark);color:#fff;padding:14px 18px 10px;box-shadow:0 2px 10px rgba(0,0,0,.25);}
         .hdr h1{font-size:19px;font-weight:800;letter-spacing:.4px;}
         .hdr-sub{font-size:11px;opacity:.75;margin-top:2px;}
 
         /* ── BOTTOM NAV ── */
-        .bnav{
-            position:fixed;bottom:0;left:0;right:0;
-            height:var(--nav);background:var(--white);
-            border-top:1px solid var(--border);
-            display:flex;z-index:100;
-            box-shadow:0 -2px 12px rgba(0,0,0,.07);
-        }
-        .nbtn{
-            flex:1;display:flex;flex-direction:column;
-            align-items:center;justify-content:center;gap:2px;
-            border:none;background:transparent;cursor:pointer;
-            color:var(--muted);font-size:10px;font-weight:600;
-            padding:6px 2px;transition:color .15s;
-        }
-        .nbtn .ico{font-size:21px;transition:transform .15s;}
+        .bnav{position:fixed;bottom:0;left:0;right:0;height:var(--nav);background:var(--white);border-top:1px solid var(--border);display:flex;z-index:100;box-shadow:0 -2px 12px rgba(0,0,0,.07);}
+        .nbtn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border:none;background:transparent;cursor:pointer;color:var(--muted);font-size:9px;font-weight:600;padding:6px 2px;transition:color .15s;}
+        .nbtn .ico{font-size:19px;transition:transform .15s;}
         .nbtn.active{color:var(--green-dark);}
         .nbtn.active .ico{transform:scale(1.12);}
 
@@ -82,19 +65,26 @@
         .tbtn.active{background:var(--green-dark);color:#fff;}
 
         /* ── FORM ── */
-        .fg{margin-bottom:11px;}
+        .fg{margin-bottom:10px;}
         .fl{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;margin-bottom:4px;display:block;}
         .fi{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:15px;background:var(--white);color:var(--text);transition:border-color .15s;-webkit-appearance:none;}
         .fi:focus{outline:none;border-color:var(--green-med);}
+        .fi-sm{padding:8px 10px;font-size:14px;text-align:center;}
         .gr2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
         .gr3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
         .slbl{font-size:13px;font-weight:700;color:var(--green-dark);padding:8px 0 6px;border-bottom:1px solid var(--green-pale);margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+
+        /* ── HCP BADGE ── */
+        .hcp-row{display:flex;align-items:center;gap:12px;background:var(--green-pale);border-radius:10px;padding:10px 14px;margin-bottom:14px;}
+        .hcp-lbl{font-size:13px;font-weight:700;color:var(--green-dark);flex:1;}
+        .hcp-input{width:90px;padding:8px 10px;border:1.5px solid var(--green-med);border-radius:8px;font-size:16px;font-weight:800;text-align:center;color:var(--green-dark);background:var(--white);}
 
         /* ── BUTTONS ── */
         .btn{width:100%;padding:13px;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;transition:opacity .15s;}
         .btn:active{opacity:.82;}
         .btn-p{background:var(--green-dark);color:#fff;}
         .btn-s{background:var(--green-pale);color:var(--green-dark);}
+        .btn-sm{width:auto;padding:6px 12px;font-size:13px;border-radius:8px;}
 
         /* ── WEAKNESS BARS ── */
         .wbc{margin-bottom:11px;}
@@ -153,26 +143,32 @@
         .chip{font-size:11px;padding:2px 8px;border-radius:10px;background:var(--green-pale);color:var(--green-dark);font-weight:600;}
         .chip-r{background:var(--red-lt);color:var(--red);}
 
-        /* ── EMPTY STATE ── */
-        .empty{text-align:center;padding:40px 20px;color:var(--muted);}
-        .empty .eico{font-size:50px;margin-bottom:12px;}
-        .empty p{font-size:14px;}
-
-        /* ── TOAST ── */
-        .toast{
-            position:fixed;bottom:calc(var(--nav) + 12px);left:50%;
-            transform:translateX(-50%) translateY(16px);
-            background:var(--green-dark);color:#fff;
-            padding:9px 18px;border-radius:20px;font-size:13px;font-weight:700;
-            opacity:0;transition:all .28s;z-index:200;white-space:nowrap;pointer-events:none;
-        }
-        .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+        /* ── CLUBS TAB ── */
+        .club-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);}
+        .club-row:last-child{border-bottom:none;}
+        .club-name{flex:1;padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;background:var(--white);color:var(--text);}
+        .club-dist{width:75px;padding:8px 8px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;text-align:center;background:var(--white);}
+        .club-dist:focus,.club-name:focus{outline:none;border-color:var(--green-med);}
+        .club-del{width:34px;height:34px;border:none;background:var(--red-lt);color:var(--red);border-radius:8px;font-size:16px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+        .dist-badge{display:inline-block;background:var(--green-pale);color:var(--green-dark);font-weight:700;font-size:13px;padding:3px 10px;border-radius:8px;min-width:50px;text-align:center;}
 
         /* ── TABLE ── */
         .stbl{width:100%;border-collapse:collapse;font-size:13px;}
         .stbl th{text-align:left;padding:6px 0;color:var(--muted);border-bottom:2px solid var(--border);font-size:11px;text-transform:uppercase;letter-spacing:.3px;}
         .stbl td{padding:7px 4px;border-bottom:1px solid var(--border);}
         .stbl tr:last-child td{border-bottom:none;}
+
+        /* ── EMPTY STATE ── */
+        .empty{text-align:center;padding:40px 20px;color:var(--muted);}
+        .empty .eico{font-size:50px;margin-bottom:12px;}
+        .empty p{font-size:14px;}
+
+        /* ── TOAST ── */
+        .toast{position:fixed;bottom:calc(var(--nav) + 12px);left:50%;transform:translateX(-50%) translateY(16px);background:var(--green-dark);color:#fff;padding:9px 18px;border-radius:20px;font-size:13px;font-weight:700;opacity:0;transition:all .28s;z-index:200;white-space:nowrap;pointer-events:none;}
+        .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+        /* ── INFO STRIP ── */
+        .info-strip{background:var(--green-xp);border:1px solid var(--green-pale);border-radius:8px;padding:8px 12px;font-size:11px;color:var(--muted);margin-bottom:12px;display:flex;align-items:center;gap:6px;}
     </style>
 </head>
 <body>
@@ -180,76 +176,94 @@
 <!-- Header -->
 <div class="hdr">
     <h1>⛳ Golf Buddy</h1>
-    <div class="hdr-sub" id="hdr-sub">Voer je data in om te beginnen</div>
+    <div class="hdr-sub" id="hdr-sub">Voer je Garmin data in om te beginnen</div>
 </div>
 
 <!-- ══════════════ TAB: DATA ══════════════ -->
 <div id="tab-data" class="tab active">
     <div class="card">
-        <div class="ctit">📋 Data invoer</div>
+        <div class="ctit">📋 Garmin Slagoverzicht</div>
 
-        <div class="tog">
-            <button class="tbtn active" id="btn-garmin" onclick="setMode('garmin')">🟢 Garmin</button>
-            <button class="tbtn" id="btn-manual" onclick="setMode('manual')">✏️ Handmatig</button>
+        <div class="info-strip">
+            ℹ️ Alle stats komen uit de Garmin Golf app → Slagoverzicht
         </div>
 
-        <p id="help-g" style="font-size:12px;color:var(--muted);margin-bottom:12px;">
-            Voer je statistieken in uit de <strong>Garmin Golf app</strong> → Statistieken → Seizoen/periode.
-        </p>
-        <p id="help-m" style="font-size:12px;color:var(--muted);margin-bottom:12px;display:none;">
-            Bereken je stats handmatig vanuit je scorekaart. Vul percentages in per categorie.
-        </p>
+        <!-- HANDICAP -->
+        <div class="hcp-row">
+            <div class="hcp-lbl">🏅 Handicap Index</div>
+            <input class="hcp-input" type="number" id="s-hcp" placeholder="—" step="0.1" min="0" max="54">
+        </div>
 
-        <div class="slbl">🏌️ Drive</div>
+        <!-- DRIVE -->
+        <div class="slbl">🏌️ Drive – Vanaf de tee</div>
         <div class="fg">
-            <label class="fl">Fairways Hit (%)</label>
-            <input class="fi" type="number" id="s-drv" placeholder="bijv. 55" min="0" max="100">
+            <label class="fl">Fairway %</label>
+            <input class="fi" type="number" id="s-drv" placeholder="bijv. 37" min="0" max="100">
         </div>
-
-        <div class="slbl">🎯 Approach / Ijzers</div>
-        <div class="fg">
-            <label class="fl">Greens in Regulation – GIR (%)</label>
-            <input class="fi" type="number" id="s-gir" placeholder="bijv. 32" min="0" max="100">
-        </div>
-
-        <div class="slbl">🏌 Chip &amp; Pitch</div>
-        <div class="gr2">
-            <div class="fg">
-                <label class="fl">Up-and-Down (%)</label>
-                <input class="fi" type="number" id="s-uad" placeholder="bijv. 30" min="0" max="100">
-            </div>
-            <div class="fg">
-                <label class="fl">Scrambling (%) opt.</label>
-                <input class="fi" type="number" id="s-scr" placeholder="bijv. 40" min="0" max="100">
-            </div>
-        </div>
-
-        <div class="slbl">🎱 Putting</div>
-        <div class="gr2">
-            <div class="fg">
-                <label class="fl">Gem. putts / hole</label>
-                <input class="fi" type="number" id="s-pavg" placeholder="bijv. 2.1" step="0.1" min="1" max="5">
-            </div>
-            <div class="fg">
-                <label class="fl">1-putt % opt.</label>
-                <input class="fi" type="number" id="s-p1" placeholder="bijv. 25" min="0" max="100">
-            </div>
-        </div>
-
-        <label class="fl" style="margin-bottom:6px;">3-putt % per afstand</label>
+        <label class="fl" style="margin-bottom:6px;">Richting verdeling</label>
         <div class="gr3">
             <div class="fg">
-                <label class="fl">Kort (&lt;3m)</label>
-                <input class="fi" type="number" id="s-ps" placeholder="%" min="0" max="100">
+                <label class="fl">Links %</label>
+                <input class="fi fi-sm" type="number" id="s-drl" placeholder="18" min="0" max="100">
             </div>
             <div class="fg">
-                <label class="fl">Medium (3-6m)</label>
-                <input class="fi" type="number" id="s-pm" placeholder="%" min="0" max="100">
+                <label class="fl">Fairway %</label>
+                <input class="fi fi-sm" type="number" id="s-drf" placeholder="37" min="0" max="100">
             </div>
             <div class="fg">
-                <label class="fl">Lang (&gt;6m)</label>
-                <input class="fi" type="number" id="s-pl" placeholder="%" min="0" max="100">
+                <label class="fl">Rechts %</label>
+                <input class="fi fi-sm" type="number" id="s-drr" placeholder="45" min="0" max="100">
             </div>
+        </div>
+
+        <!-- APPROACH -->
+        <div class="slbl">🎯 Approach – Naar de green</div>
+        <div class="fg">
+            <label class="fl">GIR – Green in Regulation %</label>
+            <input class="fi" type="number" id="s-gir" placeholder="bijv. 26" min="0" max="100">
+        </div>
+
+        <!-- CHIP -->
+        <div class="slbl">🏌 Chip – Korte game</div>
+        <div class="gr2">
+            <div class="fg">
+                <label class="fl">Gemist %</label>
+                <input class="fi" type="number" id="s-cgem" placeholder="bijv. 27" min="0" max="100">
+            </div>
+            <div class="fg">
+                <label class="fl">Naar boven/beneden %</label>
+                <input class="fi" type="number" id="s-cuad" placeholder="bijv. 9" min="0" max="100">
+            </div>
+        </div>
+        <div class="fg">
+            <label class="fl">Sandies %</label>
+            <input class="fi" type="number" id="s-csan" placeholder="bijv. 0" min="0" max="100">
+        </div>
+
+        <!-- PUTTING -->
+        <div class="slbl">🎱 Putt – Op de golfbaan</div>
+        <div class="fg">
+            <label class="fl">Gem. putts per hole</label>
+            <input class="fi" type="number" id="s-pavg" placeholder="bijv. 2.1" step="0.1" min="1" max="5">
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-bottom:4px;">
+            <div style="font-size:10px;font-weight:700;color:var(--muted);padding-top:6px;"></div>
+            <div style="font-size:10px;font-weight:700;color:var(--muted);text-align:center;padding-top:6px;">KORT</div>
+            <div style="font-size:10px;font-weight:700;color:var(--muted);text-align:center;padding-top:6px;">MEDIUM</div>
+            <div style="font-size:10px;font-weight:700;color:var(--muted);text-align:center;padding-top:6px;">LANG</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-bottom:6px;">
+            <div style="font-size:11px;font-weight:700;color:var(--muted);display:flex;align-items:center;">1 putt %</div>
+            <input class="fi fi-sm" type="number" id="s-p1s" placeholder="33" min="0" max="100">
+            <input class="fi fi-sm" type="number" id="s-p1m" placeholder="8" min="0" max="100">
+            <input class="fi fi-sm" type="number" id="s-p1l" placeholder="7" min="0" max="100">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-bottom:6px;">
+            <div style="font-size:11px;font-weight:700;color:var(--muted);display:flex;align-items:center;">3+ putts %</div>
+            <input class="fi fi-sm" type="number" id="s-ps" placeholder="0" min="0" max="100">
+            <input class="fi fi-sm" type="number" id="s-pm" placeholder="38" min="0" max="100">
+            <input class="fi fi-sm" type="number" id="s-pl" placeholder="21" min="0" max="100">
         </div>
 
         <button class="btn btn-p" onclick="saveData()" style="margin-top:10px;">💾 Opslaan &amp; Analyseer</button>
@@ -260,7 +274,7 @@
 <div id="tab-analyse" class="tab">
     <div class="empty" id="ae">
         <div class="eico">📊</div>
-        <p>Voer eerst je data in op het Data-tabblad.</p>
+        <p>Voer eerst je Garmin data in op het Data-tabblad.</p>
     </div>
     <div id="ac" style="display:none;"></div>
 </div>
@@ -285,21 +299,40 @@
     </div>
 </div>
 
-<!-- ══════════════ TAB: PROGRESSIE ══════════════ -->
-<div id="tab-progressie" class="tab">
+<!-- ══════════════ TAB: VOORTGANG ══════════════ -->
+<div id="tab-voortgang" class="tab">
     <div class="empty" id="pe">
         <div class="eico">📈</div>
-        <p>Hier zie je je progressie zodra je meerdere metingen hebt ingevoerd.</p>
+        <p>Hier zie je je voortgang zodra je meerdere metingen hebt opgeslagen.</p>
     </div>
     <div id="pc" style="display:none;"></div>
 </div>
 
+<!-- ══════════════ TAB: CLUBS ══════════════ -->
+<div id="tab-clubs" class="tab">
+    <div class="card">
+        <div class="ctit">🏌 Mijn Clubs</div>
+        <div class="info-strip">
+            ℹ️ Vul je gemiddelde carry-afstand per club in (in meters). Klik op + om een club toe te voegen.
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 75px 34px;gap:8px;padding-bottom:6px;border-bottom:2px solid var(--border);margin-bottom:4px;">
+            <span style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;">Club</span>
+            <span style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;text-align:center;">Afstand</span>
+            <span></span>
+        </div>
+        <div id="clubs-list"></div>
+        <button class="btn btn-s" onclick="addClub()" style="margin-top:12px;">+ Club toevoegen</button>
+        <button class="btn btn-p" onclick="saveClubs()" style="margin-top:8px;">💾 Clubs opslaan</button>
+    </div>
+</div>
+
 <!-- Bottom Nav -->
 <nav class="bnav">
-    <button class="nbtn active" id="nav-data"       onclick="showTab('data')">      <span class="ico">📋</span>Data</button>
-    <button class="nbtn"        id="nav-analyse"    onclick="showTab('analyse')">   <span class="ico">📊</span>Analyse</button>
-    <button class="nbtn"        id="nav-training"   onclick="showTab('training')">  <span class="ico">🏌️</span>Training</button>
-    <button class="nbtn"        id="nav-progressie" onclick="showTab('progressie')"><span class="ico">📈</span>Progressie</button>
+    <button class="nbtn active" id="nav-data"      onclick="showTab('data')">      <span class="ico">📋</span>Data</button>
+    <button class="nbtn"        id="nav-analyse"   onclick="showTab('analyse')">   <span class="ico">📊</span>Analyse</button>
+    <button class="nbtn"        id="nav-training"  onclick="showTab('training')">  <span class="ico">🏌️</span>Training</button>
+    <button class="nbtn"        id="nav-voortgang" onclick="showTab('voortgang')"> <span class="ico">📈</span>Voortgang</button>
+    <button class="nbtn"        id="nav-clubs"     onclick="showTab('clubs')">     <span class="ico">🏌</span>Clubs</button>
 </nav>
 
 <div class="toast" id="toast"></div>
@@ -439,7 +472,7 @@ const EX = [
      tip:'💡 Helder pad → putter. Ongelijk gras → chip.'},
     {id:'c15',cat:'chip',name:'Bunker Basisoefening',dur:8,dif:'Moeilijk',
      desc:'Open face, open stance, 3cm achter de bal slaan. 12 swing-herhalingen. Bunker is de enige slag waarbij je NIET direct de bal raakt.',
-     tip:'💡 Imageshout "zand tussen club en bal" bij elke bunkerslag.'},
+     tip:'💡 Denk "zand tussen club en bal" bij elke bunkerslag.'},
 
     // ─── PUTT KORT 0-2m (8) ───
     {id:'ps1',cat:'puttShort',name:'1-Meter Cirkel',dur:8,dif:'Gemakkelijk',
@@ -511,7 +544,17 @@ const EX = [
 /* ════════════════════════════════════════════════════
    CONSTANTS
 ════════════════════════════════════════════════════ */
-const BM = { drive:50, approach:35, chip:35, puttAvg:1.9, puttShort:15, puttMedium:25, puttLong:40 };
+// Benchmarks: what "good" looks like for an amateur
+const BM = {
+    drive:      50,   // Fairway % – hoog is beter
+    approach:   35,   // GIR %    – hoog is beter
+    chipGem:    20,   // Gemist % – laag is beter
+    chipUaD:    25,   // Naar boven/beneden % – hoog is beter
+    puttAvg:   1.9,   // Putts/hole – laag is beter
+    puttShort:   5,   // 3+ putt Kort %   – laag is beter
+    puttMedium: 25,   // 3+ putt Medium % – laag is beter
+    puttLong:   20,   // 3+ putt Lang %   – laag is beter
+};
 
 const CAT_LBL = {
     drive:'🏌️ Drive', approach:'🎯 Approach', chip:'🏌 Chip/Pitch',
@@ -524,53 +567,75 @@ const CAT_COL = {
 };
 
 const SESS_TYPES = [
-    {id:'spotlight', lbl:'Spotlight Focus',      icon:'🎯', bc:'bd1',
-     desc:'Maximale focus op je zwakste punt'},
-    {id:'balance',   lbl:'Gebalanceerde Aanval', icon:'⚖️', bc:'bd2',
-     desc:'Top 3 zwaktes gelijk aanpakken'},
-    {id:'full',      lbl:'Volledig Programma',   icon:'🔄', bc:'bd3',
-     desc:'Alle categorieën, gewogen op zwaktes'},
-    {id:'gamesim',   lbl:'Game Simulatie',       icon:'🏆', bc:'bd4',
-     desc:'Verdeling zoals een echte ronde'}
+    {id:'spotlight', lbl:'Spotlight Focus',      icon:'🎯', bc:'bd1', desc:'Maximale focus op je zwakste punt'},
+    {id:'balance',   lbl:'Gebalanceerde Aanval', icon:'⚖️', bc:'bd2', desc:'Top 3 zwaktes gelijk aanpakken'},
+    {id:'full',      lbl:'Volledig Programma',   icon:'🔄', bc:'bd3', desc:'Alle categorieën, gewogen op zwaktes'},
+    {id:'gamesim',   lbl:'Game Simulatie',       icon:'🏆', bc:'bd4', desc:'Verdeling zoals een echte ronde'}
+];
+
+const DEFAULT_CLUBS = [
+    {id:'cl1',  name:'Driver',          dist:''},
+    {id:'cl2',  name:'Hout 3',          dist:''},
+    {id:'cl3',  name:'Hout 5',          dist:''},
+    {id:'cl4',  name:'Hybride 3',       dist:''},
+    {id:'cl5',  name:'Hybride 4',       dist:''},
+    {id:'cl6',  name:'IJzer 5',         dist:''},
+    {id:'cl7',  name:'IJzer 6',         dist:''},
+    {id:'cl8',  name:'IJzer 7',         dist:''},
+    {id:'cl9',  name:'IJzer 8',         dist:''},
+    {id:'cl10', name:'IJzer 9',         dist:''},
+    {id:'cl11', name:'Pitching Wedge',  dist:''},
+    {id:'cl12', name:'Gap Wedge',       dist:''},
+    {id:'cl13', name:'Sand Wedge',      dist:''},
+    {id:'cl14', name:'Lob Wedge',       dist:''},
 ];
 
 /* ════════════════════════════════════════════════════
-   STATE
+   STORAGE KEYS
 ════════════════════════════════════════════════════ */
-let mode = 'garmin';
-let genSessData = [];
-
-/* ════════════════════════════════════════════════════
-   STORAGE
-════════════════════════════════════════════════════ */
-const LS_ENT = 'gb_entries';
-const LS_LAT = 'gb_latest';
+const LS_ENT   = 'gb_entries';
+const LS_LAT   = 'gb_latest';
+const LS_CLUBS = 'gb_clubs';
 
 function getEntries(){ try{ return JSON.parse(localStorage.getItem(LS_ENT)||'[]'); }catch{return [];} }
 function getLatest(){  try{ return JSON.parse(localStorage.getItem(LS_LAT)||'null'); }catch{return null;} }
+function getClubs(){   try{ return JSON.parse(localStorage.getItem(LS_CLUBS)||'null'); }catch{return null;} }
 
 function persistEntry(e){
     const arr = getEntries();
     arr.unshift(e);
-    if(arr.length > 10) arr.pop();
+    if(arr.length>10) arr.pop();
     localStorage.setItem(LS_ENT, JSON.stringify(arr));
     localStorage.setItem(LS_LAT, JSON.stringify(e));
 }
 
 /* ════════════════════════════════════════════════════
-   WEAKNESS ALGORITHM
+   WEAKNESS ALGORITHM  (gebaseerd op Garmin stats)
 ════════════════════════════════════════════════════ */
 function calcScores(s){
     const sc = {};
-    sc.drive    = s.drive    ? Math.max(0,(BM.drive    - +s.drive)    * 1.5) : 0;
-    sc.approach = s.approach ? Math.max(0,(BM.approach - +s.approach) * 2.0) : 0;
-    sc.chip     = s.chip     ? Math.max(0,(BM.chip     - +s.chip)     * 2.0) : 0;
 
-    const pBase = s.puttAvg ? Math.max(0,(+s.puttAvg - BM.puttAvg) * 40) : 0;
+    // ── Drive: Fairway % (primary) + richtingsbias (bonus penalty)
+    sc.drive = s.drive ? Math.max(0, (BM.drive - +s.drive) * 1.5) : 0;
+    if(s.drl && s.drr){
+        const bias = Math.abs(+s.drl - +s.drr);
+        if(bias > 20) sc.drive += bias * 0.4; // sterk scheef = probleem
+    }
 
-    sc.puttShort  = (s.puttShort  ? Math.max(0,(+s.puttShort  - BM.puttShort)  * 1.5) : 0) + pBase*0.3;
-    sc.puttMedium = (s.puttMedium ? Math.max(0,(+s.puttMedium - BM.puttMedium) * 1.5) : 0) + pBase*0.4;
-    sc.puttLong   = (s.puttLong   ? Math.max(0,(+s.puttLong   - BM.puttLong)   * 1.0) : 0) + pBase*0.3;
+    // ── Approach: GIR %
+    sc.approach = s.approach ? Math.max(0, (BM.approach - +s.approach) * 2) : 0;
+
+    // ── Chip: Gemist % (hoger = slechter) + Naar boven/beneden (lager = slechter)
+    sc.chip = 0;
+    if(s.cgem) sc.chip += Math.max(0, (+s.cgem - BM.chipGem) * 2);
+    if(s.cuad) sc.chip += Math.max(0, (BM.chipUaD - +s.cuad) * 1.5);
+
+    // ── Putting: basis vanuit gem. per hole
+    const pBase = s.puttAvg ? Math.max(0, (+s.puttAvg - BM.puttAvg) * 40) : 0;
+
+    sc.puttShort  = (s.puttShort  ? Math.max(0, (+s.puttShort  - BM.puttShort)  * 2.0) : 0) + pBase*0.2;
+    sc.puttMedium = (s.puttMedium ? Math.max(0, (+s.puttMedium - BM.puttMedium) * 1.5) : 0) + pBase*0.4;
+    sc.puttLong   = (s.puttLong   ? Math.max(0, (+s.puttLong   - BM.puttLong)   * 1.5) : 0) + pBase*0.4;
 
     return sc;
 }
@@ -598,59 +663,45 @@ function buildSess(type, sc, mins, usedIds){
         const tot = rank.reduce((s,r)=>s+r.score+5,0);
         rank.forEach(r=>{ alloc[r.cat]=(r.score+5)/tot; });
     } else { // gamesim
-        alloc = {drive:0.15, approach:0.20, chip:0.30, puttShort:0.10, puttMedium:0.15, puttLong:0.10};
+        alloc={drive:0.15, approach:0.20, chip:0.30, puttShort:0.10, puttMedium:0.15, puttLong:0.10};
     }
 
-    const bycat = {};
-    Object.keys(CAT_LBL).forEach(cat=>{
-        bycat[cat] = shuffle(EX.filter(e=>e.cat===cat));
-    });
+    const bycat={};
+    Object.keys(CAT_LBL).forEach(cat=>{ bycat[cat]=shuffle(EX.filter(e=>e.cat===cat)); });
 
-    const result = [];
-
-    for(const [cat, frac] of Object.entries(alloc)){
-        if(!frac || frac<=0) continue;
-        const target = Math.round(mins * frac);
-        const pool = bycat[cat]||[];
-        let filled = 0;
-
-        // Prefer unused exercises first
+    const result=[];
+    for(const [cat,frac] of Object.entries(alloc)){
+        if(!frac||frac<=0) continue;
+        const target=Math.round(mins*frac);
+        const pool=bycat[cat]||[];
+        let filled=0;
+        // Prefer unused
         for(const ex of pool){
             if(filled>=target) break;
-            if(!usedIds.has(ex.id) && filled+ex.dur <= target+3){
-                result.push({...ex}); filled+=ex.dur; usedIds.add(ex.id);
-            }
+            if(!usedIds.has(ex.id)&&filled+ex.dur<=target+3){result.push({...ex});filled+=ex.dur;usedIds.add(ex.id);}
         }
-        // Backfill with used ones if needed
+        // Backfill with used
         for(const ex of pool){
             if(filled>=target) break;
-            if(usedIds.has(ex.id) && filled+ex.dur <= target+3 && !result.find(r=>r.id===ex.id)){
-                result.push({...ex}); filled+=ex.dur;
-            }
+            if(usedIds.has(ex.id)&&filled+ex.dur<=target+3&&!result.find(r=>r.id===ex.id)){result.push({...ex});filled+=ex.dur;}
         }
     }
-
     return result;
 }
 
 /* ════════════════════════════════════════════════════
-   UI – TAB NAV
+   UI HELPERS
 ════════════════════════════════════════════════════ */
+let genSessData=[];
+
 function showTab(t){
     document.querySelectorAll('.tab').forEach(el=>el.classList.remove('active'));
     document.querySelectorAll('.nbtn').forEach(el=>el.classList.remove('active'));
     document.getElementById('tab-'+t).classList.add('active');
     document.getElementById('nav-'+t).classList.add('active');
-    if(t==='analyse')    renderAnalyse();
-    if(t==='progressie') renderProg();
-}
-
-function setMode(m){
-    mode=m;
-    document.getElementById('btn-garmin').classList.toggle('active', m==='garmin');
-    document.getElementById('btn-manual').classList.toggle('active', m==='manual');
-    document.getElementById('help-g').style.display = m==='garmin'?'block':'none';
-    document.getElementById('help-m').style.display = m==='manual'?'block':'none';
+    if(t==='analyse')   renderAnalyse();
+    if(t==='voortgang') renderProg();
+    if(t==='clubs')     renderClubs();
 }
 
 function updDur(){
@@ -664,51 +715,61 @@ function toast(msg){
     setTimeout(()=>t.classList.remove('show'),2400);
 }
 
+function fmtDate(ts){ return new Date(ts).toLocaleDateString('nl-NL',{day:'2-digit',month:'2-digit',year:'numeric'}); }
+
 /* ════════════════════════════════════════════════════
-   SAVE DATA
+   SAVE STATS
 ════════════════════════════════════════════════════ */
 function saveData(){
-    const s = {
-        drive:    document.getElementById('s-drv').value  ||null,
-        approach: document.getElementById('s-gir').value  ||null,
-        chip:     document.getElementById('s-uad').value  ||null,
-        scrambling:document.getElementById('s-scr').value ||null,
-        puttAvg:  document.getElementById('s-pavg').value ||null,
-        puttOneP: document.getElementById('s-p1').value   ||null,
-        puttShort:document.getElementById('s-ps').value   ||null,
+    const s={
+        hcp:    document.getElementById('s-hcp').value  ||null,
+        drive:  document.getElementById('s-drv').value  ||null,
+        drl:    document.getElementById('s-drl').value  ||null,
+        drf:    document.getElementById('s-drf').value  ||null,
+        drr:    document.getElementById('s-drr').value  ||null,
+        approach:document.getElementById('s-gir').value ||null,
+        cgem:   document.getElementById('s-cgem').value ||null,
+        cuad:   document.getElementById('s-cuad').value ||null,
+        csan:   document.getElementById('s-csan').value ||null,
+        puttAvg:document.getElementById('s-pavg').value ||null,
+        p1s:    document.getElementById('s-p1s').value  ||null,
+        p1m:    document.getElementById('s-p1m').value  ||null,
+        p1l:    document.getElementById('s-p1l').value  ||null,
+        puttShort: document.getElementById('s-ps').value  ||null,
         puttMedium:document.getElementById('s-pm').value  ||null,
-        puttLong: document.getElementById('s-pl').value   ||null
+        puttLong:  document.getElementById('s-pl').value  ||null,
     };
 
     if(!Object.values(s).some(v=>v!==null&&v!=='')){
         toast('❌ Vul minstens één statistiek in'); return;
     }
 
-    const ws = calcScores(s);
-    const entry = { id:Date.now(), ts:Date.now(), mode, stats:s, ws };
+    const ws=calcScores(s);
+    const entry={id:Date.now(), ts:Date.now(), stats:s, ws};
     persistEntry(entry);
-
     updHeader(entry);
+
     document.getElementById('te').style.display='none';
     document.getElementById('tc').style.display='block';
 
     toast('✅ Opgeslagen!');
-    setTimeout(()=>showTab('analyse'), 700);
+    setTimeout(()=>showTab('analyse'),700);
 }
 
 function updHeader(e){
-    const top = Object.entries(e.ws).sort((a,b)=>b[1]-a[1])[0];
-    if(top && top[1]>0)
-        document.getElementById('hdr-sub').textContent='Aandacht: '+(CAT_LBL[top[0]]||top[0]);
+    const top=Object.entries(e.ws).sort((a,b)=>b[1]-a[1])[0];
+    const hcp=e.stats?.hcp?` · HCP ${e.stats.hcp}`:'';
+    if(top&&top[1]>0)
+        document.getElementById('hdr-sub').textContent='Aandacht: '+(CAT_LBL[top[0]]||top[0])+hcp;
     else
-        document.getElementById('hdr-sub').textContent='Stats zien er gebalanceerd uit ✅';
+        document.getElementById('hdr-sub').textContent='Stats gebalanceerd ✅'+hcp;
 }
 
 /* ════════════════════════════════════════════════════
    RENDER ANALYSE
 ════════════════════════════════════════════════════ */
 function renderAnalyse(){
-    const lat = getLatest();
+    const lat=getLatest();
     if(!lat){
         document.getElementById('ae').style.display='block';
         document.getElementById('ac').style.display='none';
@@ -717,15 +778,25 @@ function renderAnalyse(){
     document.getElementById('ae').style.display='none';
     document.getElementById('ac').style.display='block';
 
-    const sc = lat.ws;
-    const rank = rankCats(sc);
-    const maxSc = Math.max(...Object.values(sc), 1);
-    const d = fmtDate(lat.ts);
+    const sc=lat.ws, s=lat.stats;
+    const rank=rankCats(sc);
+    const maxSc=Math.max(...Object.values(sc),1);
 
-    let top = rank[0];
-    let hlHtml = '';
-    if(top && top.score > 5){
-        const cls = top.score>30?'hl-r':'hl-o';
+    // Handicap banner
+    let hcpHtml='';
+    if(s.hcp){
+        hcpHtml=`<div style="display:flex;align-items:center;gap:10px;background:var(--green-pale);border-radius:10px;padding:10px 14px;margin-bottom:12px;">
+            <div style="font-size:28px;font-weight:900;color:var(--green-dark);">${s.hcp}</div>
+            <div><div style="font-size:13px;font-weight:700;color:var(--green-dark);">Handicap Index</div>
+            <div style="font-size:11px;color:var(--muted);">Meting: ${fmtDate(lat.ts)}</div></div>
+        </div>`;
+    }
+
+    // Highlight
+    const top=rank[0];
+    let hlHtml='';
+    if(top&&top.score>5){
+        const cls=top.score>30?'hl-r':'hl-o';
         hlHtml=`<div class="hl ${cls}"><div class="hlt">⚠️ Grootste aandachtspunt: ${CAT_LBL[top.cat]}</div>
             <div class="hld">Zwaktescore: ${top.score.toFixed(0)} — geef hier de meeste trainingstijd aan.</div></div>`;
     } else {
@@ -733,56 +804,76 @@ function renderAnalyse(){
             <div class="hld">Je zit boven benchmark in de meeste categorieën. Focus op onderhoud.</div></div>`;
     }
 
-    let barsHtml = rank.map(({cat,score})=>{
-        const pct = Math.min(100, (score/maxSc)*100);
-        const bc  = score>30?'b-crit':score>15?'b-wk':score>5?'b-att':'b-ok';
-        const lbl = score>30?'🔴 Kritiek':score>15?'🟠 Zwak':score>5?'🟡 Aandacht':'🟢 Goed';
-        const raw = statRaw(cat,lat.stats);
+    // Bars
+    const barsHtml=rank.map(({cat,score})=>{
+        const pct=Math.min(100,(score/maxSc)*100);
+        const bc=score>30?'b-crit':score>15?'b-wk':score>5?'b-att':'b-ok';
+        const lbl=score>30?'🔴 Kritiek':score>15?'🟠 Zwak':score>5?'🟡 Aandacht':'🟢 Goed';
         return `<div class="wbc">
-            <div class="wbh"><span class="wbl">${CAT_LBL[cat]}</span>
-            <span class="wbv">${lbl} ${raw}</span></div>
+            <div class="wbh"><span class="wbl">${CAT_LBL[cat]}</span><span class="wbv">${lbl}</span></div>
             <div class="wbt"><div class="wbf ${bc}" style="width:${pct}%"></div></div>
         </div>`;
     }).join('');
 
-    let tblRows = [
-        {lbl:'🏌️ Fairways Hit',  v:lat.stats.drive,     bm:BM.drive,       u:'%', hi:true},
-        {lbl:'🎯 GIR',           v:lat.stats.approach,  bm:BM.approach,    u:'%', hi:true},
-        {lbl:'🏌 Up-and-Down',   v:lat.stats.chip,      bm:BM.chip,        u:'%', hi:true},
-        {lbl:'🎱 Putts/hole',    v:lat.stats.puttAvg,   bm:BM.puttAvg,     u:'',  hi:false},
-        {lbl:'🎱 3-putt Kort',   v:lat.stats.puttShort, bm:BM.puttShort,   u:'%', hi:false},
-        {lbl:'🎱 3-putt Medium', v:lat.stats.puttMedium,bm:BM.puttMedium,  u:'%', hi:false},
-        {lbl:'🎱 3-putt Lang',   v:lat.stats.puttLong,  bm:BM.puttLong,    u:'%', hi:false},
+    // Benchmark table
+    const rows=[
+        {lbl:'🏌️ Fairway Hit',       v:s.drive,      bm:BM.drive,      u:'%',  hi:true},
+        {lbl:'↖️ Richting Links',     v:s.drl,        bm:null,          u:'%',  hi:null, info:true},
+        {lbl:'↗️ Richting Rechts',    v:s.drr,        bm:null,          u:'%',  hi:null, info:true},
+        {lbl:'🎯 GIR',                v:s.approach,   bm:BM.approach,   u:'%',  hi:true},
+        {lbl:'🏌 Chip Gemist',        v:s.cgem,       bm:BM.chipGem,    u:'%',  hi:false},
+        {lbl:'🏌 Naar boven/beneden', v:s.cuad,       bm:BM.chipUaD,    u:'%',  hi:true},
+        {lbl:'🏖️ Sandies',            v:s.csan,       bm:null,          u:'%',  hi:null, info:true},
+        {lbl:'🎱 Putts/hole',         v:s.puttAvg,    bm:BM.puttAvg,    u:'',   hi:false},
+        {lbl:'🎱 1-putt Kort',        v:s.p1s,        bm:null,          u:'%',  hi:null, info:true},
+        {lbl:'🎱 1-putt Medium',      v:s.p1m,        bm:null,          u:'%',  hi:null, info:true},
+        {lbl:'🎱 1-putt Lang',        v:s.p1l,        bm:null,          u:'%',  hi:null, info:true},
+        {lbl:'🎱 3+ putt Kort',       v:s.puttShort,  bm:BM.puttShort,  u:'%',  hi:false},
+        {lbl:'🎱 3+ putt Medium',     v:s.puttMedium, bm:BM.puttMedium, u:'%',  hi:false},
+        {lbl:'🎱 3+ putt Lang',       v:s.puttLong,   bm:BM.puttLong,   u:'%',  hi:false},
     ].filter(r=>r.v!==null&&r.v!=='').map(r=>{
-        const num=+r.v;
-        const good = r.hi ? num>=r.bm : num<=r.bm;
+        if(r.info){
+            return `<tr><td>${r.lbl}</td>
+                <td style="text-align:center;font-weight:700;">${+r.v}${r.u}</td>
+                <td style="text-align:center;color:var(--muted);">ℹ️</td></tr>`;
+        }
+        const good=r.hi? +r.v>=r.bm : +r.v<=r.bm;
         return `<tr><td>${r.lbl}</td>
-            <td style="text-align:center;font-weight:700;color:${good?'var(--green-med)':'var(--red)'};">${num}${r.u}</td>
+            <td style="text-align:center;font-weight:700;color:${good?'var(--green-med)':'var(--red)'};">${+r.v}${r.u}</td>
             <td style="text-align:center;color:var(--muted);">${good?'✅':'❌'} ${r.bm}${r.u}</td></tr>`;
     }).join('');
 
-    document.getElementById('ac').innerHTML=`
-        <div class="card">
-            <div class="ctit">📅 Meting: ${d}</div>
-            ${hlHtml}
-            ${barsHtml}
-        </div>
-        <div class="card">
-            <div class="ctit">📏 Jouw stats vs Benchmark</div>
-            <table class="stbl">
-                <thead><tr><th>Categorie</th><th style="text-align:center;">Jij</th><th style="text-align:center;">Doel</th></tr></thead>
-                <tbody>${tblRows}</tbody>
-            </table>
+    // Direction chart
+    let dirHtml='';
+    if(s.drl&&s.drf&&s.drr){
+        const l=+s.drl, f=+s.drf, r=+s.drr;
+        dirHtml=`<div class="card" style="margin-top:0;">
+            <div class="ctit">📐 Rijrichting Verdeling</div>
+            <div style="display:flex;border-radius:8px;overflow:hidden;height:32px;margin-bottom:8px;">
+                <div style="width:${l}%;background:#e65100;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;min-width:28px;">${l}%</div>
+                <div style="width:${f}%;background:var(--green-med);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;min-width:28px;">${f}%</div>
+                <div style="width:${r}%;background:#1565C0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;min-width:28px;">${r}%</div>
+            </div>
+            <div style="display:flex;gap:12px;font-size:11px;">
+                <span style="color:#e65100;">⬛ Links ${l}%</span>
+                <span style="color:var(--green-med);">⬛ Fairway ${f}%</span>
+                <span style="color:#1565C0;">⬛ Rechts ${r}%</span>
+            </div>
+            ${Math.abs(l-r)>20?`<div style="margin-top:8px;font-size:12px;color:var(--orange);">⚠️ Je mist duidelijk vaker naar ${l>r?'links':'rechts'} – swing path verbeteren.</div>`:''}
         </div>`;
-}
+    }
 
-function statRaw(cat, s){
-    const m={drive:s.drive?s.drive+'%':'—', approach:s.approach?s.approach+'%':'—',
-             chip:s.chip?s.chip+'%':'—',
-             puttShort:s.puttShort?s.puttShort+'%':s.puttAvg?s.puttAvg+' p/h':'—',
-             puttMedium:s.puttMedium?s.puttMedium+'%':'—',
-             puttLong:s.puttLong?s.puttLong+'%':'—'};
-    return m[cat]||'—';
+    document.getElementById('ac').innerHTML=`
+        <div class="card">${hcpHtml}${hlHtml}${barsHtml}</div>
+        ${dirHtml}
+        <div class="card">
+            <div class="ctit">📏 Stats vs Benchmark</div>
+            <table class="stbl">
+                <thead><tr><th>Stat</th><th style="text-align:center;">Jij</th><th style="text-align:center;">Doel</th></tr></thead>
+                <tbody>${rows}</tbody>
+            </table>
+            <p style="font-size:10px;color:var(--muted);margin-top:8px;">ℹ️ = informatief, geen benchmark beschikbaar</p>
+        </div>`;
 }
 
 /* ════════════════════════════════════════════════════
@@ -791,66 +882,46 @@ function statRaw(cat, s){
 function genSessions(){
     const lat=getLatest(); if(!lat) return;
     const mins=+document.getElementById('dur-slider').value;
-    const sc=lat.ws;
     const used=new Set();
-
-    genSessData = SESS_TYPES.map(st=>({
-        ...st,
-        exs: buildSess(st.id, sc, mins, used),
-        mins
-    }));
-
+    genSessData=SESS_TYPES.map(st=>({...st, exs:buildSess(st.id,lat.ws,mins,used), mins}));
     renderSessions();
     toast('🎯 4 sessies klaar!');
 }
 
 function renderSessions(){
-    let html = genSessData.map((sess,i)=>{
-        const tot = sess.exs.reduce((s,e)=>s+e.dur,0);
+    document.getElementById('sess-container').innerHTML=genSessData.map((sess,i)=>{
+        const tot=sess.exs.reduce((s,e)=>s+e.dur,0);
         return `<div class="sc">
             <div class="sh" onclick="togSess(${i})">
                 <div class="shl">
                     <div class="sbadge ${sess.bc}">${sess.icon}</div>
-                    <div>
-                        <div class="stit">Sessie ${i+1}: ${sess.lbl}</div>
-                        <div class="smeta">${sess.desc} &middot; ${tot} min &middot; ${sess.exs.length} oef.</div>
-                    </div>
+                    <div><div class="stit">Sessie ${i+1}: ${sess.lbl}</div>
+                    <div class="smeta">${sess.desc} · ${tot} min · ${sess.exs.length} oef.</div></div>
                 </div>
                 <div class="schev" id="chev-${i}">▼</div>
             </div>
-            <div class="sb" id="sb-${i}">
-                ${renderExList(sess.exs)}
-            </div>
+            <div class="sb" id="sb-${i}">${renderExList(sess.exs)}</div>
         </div>`;
     }).join('');
-
-    document.getElementById('sess-container').innerHTML=html;
 }
 
 function renderExList(exs){
     if(!exs.length) return '<p style="color:var(--muted);font-size:13px;padding:10px 0;">Geen oefeningen voor deze configuratie.</p>';
-    return exs.map(e=>`
-        <div class="ei">
-            <div class="eih">
-                <div class="ein">${e.name}</div>
-                <div class="eid">${e.dur} min</div>
-            </div>
-            <div class="eidesc">${e.desc}</div>
-            <div class="eitip">${e.tip}</div>
-            <span class="eicat" style="background:${CAT_COL[e.cat]||'#f5f5f5'};color:#333;">${CAT_LBL[e.cat]||e.cat} &middot; ${e.dif}</span>
-        </div>`).join('');
+    return exs.map(e=>`<div class="ei">
+        <div class="eih"><div class="ein">${e.name}</div><div class="eid">${e.dur} min</div></div>
+        <div class="eidesc">${e.desc}</div>
+        <div class="eitip">${e.tip}</div>
+        <span class="eicat" style="background:${CAT_COL[e.cat]||'#f5f5f5'};color:#333;">${CAT_LBL[e.cat]||e.cat} · ${e.dif}</span>
+    </div>`).join('');
 }
 
 function togSess(i){
-    const b=document.getElementById('sb-'+i);
-    const c=document.getElementById('chev-'+i);
-    const open=b.classList.contains('open');
-    b.classList.toggle('open',!open);
-    c.classList.toggle('open',!open);
+    document.getElementById('sb-'+i).classList.toggle('open');
+    document.getElementById('chev-'+i).classList.toggle('open');
 }
 
 /* ════════════════════════════════════════════════════
-   RENDER PROGRESSIE
+   RENDER VOORTGANG
 ════════════════════════════════════════════════════ */
 function renderProg(){
     const entries=getEntries();
@@ -863,37 +934,31 @@ function renderProg(){
     document.getElementById('pc').style.display='block';
 
     let html='';
-
-    // Chart
     if(entries.length>=2){
         html+=`<div class="card"><div class="ctit">📈 Zwakte Score Verloop</div>
             ${buildChart(entries)}
-            <p style="font-size:11px;color:var(--muted);margin-top:8px;">Lager = beter. Score 0 = je zit boven de benchmark.</p>
-        </div>`;
+            <p style="font-size:11px;color:var(--muted);margin-top:8px;">Lager = beter. Score 0 = boven benchmark.</p></div>`;
     }
 
-    // Entry list
     html+=`<div class="card"><div class="ctit">📋 Metingen (max 10)</div>`;
     entries.forEach((e,idx)=>{
         const top=Object.entries(e.ws||{}).sort((a,b)=>b[1]-a[1])[0];
         const s=e.stats||{};
         html+=`<div class="ent">
-            <div class="entd">${fmtDate(e.ts)} ${idx===0?'<span style="font-size:10px;background:var(--green-dark);color:#fff;padding:2px 7px;border-radius:8px;margin-left:4px;">Nieuwste</span>':''}</div>
+            <div class="entd">${fmtDate(e.ts)} ${s.hcp?`<span style="font-size:11px;background:var(--green-pale);color:var(--green-dark);padding:2px 7px;border-radius:8px;margin-left:4px;">HCP ${s.hcp}</span>`:''} ${idx===0?'<span style="font-size:10px;background:var(--green-dark);color:#fff;padding:2px 7px;border-radius:8px;margin-left:4px;">Nieuwste</span>':''}</div>
             <div class="entchips">
-                ${s.drive    ?`<span class="chip">🏌️ ${s.drive}% FH</span>`:''}
+                ${s.drive    ?`<span class="chip">🏌️ ${s.drive}% FW</span>`:''}
                 ${s.approach ?`<span class="chip">🎯 ${s.approach}% GIR</span>`:''}
-                ${s.chip     ?`<span class="chip">🏌 ${s.chip}% U&D</span>`:''}
+                ${s.cgem     ?`<span class="chip">🏌 ${s.cgem}% gem.</span>`:''}
                 ${s.puttAvg  ?`<span class="chip">🎱 ${s.puttAvg} p/h</span>`:''}
                 ${top        ?`<span class="chip chip-r">Focus: ${CAT_LBL[top[0]]}</span>`:''}
             </div>
         </div>`;
     });
     html+='</div>';
-
     html+=`<div style="text-align:center;margin-top:4px;">
         <button class="btn btn-s" onclick="confirmReset()" style="max-width:220px;font-size:13px;">🗑️ Alle data verwijderen</button>
     </div>`;
-
     document.getElementById('pc').innerHTML=html;
 }
 
@@ -902,31 +967,22 @@ function buildChart(entries){
     const cats=['drive','approach','chip','puttMedium'];
     const cols=['#1565C0','#2e7d32','#6a1b9a','#e65100'];
     const lbls=['Drive','Approach','Chip','Putt M'];
-
     const W=320,H=150,PL=32,PB=28,PR=10,PT=10;
-    const cW=W-PL-PR, cH=H-PB-PT;
+    const cW=W-PL-PR,cH=H-PB-PT;
     const allSc=data.flatMap(e=>cats.map(c=>e.ws?.[c]||0));
     const maxSc=Math.max(...allSc,20);
     const xS=data.length>1?cW/(data.length-1):cW;
-
     let svg=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;display:block;margin:auto;">`;
-
-    // Grid
     for(let i=0;i<=4;i++){
         const y=PT+(cH/4)*i;
-        const v=Math.round(maxSc-(maxSc/4)*i);
         svg+=`<line x1="${PL}" y1="${y}" x2="${W-PR}" y2="${y}" stroke="#e0e0e0" stroke-width="1"/>
-              <text x="${PL-3}" y="${y+4}" text-anchor="end" font-size="9" fill="#aaa">${v}</text>`;
+              <text x="${PL-3}" y="${y+4}" text-anchor="end" font-size="9" fill="#aaa">${Math.round(maxSc-(maxSc/4)*i)}</text>`;
     }
-
-    // X labels
     data.forEach((e,i)=>{
         const x=PL+(data.length>1?i*xS:cW/2);
         const d=new Date(e.ts);
         svg+=`<text x="${x}" y="${H-4}" text-anchor="middle" font-size="9" fill="#aaa">${d.getDate()}/${d.getMonth()+1}</text>`;
     });
-
-    // Lines
     cats.forEach((cat,ci)=>{
         let path='';
         data.forEach((e,i)=>{
@@ -943,15 +999,12 @@ function buildChart(entries){
             svg+=`<circle cx="${x}" cy="${y}" r="3.5" fill="${cols[ci]}" stroke="#fff" stroke-width="1.5"/>`;
         });
     });
-
     svg+='</svg>';
-
     let leg='<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;">';
     cats.forEach((c,i)=>{ leg+=`<div style="display:flex;align-items:center;gap:4px;font-size:11px;">
         <div style="width:14px;height:3px;background:${cols[i]};border-radius:2px;"></div>
         <span style="color:var(--muted);">${lbls[i]}</span></div>`; });
     leg+='</div>';
-
     return svg+leg;
 }
 
@@ -962,17 +1015,63 @@ function confirmReset(){
         toast('🗑️ Data verwijderd');
         document.getElementById('te').style.display='block';
         document.getElementById('tc').style.display='none';
-        document.getElementById('hdr-sub').textContent='Voer je data in om te beginnen';
+        document.getElementById('hdr-sub').textContent='Voer je Garmin data in om te beginnen';
         renderProg();
     }
 }
 
 /* ════════════════════════════════════════════════════
-   HELPERS
+   CLUBS TAB
 ════════════════════════════════════════════════════ */
-function fmtDate(ts){
-    return new Date(ts).toLocaleDateString('nl-NL',{day:'2-digit',month:'2-digit',year:'numeric'});
+let clubsData = [];
+
+function renderClubs(){
+    const saved = getClubs();
+    if(saved && saved.length) clubsData = saved;
+    else if(!clubsData.length) clubsData = DEFAULT_CLUBS.map(c=>({...c, id:c.id+'_'+Date.now()+Math.random()}));
+    drawClubs();
 }
+
+function drawClubs(){
+    document.getElementById('clubs-list').innerHTML = clubsData.map((c,i)=>`
+        <div class="club-row">
+            <input class="club-name" type="text" value="${escHtml(c.name)}" placeholder="Club naam"
+                oninput="clubsData[${i}].name=this.value">
+            <input class="club-dist" type="number" value="${c.dist||''}" placeholder="m" min="0" max="400"
+                oninput="clubsData[${i}].dist=this.value">
+            <button class="club-del" onclick="delClub(${i})" title="Verwijderen">🗑</button>
+        </div>`).join('');
+}
+
+function addClub(){
+    clubsData.push({id:'new_'+Date.now(), name:'', dist:''});
+    drawClubs();
+    // Scroll to bottom and focus new input
+    setTimeout(()=>{
+        const rows=document.querySelectorAll('.club-name');
+        if(rows.length) rows[rows.length-1].focus();
+    },50);
+}
+
+function delClub(i){
+    clubsData.splice(i,1);
+    drawClubs();
+}
+
+function saveClubs(){
+    // Read current values from DOM (in case user typed without triggering oninput)
+    const rows=document.querySelectorAll('.club-row');
+    rows.forEach((row,i)=>{
+        if(clubsData[i]){
+            clubsData[i].name = row.querySelector('.club-name').value;
+            clubsData[i].dist = row.querySelector('.club-dist').value;
+        }
+    });
+    localStorage.setItem(LS_CLUBS, JSON.stringify(clubsData));
+    toast('💾 Clubs opgeslagen!');
+}
+
+function escHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 /* ════════════════════════════════════════════════════
    INIT
@@ -980,12 +1079,12 @@ function fmtDate(ts){
 (function init(){
     const lat=getLatest();
     if(!lat) return;
-
     const s=lat.stats;
-    const ids={drive:'s-drv',approach:'s-gir',chip:'s-uad',scrambling:'s-scr',
-               puttAvg:'s-pavg',puttOneP:'s-p1',puttShort:'s-ps',puttMedium:'s-pm',puttLong:'s-pl'};
-    Object.entries(ids).forEach(([k,id])=>{ if(s[k]) document.getElementById(id).value=s[k]; });
-
+    const map={hcp:'s-hcp',drive:'s-drv',drl:'s-drl',drf:'s-drf',drr:'s-drr',
+               approach:'s-gir',cgem:'s-cgem',cuad:'s-cuad',csan:'s-csan',
+               puttAvg:'s-pavg',p1s:'s-p1s',p1m:'s-p1m',p1l:'s-p1l',
+               puttShort:'s-ps',puttMedium:'s-pm',puttLong:'s-pl'};
+    Object.entries(map).forEach(([k,id])=>{ if(s[k]) document.getElementById(id).value=s[k]; });
     updHeader(lat);
     document.getElementById('te').style.display='none';
     document.getElementById('tc').style.display='block';
