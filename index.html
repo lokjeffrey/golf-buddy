@@ -190,7 +190,10 @@
             <h1>⛳ Golf Buddy</h1>
             <div class="hdr-sub" id="hdr-sub">Laden...</div>
         </div>
-        <button class="logout-btn" onclick="handleLogout()">Uitloggen</button>
+        <div style="display:flex; gap:8px;">
+            <button class="logout-btn" onclick="window.shareApp()" style="background:#e8f5e9;color:#1b5e20;">📤 Deel</button>
+            <button class="logout-btn" onclick="handleLogout()">Uitloggen</button>
+        </div>
     </div>
 
     <!-- DATA TAB -->
@@ -312,12 +315,36 @@
         </div>
     </div>
 
+    <!-- COMM TAB (Leaderboard) -->
+    <div id="tab-comm" class="tab">
+        <div class="card">
+            <div class="ctit">🏆 Challenge van de Week</div>
+            <div id="comm-week-ex" style="margin-bottom:12px;"></div>
+            
+            <div style="background:var(--gp);border:1px solid var(--gl);border-radius:8px;padding:12px;margin-bottom:12px;">
+                <div style="font-size:12px;font-weight:700;color:var(--gd);margin-bottom:6px;">Mijn Score:</div>
+                <div style="display:flex;gap:8px;align-items:center;">
+                    <input type="number" id="comm-score-input" placeholder="0" style="flex:1;padding:8px 10px;border:1.5px solid var(--gl);border-radius:8px;font-size:14px;background:#fff;max-width:80px;">
+                    <button class="btn btn-p" onclick="submitCommScore()" style="flex:2;margin:0;padding:8px;font-size:13px;">Opslaan in Leaderboard</button>
+                </div>
+            </div>
+
+            <div class="ctit">📈 Live Leaderboard</div>
+            <div class="info-strip">Vul je weergavenaam in bij Profiel om in plaats van "Golfer" herkenbaar te zijn in de lijst!</div>
+            <table class="stbl">
+                <thead><tr><th>#</th><th>Naam</th><th style="text-align:right;">Score</th></tr></thead>
+                <tbody id="comm-leaderboard-body"><tr><td colspan="3" style="text-align:center;">Laden...</td></tr></tbody>
+            </table>
+        </div>
+    </div>
+
     <nav class="bnav">
         <button class="nbtn active" id="nav-data"      onclick="showTab('data')">      <span class="ico">📋</span>Data</button>
-        <button class="nbtn"        id="nav-analyse"   onclick="showTab('analyse')">   <span class="ico">📊</span>Analyse</button>
-        <button class="nbtn"        id="nav-training"  onclick="showTab('training')">  <span class="ico">🏌️</span>Training</button>
-        <button class="nbtn"        id="nav-voortgang" onclick="showTab('voortgang')"> <span class="ico">📈</span>Voortgang</button>
-        <button class="nbtn"        id="nav-clubs"     onclick="showTab('clubs')">     <span class="ico">🏌</span>Clubs</button>
+        <button class="nbtn"        id="nav-analyse"   onclick="showTab('analyse')">   <span class="ico">📊</span>Stats</button>
+        <button class="nbtn"        id="nav-training"  onclick="showTab('training')">  <span class="ico">🏌️</span>Train</button>
+        <button class="nbtn"        id="nav-comm"      onclick="showTab('comm')">      <span class="ico">🏆</span>Comm</button>
+        <button class="nbtn"        id="nav-voortgang" onclick="showTab('voortgang')"> <span class="ico">📈</span>Groei</button>
+        <button class="nbtn"        id="nav-clubs"     onclick="showTab('clubs')">     <span class="ico">⛳</span>Bag</button>
     </nav>
 </div>
 <div class="toast" id="toast"></div>
@@ -326,7 +353,7 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+import { getFirestore, doc, setDoc, getDoc, collection, query, orderBy, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
 // Firebase config
 const firebaseConfig = {
@@ -459,7 +486,7 @@ const EX=[
  {id:'a11',cat:'approach',clubHint:'short_iron',distHint:120,name:'GIR Simulatie',dur:9,dif:'Moeilijk',balls:9,ballType:'range',sets:null,goal:'3/3 greens geraakt per set',desc:'3 scenarios: 150m, 125m, 90m (3 ballen elk). Noteer: green geraakt? Ja/Nee. Bij minder dan 3/3: herhaal de set (max 3×).',tip:'💡 Game-realistische oefening geeft het meeste transfereffect.'},
  {id:'a12',cat:'approach',clubHint:'short_iron',distHint:135,name:'Cirkel van 6 Meter',dur:8,dif:'Gemiddeld',balls:10,ballType:'range',sets:null,goal:'≥ 7/10 ballen binnen 6m van vlag',desc:'Sla 10 approach shots naar een doelgebied van 6m rondom een vlag. Noteer je score (X/10).',tip:'💡 6 meter is een realistische GIR-definitie voor amateurs.'},
 
- {id:'c1',cat:'chip',clubHint:'short_iron',name:'Bump-and-Run (8-IJzer)',dur:7,dif:'Gemakkelijk',balls:20,ballType:'own',sets:1,goal:null,desc:'Chip met 8-ijzer. Lagere balvlucht, meer roll. 20 chips vanuit verschillende posities rondom de practice green.',tip:'💡 Bump-and-run is de veiligste chip – minder risico dan een lob wedge.'},
+ {id:'c1',cat:'chip',clubHint:'short_iron',name:'Phil\'s Hinge & Hold',dur:7,dif:'Gemiddeld',balls:20,ballType:'own',sets:1,goal:null,desc:'De bekende chiptechniek van Phil Mickelson: polsen direct "hingen" (knikken) in de backswing, en die hoek "holden" door de impact heen. 20 chips rond de green.',tip:'💡 Nooit je polsen laten flippen bij impact. Handen leiden de clubhead.'},
  {id:'c2',cat:'chip',clubHint:'wedge',name:'Precisie Chip (Hoogste Wedge)',dur:8,dif:'Gemiddeld',balls:20,ballType:'own',sets:1,goal:null,desc:'Korte precisie chips met je hoogste wedge (meeste loft). Focus op een specifieke landingszone op 1m van de pin. 20 chips.',tip:'💡 Chip naar een landingszone – de bal rolt daarna vanzelf.'},
  {id:'c3',cat:'chip',clubHint:'wedge',name:'Cirkel van 3 Meter',dur:8,dif:'Gemiddeld',balls:15,ballType:'own',sets:null,goal:'≥ 10/15 ballen binnen 3m van hole',desc:'Chip 15 ballen met je wedge – allemaal moeten binnen 3 meter van de hole stoppen. Noteer je score.',tip:'💡 3 meter = tap-in zone. Dit is je veiligheidszone voor up-and-downs.'},
  {id:'c4',cat:'chip',clubHint:'wedge',name:'Flop Shot Training',dur:9,dif:'Moeilijk',balls:10,ballType:'own',sets:1,goal:null,desc:'Open stance, open face, bal vooraan. Sla 10 hoge chips over een denkbeeldig obstakel met je loftrijkste wedge.',tip:'💡 Flop shot = open face + extra acceleratie. Nooit decelereren!'},
@@ -475,8 +502,8 @@ const EX=[
  {id:'c14',cat:'chip',clubHint:'short_iron',name:'Fringe: Chippen of Putten?',dur:7,dif:'Gemiddeld',balls:8,ballType:'own',sets:1,goal:null,desc:'Leg 8 ballen op de fringe. Oefen de beslissing: chippen (8-ijzer) of putten? Probeer beide methodes voor dezelfde bal.',tip:'💡 Helder pad → putter. Ongelijk gras → chip met je 8-ijzer.'},
  {id:'c15',cat:'chip',clubHint:'wedge',name:'Bunker Basisoefening',dur:8,dif:'Moeilijk',balls:0,ballType:'none',sets:null,goal:'12 bunkerswings met juiste techniek',desc:'Geen ballen nodig. Open face, open stance, swingoefening 3cm achter denkbeeldige bal met je sand wedge. 12 herhalingen.',tip:'💡 Denk "zand tussen club en bal" bij elke bunkerslag.'},
 
- {id:'ps1',cat:'puttShort',clubHint:'putter',name:'1-Meter Cirkel',dur:8,dif:'Gemakkelijk',balls:6,ballType:'own',sets:3,goal:null,desc:'Set 1: 6 ballen op 1m cirkel (maak alle 6). Set 2: 1,5m. Set 3: 2m. Noteer bij welke set je een bal mist.',tip:'💡 Basistest voor korte putt-zekerheid. Profis maken 100% van 1m.'},
- {id:'ps2',cat:'puttShort',clubHint:'putter',name:'Gate Drill (Tees als Poortje)',dur:7,dif:'Gemakkelijk',balls:9,ballType:'own',sets:null,goal:'putter raakt de tees niet',desc:'Zet twee tees iets breder dan je putter face op weg naar de hole. 9 putts van 1–1,5m. De putter mag de tees niet raken.',tip:'💡 Als je de tees raakt, beweegt je putter niet recht door de bal.'},
+ {id:'ps1',cat:'puttShort',clubHint:'putter',name:'Dave Pelz 3-Voet Cirkel',dur:8,dif:'Gemakkelijk',balls:6,ballType:'own',sets:3,goal:null,desc:'De gouden standaard van Dave Pelz. Leg 6 ballen in een cirkel op 3 voet (±1 meter). Maak ze allemaal. Herhaal 3x.',tip:'💡 Op 3 voet verlies je de meeste slagen als je twijfelt. Train op automatisme.'},
+ {id:'ps2',cat:'puttShort',clubHint:'putter',name:'Tiger\'s Gate Drill',dur:7,dif:'Gemakkelijk',balls:9,ballType:'own',sets:null,goal:'putter raakt de tees niet',desc:'Dé opwarmoefening van Tiger Woods. Zet twee tees net iets breder dan je putter face. 9 putts van 1,5m. Raak de tees niet!',tip:'💡 De ultieme feedback voor een square clubface bij impact.'},
  {id:'ps3',cat:'puttShort',clubHint:'putter',name:'String Line Training',dur:8,dif:'Gemiddeld',balls:10,ballType:'own',sets:1,goal:null,desc:'Span een stukje draad van bal naar hole. Sla 10 putts langs de draad voor perfecte lijnvisualisatie.',tip:'💡 String Line is het meest effectieve hulpmiddel voor putterlijngevoel.'},
  {id:'ps4',cat:'puttShort',clubHint:'putter',name:'Make 10 Op Rij Challenge',dur:9,dif:'Moeilijk',balls:10,ballType:'own',sets:null,goal:'10 putts op rij van 1m (bij miss: opnieuw bij 0)',desc:'10 putts achter elkaar van 1m. Elke miss = opnieuw bij 0 beginnen. Noteer hoeveel pogingen tot je 10 op rij haalt.',tip:'💡 Routine is de sleutel. Pre-shot routine moet altijd identiek zijn.'},
  {id:'ps5',cat:'puttShort',clubHint:'putter',name:'Pre-Shot Routine Herhaling',dur:6,dif:'Gemakkelijk',balls:20,ballType:'own',sets:4,goal:null,desc:'4 sets van 5 putts. Focus puur op vaste routine: aanlijn → 2 blikken → stance → sla. Denk niet aan de uitkomst.',tip:'💡 Routine verwijdert twijfel. Twijfel verstoort het tempo.'},
@@ -734,6 +761,74 @@ window.showTab = (t) => {
     if(t==='analyse')   renderAnalyse();
     if(t==='voortgang') renderProg();
     if(t==='clubs')     renderClubs();
+    if(t==='comm')      initComm();
+};
+
+let unsubComm = null;
+let currentWeekStr = '';
+let currentWeekEx = null;
+
+function initComm() {
+    // Bepaal ISO week
+    const d = new Date();
+    d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay()||7));
+    const yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
+    const weekNo = Math.ceil(( ( (d - yearStart) / 86400000) + 1)/7);
+    currentWeekStr = `${d.getUTCFullYear()}_W${weekNo}`;
+    
+    // Selecteer oefening (geen "pogingen", want hoger is beter in leaderboard)
+    const chExs = EX.filter(e => e.goal && !e.desc.includes('pogingen'));
+    currentWeekEx = chExs[weekNo % chExs.length];
+    
+    document.getElementById('comm-week-ex').innerHTML = `
+        <div class="ei" style="border-left:4px solid var(--yw);margin:0;box-shadow:0 2px 5px rgba(0,0,0,0.05);">
+            <div class="eih"><div class="ein">🎯 ${currentWeekEx.name}</div><div class="eid">${currentWeekEx.dur} min</div></div>
+            ${exMetaHtml(currentWeekEx)}
+            <div class="eidesc">${currentWeekEx.desc}</div>
+            <div class="eitip">${currentWeekEx.tip}</div>
+        </div>
+    `;
+    
+    if(unsubComm) unsubComm();
+    unsubComm = onSnapshot(
+        query(collection(db, "leaderboards", currentWeekStr, "scores"), orderBy("score", "desc"), limit(50)),
+        (snap) => {
+            let html = '';
+            let rank = 1;
+            snap.forEach(doc => {
+                const d = doc.data();
+                const isMe = doc.id === currentUser.uid;
+                html += `<tr style="${isMe ? 'background:#e3f2fd;font-weight:700;' : ''}">
+                    <td>${rank++}</td>
+                    <td>${d.name || 'Golfer'}${isMe ? ' (Jij)' : ''}</td>
+                    <td style="text-align:right;font-weight:700;color:var(--gd);">${d.score}</td>
+                </tr>`;
+            });
+            if(html === '') html = '<tr><td colspan="3" style="text-align:center;color:var(--mu);padding:20px;">Nog geen scores deze week.<br>Wees de eerste!</td></tr>';
+            document.getElementById('comm-leaderboard-body').innerHTML = html;
+        }
+    );
+}
+
+window.submitCommScore = async () => {
+    if(!currentUser) return;
+    const val = parseFloat(document.getElementById('comm-score-input').value);
+    if(isNaN(val)) return toast('❌ Vul een getal in als score.');
+    
+    const emailName = currentUser.email ? currentUser.email.split('@')[0] : 'Golfer';
+    
+    try {
+        await setDoc(doc(db, "leaderboards", currentWeekStr, "scores", currentUser.uid), {
+            score: val,
+            name: emailName,
+            timestamp: new Date().getTime()
+        });
+        toast('🏆 Score toegevoegd aan het Leaderboard!');
+        document.getElementById('comm-score-input').value = '';
+    } catch(e) {
+        console.error(e);
+        toast('❌ Fout bij opslaan. Check je internetverbinding.');
+    }
 };
 
 window.updDur = () => {
@@ -1163,6 +1258,23 @@ function initAppUI(){
     document.getElementById('te').style.display='none';
     document.getElementById('tc').style.display='block';
 }
+
+window.shareApp = () => {
+    if(navigator.share){
+        const lat=getLatest();
+        let text = 'Ik train data-gedreven met Golf Buddy. Bekijk de app!';
+        if(lat && lat.stats && lat.stats.hcp) {
+            text = `Mijn actuele Handicap Index is ${lat.stats.hcp}. Ik train data-gedreven met Golf Buddy. Train met me mee! ⛳`;
+        }
+        navigator.share({
+            title: 'Golf Buddy',
+            text: text,
+            url: window.location.href
+        }).catch(console.error);
+    } else {
+        toast('Delen wordt niet ondersteund in deze browser.');
+    }
+};
 </script>
 <script>
     if ('serviceWorker' in navigator) {
