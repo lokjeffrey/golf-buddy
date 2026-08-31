@@ -462,7 +462,7 @@ const EX=[
  {id:'ps8',cat:'puttShort',clubHint:'putter',name:'Face Impact Check',dur:6,dif:'Gemakkelijk',balls:15,ballType:'own',sets:1,goal:null,desc:'Plak tape op het midden van je putter face. Sla 15 putts. Zie je exact waar je impact valt.',tip:'💡 Impact buiten het sweetspot = verlies van afstandscontrole en lijn.'},
 
  {id:'pm1',cat:'puttMedium',clubHint:'putter',name:'Ladder Drill (3-6m)',dur:9,dif:'Gemiddeld',balls:4,ballType:'own',sets:null,goal:'4 afstanden op volgorde in 1 putt',desc:'Leg 4 ballen op 3m, 4m, 5m en 6m. Probeer elke putt in één slag. Mis je er één? Herhaal die afstand direct opnieuw. Lukt de hele ladder? Herhaal hem (max 3×). Noteer hoeveel pogingen je per afstand nodig had.',tip:'💡 Ladder drill is dé klassieke oefening voor afstandsgevoel bij medium putts.'},
- {id:'pm2',cat:'puttMedium',clubHint:'putter',name:'2-Putt Zone Training',dur:8,dif:'Gemiddeld',balls:10,ballType:'own',sets:null,goal:'≥ 8/10 eerste putts stoppen binnen 1m',desc:'Leg 10 ballen op 5m afstand van de hole. De eerste putt mag niet bedoeld zijn om in te gaan – hij moet stopppen binnen 1m van de hole (in de "tap-in zone"). Noteer hoeveel eerste putts binnen 1m stoppen (doel: 8/10).',tip:'💡 Eerste putt op "tap-in afstand" zetten = 3-putt voorkomen.'},
+ {id:'pm2',cat:'puttMedium',clubHint:'putter',name:'2-Putt Zone Training',dur:8,dif:'Gemiddeld',balls:10,ballType:'own',sets:null,goal:'≥ 8/10 eerste putts stoppen binnen 1m',desc:'Leg 10 ballen op 5m afstand van de hole. De eerste putt mag niet bedoeld zijn om in te gaan – hij moet stoppen binnen 1m van de hole (in de "tap-in zone"). Noteer hoeveel eerste putts binnen 1m stoppen (doel: 8/10).',tip:'💡 Eerste putt op "tap-in afstand" zetten = 3-putt voorkomen.'},
  {id:'pm3',cat:'puttMedium',clubHint:'putter',name:'Break Lezen Training',dur:9,dif:'Moeilijk',balls:8,ballType:'own',sets:1,goal:null,desc:'Lees de lijn van achter de hole (laagste kant). Maak een voorspelling (links/rechts breekt, hoeveel cm). Sla dan en vergelijk. 8 putts.',tip:'💡 Lees altijd van de laagste kant. De bal breekt altijd naar het laagste punt.'},
  {id:'pm4',cat:'puttMedium',clubHint:'putter',name:'9-Hole Putting Ronde',dur:15,dif:'Gemiddeld',balls:1,ballType:'own',sets:null,goal:'9-hole ronde ≤ 9 putts totaal',desc:'Speel een volledige 9-hole ronde op de practice green van ±4m afstand. Noteer je totale puttaantal.',tip:'💡 Competitieve context traint beter dan losse oefening.'},
  {id:'pm5',cat:'puttMedium',clubHint:'putter',name:'Target Putt (Poortje)',dur:8,dif:'Gemiddeld',balls:15,ballType:'own',sets:null,goal:'putts door het poortje van 4m',desc:'Zet twee tees 30cm breed voor de hole als "poortje". Van 4m: sla 15 putts en tel hoeveel er door het poortje gaan.',tip:'💡 Maak het poortje smaller naarmate je beter wordt.'},
@@ -480,7 +480,7 @@ const EX=[
 /* ═══════════════════════════════════════════════════════
    CONSTANTS & UTILS
 ═══════════════════════════════════════════════════════ */
-const CAT_LBL={drive:'🏌️ Drive',approach:'🎯 Approach',chip:'🏌 Chip/Pitch',puttShort:'🎱 Putt Kort',puttMedium:'🎱 Putt Medium',puttLong:'🎱 Putt Lang'};
+const CAT_LBL={drive:'🏌️ Afslag',approach:'🎯 Approach',chip:'🏌 Chip/Pitch',puttShort:'🎱 Putt Kort',puttMedium:'🎱 Putt Medium',puttLong:'🎱 Putt Lang'};
 const CAT_COL={drive:'#e3f2fd',approach:'#e8f5e9',chip:'#f3e5f5',puttShort:'#fce4ec',puttMedium:'#fff3e0',puttLong:'#e0f2f1'};
 
 const SESS=[
@@ -492,10 +492,10 @@ const SESS=[
 
 function getBM(hcp){
     const h=hcp?+hcp:14;
-    if(h<=9)  return{drive:60,approach:50,chipGem:10,chipUaD:40,puttAvg:1.7,puttShort:2, puttMedium:15,puttLong:10};
-    if(h<=18) return{drive:50,approach:35,chipGem:20,chipUaD:25,puttAvg:1.9,puttShort:5, puttMedium:25,puttLong:20};
-    if(h<=27) return{drive:40,approach:20,chipGem:30,chipUaD:15,puttAvg:2.1,puttShort:10,puttMedium:35,puttLong:30};
-    return           {drive:30,approach:10,chipGem:40,chipUaD:8, puttAvg:2.3,puttShort:15,puttMedium:45,puttLong:40};
+    if(h<=9)  return{drive:60,approach:50,chipGem:10,chipUaD:40,puttAvg:1.7,puttShort:2, puttMedium:15,puttLong:10,p1s:70,p1m:25,p1l:15,csan:50};
+    if(h<=18) return{drive:50,approach:35,chipGem:20,chipUaD:25,puttAvg:1.9,puttShort:5, puttMedium:25,puttLong:20,p1s:50,p1m:15,p1l:8, csan:25};
+    if(h<=27) return{drive:40,approach:20,chipGem:30,chipUaD:15,puttAvg:2.1,puttShort:10,puttMedium:35,puttLong:30,p1s:35,p1m:10,p1l:5, csan:10};
+    return           {drive:30,approach:10,chipGem:40,chipUaD:8, puttAvg:2.3,puttShort:15,puttMedium:45,puttLong:40,p1s:25,p1m:7, p1l:3, csan:5};
 }
 
 function getHcpClass(hcp){
@@ -832,16 +832,16 @@ function renderGarminAnalyse(lat){
         {lbl:'🎯 GIR',v:s.approach,bm:bm.approach,u:'%',hi:true},
         {lbl:'🏌 Chip Miss %',v:s.cgem,bm:bm.chipGem,u:'%',hi:false},
         {lbl:'🏌 Up-and-Down %',v:s.cuad,bm:bm.chipUaD,u:'%',hi:true},
-        {lbl:'🏖️ Sand Save %',v:s.csan,bm:null,u:'%',info:true},
+        {lbl:'🏖️ Sand Save %',v:s.csan,bm:bm.csan,u:'%',hi:true},
         {lbl:'🎱 Putts/hole',v:s.puttAvg,bm:bm.puttAvg,u:'',hi:false},
-        {lbl:'🎱 1-putt Kort',v:s.p1s,bm:null,u:'%',info:true},
-        {lbl:'🎱 1-putt Medium',v:s.p1m,bm:null,u:'%',info:true},
-        {lbl:'🎱 1-putt Lang',v:s.p1l,bm:null,u:'%',info:true},
+        {lbl:'🎱 1-putt Kort',v:s.p1s,bm:bm.p1s,u:'%',hi:true},
+        {lbl:'🎱 1-putt Medium',v:s.p1m,bm:bm.p1m,u:'%',hi:true},
+        {lbl:'🎱 1-putt Lang',v:s.p1l,bm:bm.p1l,u:'%',hi:true},
         {lbl:'🎱 3+ putt Kort',v:s.puttShort,bm:bm.puttShort,u:'%',hi:false},
         {lbl:'🎱 3+ putt Medium',v:s.puttMedium,bm:bm.puttMedium,u:'%',hi:false},
         {lbl:'🎱 3+ putt Lang',v:s.puttLong,bm:bm.puttLong,u:'%',hi:false},
     ].filter(r=>r.v!==null&&r.v!=='').map(r=>{
-        if(r.info)return`<tr><td>${r.lbl}</td><td style="text-align:center;font-weight:700;">${+r.v}${r.u}</td><td style="text-align:center;color:var(--mu);">ℹ️</td></tr>`;
+        if(r.info)return`<tr><td>${r.lbl}</td><td style="text-align:center;font-weight:700;">${+r.v}${r.u}</td><td style="text-align:center;color:var(--mu);font-size:11px;">Geen doel</td></tr>`;
         const good=r.hi?+r.v>=r.bm:+r.v<=r.bm;
         return`<tr><td>${r.lbl}</td>
             <td style="text-align:center;font-weight:700;color:${good?'var(--gm)':'var(--rd)'};">${+r.v}${r.u}</td>
@@ -868,14 +868,21 @@ function renderGarminAnalyse(lat){
         <div class="card">${hcpBadgeHtml(s)}${hlHtml}${barsHtml}</div>
         ${dirHtml}
         <div class="card"><div class="ctit">📏 Stats vs Benchmark (jouw HCP-klasse)</div>
-            <table class="stbl"><thead><tr><th>Stat</th><th style="text-align:center;">Jij</th><th style="text-align:center;">Doel</th></tr></thead><tbody>${rows}</tbody></table>
+            <table class="stbl"><thead><tr><th>Stat</th><th style="text-align:center;">Jij</th><th style="text-align:center;">Benchmark</th></tr></thead><tbody>${rows}</tbody></table>
         </div>`;
+}
 }
 
 /* ═══════════════════════════════════════════════════════
    TRAINING
 ═══════════════════════════════════════════════════════ */
 let genSessData=[];
+
+const WARMUP_HTML = `
+    <div class="ei" style="background:var(--gp);border-radius:8px;margin-bottom:4px;">
+        <div class="eih"><div class="ein" style="color:var(--gd);">🧘 Warming-up (5 min)</div></div>
+        <div class="eidesc"><strong>1. Losdraaien (2 min)</strong> — Draai je schouders, heupen, knieën en polsen zachtjes los. Geen clubs nodig.<br><strong>2. Korte swings (3 min)</strong> — Pak je Sand Wedge of Pitching Wedge. Sla 10–15 halve, ontspannen slagen om het ritme te voelen.</div>
+    </div>`;
 
 window.genSessions = () => {
     const lat=getLatest();if(!lat)return;
@@ -888,41 +895,18 @@ window.genSessions = () => {
 };
 
 function renderSessions(){
-    const warmupHtml = `
-        <div class="sc" style="background:var(--gp);border:1px solid var(--gl);">
-            <div class="sh" onclick="togSess('wu')">
-                <div class="shl">
-                    <div class="sbadge" style="background:var(--gl);color:#fff;">🧘</div>
-                    <div><div class="stit" style="color:var(--gd);">Warming-up (5 min)</div>
-                    <div class="smeta">Algemeen fysiek + ontspannen swings</div></div>
-                </div>
-                <div class="schev" id="chev-wu">▼</div>
-            </div>
-            <div class="ssb" id="sb-wu">
-                <div class="ei">
-                    <div class="eih"><div class="ein">1. Losdraaien (2 min)</div></div>
-                    <div class="eidesc">Draai je schouders, heupen, knieën en polsen zachtjes los. Geen clubs nodig.</div>
-                </div>
-                <div class="ei">
-                    <div class="eih"><div class="ein">2. Korte swings (3 min)</div></div>
-                    <div class="eidesc">Pak je favoriete wedge (bijv. Sand Wedge of Pitching Wedge). Sla 10-15 halve, ontspannen slagen om het ritme te voelen.</div>
-                </div>
-            </div>
-        </div>
-    `;
-
-    document.getElementById('sess-container').innerHTML= warmupHtml + genSessData.map((sess,i)=>{
+    document.getElementById('sess-container').innerHTML= genSessData.map((sess,i)=>{
         const tot=sess.exs.reduce((s,e)=>s+e.dur,0);
         return`<div class="sc">
             <div class="sh" onclick="togSess(${i})">
                 <div class="shl">
                     <div class="sbadge ${sess.bc}">${sess.icon}</div>
                     <div><div class="stit">Sessie ${i+1}: ${sess.lbl}</div>
-                    <div class="smeta">${sess.desc} · ~${tot} min · ${sess.exs.length} oefeningen</div></div>
+                    <div class="smeta">${sess.desc} · ~${tot+5} min (incl. warming-up) · ${sess.exs.length} oefeningen</div></div>
                 </div>
                 <div class="schev" id="chev-${i}">▼</div>
             </div>
-            <div class="ssb" id="sb-${i}">${renderExList(sess.exs)}</div>
+            <div class="ssb" id="sb-${i}">${WARMUP_HTML}${renderExList(sess.exs,i)}</div>
         </div>`;
     }).join('');
 }
@@ -942,19 +926,44 @@ function difBadge(dif){
     return`<span class="dif-badge ${cls}">${dif}</span>`;
 }
 
-function renderExList(exs){
+
+function renderExList(exs, sessIdx=0){
     if(!exs.length)return'<p style="color:var(--mu);font-size:13px;padding:10px 0;">Geen oefeningen voor deze configuratie.</p>';
-    // Pick the challenge: first exercise with a measurable goal, or the hardest one
+
+    // Sort drive exercises to alternate clubHints (avoid 3x driver in a row)
+    const reordered = (() => {
+        const drives = exs.filter(e => e.cat==='drive');
+        const others = exs.filter(e => e.cat!=='drive');
+        if(drives.length > 1){
+            const sorted = [...drives].sort((a,b)=>(a.clubHint||'').localeCompare(b.clubHint||''));
+            return [...sorted, ...others];
+        }
+        return exs;
+    })();
+
+    // Pick the challenge: first with a measurable goal, else hardest
     const challengeIdx = (() => {
-        let idx = exs.findIndex(e => e.goal);
-        if(idx < 0) idx = exs.findIndex(e => e.dif === 'Moeilijk');
+        let idx = reordered.findIndex(e => e.goal);
+        if(idx < 0) idx = reordered.findIndex(e => e.dif === 'Moeilijk');
         if(idx < 0) idx = 0;
         return idx;
     })();
-    return exs.map((e,i)=>{
+
+    return reordered.map((e,i)=>{
         const isChallenge = i === challengeIdx;
+        const scoreKey = `score_s${sessIdx}_${e.id}`;
+        const savedScore = localStorage.getItem(scoreKey) || '';
         const challengeHtml = isChallenge
-            ? `<div style="background:#fff9c4;border:1.5px solid #f9a825;border-radius:8px;padding:6px 10px;margin-bottom:8px;font-size:12px;font-weight:700;color:#7b5e00;">🏆 Sessie Challenge — noteer je score voor progressiebeheer!</div>`
+            ? `<div style="background:#fff9c4;border:1.5px solid #f9a825;border-radius:8px;padding:8px 10px;margin-bottom:8px;">
+                <div style="font-size:12px;font-weight:700;color:#7b5e00;margin-bottom:6px;">🏆 Sessie Challenge — noteer je score!</div>
+                <div style="display:flex;gap:8px;align-items:center;">
+                    <input type="text" placeholder="Bijv. 7/10 of 3 pogingen..."
+                        value="${savedScore}"
+                        oninput="localStorage.setItem('${scoreKey}', this.value)"
+                        style="flex:1;padding:6px 10px;border:1.5px solid #f9a825;border-radius:8px;font-size:13px;background:#fff;">
+                    <span style="font-size:10px;color:#7b5e00;white-space:nowrap;">✔ Auto-opgeslagen</span>
+                </div>
+               </div>`
             : '';
         const headerBg = isChallenge ? 'background:#fffde7;border-radius:8px;padding:4px 8px;' : '';
         return `<div class="ei" ${isChallenge ? 'style="border-bottom:2px solid #f9a825;"' : ''}>
@@ -966,6 +975,7 @@ function renderExList(exs){
     </div>`;
     }).join('');
 }
+
 
 
 window.togSess = (i) => {
