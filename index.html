@@ -1171,7 +1171,18 @@ window.genSessions = async () => {
     const newPlan = [];
     for(let i=0; i<planLen; i++) {
         const base = SESS[i % SESS.length];
-        const exs = buildSess(base.id, lat.ws, mins, used, hcp);
+        
+        let targetForBuild = mins;
+        
+        // Trackman wordt altijd geïnjecteerd en duurt 10 minuten
+        targetForBuild -= 10; 
+        
+        // Weekly Challenge wordt geïnjecteerd in sessie 1
+        if (i === 0 && currentWeekEx) {
+            targetForBuild -= currentWeekEx.dur;
+        }
+
+        const exs = buildSess(base.id, lat.ws, targetForBuild, used, hcp);
         
         // Inject Trackman Bag Update (a13) at the very top
         const trackmanEx = EX.find(e => e.id === 'a13');
@@ -1265,7 +1276,12 @@ window.recalcSession = async (idx) => {
     
     const baseId = activePlan[idx].id.split('_')[0];
     activePlan[idx].mins = newMins;
-    const exs = buildSess(baseId, lat.ws, newMins, new Set(), lat.stats?.hcp);
+    
+    let targetForBuild = newMins;
+    targetForBuild -= 10; // Trackman
+    if(idx === 0 && currentWeekEx) targetForBuild -= currentWeekEx.dur; // Weekly Challenge
+    
+    const exs = buildSess(baseId, lat.ws, targetForBuild, new Set(), lat.stats?.hcp);
     
     const trackmanEx = EX.find(e => e.id === 'a13');
     if (trackmanEx && !exs.find(e => e.id === 'a13')) {
