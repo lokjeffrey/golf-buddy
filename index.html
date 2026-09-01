@@ -167,11 +167,11 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         /* Floating Report Button */
-        #report-fab{position:fixed;bottom:calc(var(--nav)+16px);right:16px;height:40px;padding:0 14px;border-radius:20px;background:var(--rd);color:#fff;border:none;font-size:13px;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,.25);cursor:pointer;z-index:190;display:flex;align-items:center;gap:6px;white-space:nowrap;transition:transform .2s;}
+        #report-fab{position:fixed;bottom:calc(var(--nav)+16px);right:16px;height:40px;padding:0 14px;border-radius:20px;background:var(--rd);color:#fff;border:none;font-size:13px;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,.35);cursor:pointer;z-index:9999;display:flex;align-items:center;gap:6px;white-space:nowrap;transition:transform .2s;}
         #report-fab:active{transform:scale(.95);}
 
         /* Report Modal */
-        #report-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;display:none;align-items:flex-end;justify-content:center;}
+        #report-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9998;display:none;align-items:flex-end;justify-content:center;}
         #report-overlay.open{display:flex;}
         #report-modal{background:#fff;border-radius:20px 20px 0 0;padding:24px 20px 32px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;animation:slideUp .28s ease;}
         @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
