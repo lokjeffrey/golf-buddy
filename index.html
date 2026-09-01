@@ -1268,7 +1268,7 @@ function renderSessions(){
                 </div>
                 <div class="schev" id="chev-${i}">▼</div>
             </div>
-            <div class="ssb" id="sb-${i}" style="${done?'display:none;':''}">${WARMUP_HTML}${renderExList(sess.exs,i)}${btnHtml}</div>
+            <div class="ssb" id="sb-${i}">${WARMUP_HTML}${renderExList(sess.exs,i)}${btnHtml}</div>
         </div>`;
     }).join('');
 }
@@ -1616,6 +1616,11 @@ window.openReport = () => {
     document.getElementById('report-type').value = '';
     document.getElementById('report-text').value = '';
     document.getElementById('report-status').textContent = '';
+    const btn = document.getElementById('btn-send-report');
+    if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = '📤 Versturen';
+    }
 };
 
 window.closeReport = () => {
