@@ -167,8 +167,8 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         /* Floating Report Button */
-        #report-fab{position:fixed;bottom:calc(var(--nav)+16px);right:16px;height:40px;padding:0 14px;border-radius:20px;background:var(--rd);color:#fff;border:none;font-size:13px;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,.35);cursor:pointer;z-index:9999;display:flex;align-items:center;gap:6px;white-space:nowrap;transition:transform .2s;}
-        #report-fab:active{transform:scale(.95);}
+        #report-fab{position:fixed;bottom:calc(var(--nav)+16px);right:16px;height:40px;padding:0 14px;border-radius:20px;background:var(--rd);color:#fff;border:none;font-size:13px;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,.35);cursor:pointer;z-index:9999;display:flex;align-items:center;gap:6px;white-space:nowrap;transform:translateZ(0);transition:opacity .2s;}
+        #report-fab:active{opacity:.8;}
 
         /* Report Modal */
         #report-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9998;display:none;align-items:flex-end;justify-content:center;}
@@ -436,41 +436,6 @@
     </nav>
 </div>
 <div class="toast" id="toast"></div>
-
-<!-- FLOATING REPORT BUTTON -->
-<button id="report-fab" onclick="openReport()" title="Bug of Feature melden">🐛 Report</button>
-
-<!-- REPORT MODAL -->
-<div id="report-overlay" onclick="closeReportOnOverlay(event)">
-  <div id="report-modal">
-    <h2>📣 Feedback &amp; Bug Report</h2>
-    <p>Bedankt voor je hulp! Vermeld zoveel mogelijk detail. Optioneel: voeg een screenshot toe.</p>
-
-    <select id="report-type" class="rfield">
-      <option value="">— Wat wil je melden? —</option>
-      <option value="Bug">🐛 Bug / Fout in de app</option>
-      <option value="Feature Request">💡 Nieuwe feature</option>
-      <option value="Verbetering">✏️ Verbetering</option>
-      <option value="Vraag">❓ Vraag</option>
-      <option value="Anders">💬 Anders</option>
-    </select>
-
-    <textarea id="report-text" class="rfield" rows="5" placeholder="Beschrijf het probleem of je idee zo duidelijk mogelijk..."></textarea>
-
-    <input type="file" id="report-file" accept="image/*" style="display:none;" onchange="previewScreenshot(event)">
-    <label for="report-file" class="upload-btn">
-      📷 <span id="upload-label">Voeg screenshot toe (optioneel)</span>
-    </label>
-    <img id="report-screenshot-preview" alt="Screenshot preview">
-
-    <div id="report-status"></div>
-
-    <div style="display:flex;gap:10px;margin-top:8px;">
-      <button class="btn btn-s" style="flex:1;" onclick="closeReport()">Annuleren</button>
-      <button class="btn btn-p" style="flex:2;margin:0;" id="btn-send-report" onclick="submitReport()">📤 Versturen</button>
-    </div>
-  </div>
-</div>
 
 <!-- FIREBASE & APP SCRIPT -->
 <script type="module">
@@ -1706,5 +1671,34 @@ window.submitReport = async () => {
         });
     }
 </script>
+
+<!-- FLOATING REPORT BUTTON & MODAL — altijd als laatste element voor maximale z-index werking -->
+<button id="report-fab" onclick="openReport()" title="Bug of Feature melden">🐛 Report</button>
+
+<div id="report-overlay" onclick="closeReportOnOverlay(event)">
+  <div id="report-modal">
+    <h2>📣 Feedback &amp; Bug Report</h2>
+    <p>Bedankt voor je hulp! Vermeld zoveel mogelijk detail. Optioneel: voeg een screenshot toe.</p>
+    <select id="report-type" class="rfield">
+      <option value="">— Wat wil je melden? —</option>
+      <option value="Bug">🐛 Bug / Fout in de app</option>
+      <option value="Feature Request">💡 Nieuwe feature</option>
+      <option value="Verbetering">✏️ Verbetering</option>
+      <option value="Vraag">❓ Vraag</option>
+      <option value="Anders">💬 Anders</option>
+    </select>
+    <textarea id="report-text" class="rfield" rows="5" placeholder="Beschrijf het probleem of je idee zo duidelijk mogelijk..."></textarea>
+    <input type="file" id="report-file" accept="image/*" style="display:none;" onchange="previewScreenshot(event)">
+    <label for="report-file" class="upload-btn">
+      📷 <span id="upload-label">Voeg screenshot toe (optioneel)</span>
+    </label>
+    <img id="report-screenshot-preview" alt="Screenshot preview">
+    <div id="report-status"></div>
+    <div style="display:flex;gap:10px;margin-top:8px;">
+      <button class="btn btn-s" style="flex:1;" onclick="closeReport()">Annuleren</button>
+      <button class="btn btn-p" style="flex:2;margin:0;" id="btn-send-report" onclick="submitReport()">📤 Versturen</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
