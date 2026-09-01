@@ -439,7 +439,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
 import { getFirestore, doc, setDoc, getDoc, addDoc, collection, query, orderBy, limit, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
-import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-storage.js";
 
 // Firebase config
 const firebaseConfig = {
@@ -454,7 +453,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-const storage = getStorage(app);
 
 let currentUser = null;
 let entriesData = [];
@@ -1560,10 +1558,6 @@ window.openReport = () => {
     document.getElementById('report-type').value = '';
     document.getElementById('report-text').value = '';
     document.getElementById('report-status').textContent = '';
-    document.getElementById('report-screenshot-preview').style.display = 'none';
-    document.getElementById('upload-label').textContent = 'Voeg screenshot toe (optioneel)';
-    reportScreenshotFile = null;
-    document.getElementById('report-file').value = '';
 };
 
 window.closeReport = () => {
@@ -1572,20 +1566,6 @@ window.closeReport = () => {
 
 window.closeReportOnOverlay = (e) => {
     if (e.target === document.getElementById('report-overlay')) closeReport();
-};
-
-window.previewScreenshot = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    reportScreenshotFile = file;
-    const reader = new FileReader();
-    reader.onload = ev => {
-        const img = document.getElementById('report-screenshot-preview');
-        img.src = ev.target.result;
-        img.style.display = 'block';
-        document.getElementById('upload-label').textContent = `✅ ${file.name}`;
-    };
-    reader.readAsDataURL(file);
 };
 
 window.submitReport = async () => {
@@ -1602,20 +1582,10 @@ window.submitReport = async () => {
     status.textContent = '';
 
     try {
-        let screenshotUrl = null;
-
-        // 1. Upload screenshot naar Firebase Storage (als aanwezig)
-        if (reportScreenshotFile) {
-            const fileRef = storageRef(storage, `reports/${Date.now()}_${reportScreenshotFile.name}`);
-            const snap = await uploadBytes(fileRef, reportScreenshotFile);
-            screenshotUrl = await getDownloadURL(snap.ref);
-        }
-
-        // 2. Sla rapport op in Firestore
+        // 1. Sla rapport op in Firestore
         const reportData = {
             type,
             text,
-            screenshotUrl,
             userEmail: currentUser?.email || 'Niet ingelogd',
             userId: currentUser?.uid || null,
             createdAt: serverTimestamp(),
@@ -1637,7 +1607,6 @@ window.submitReport = async () => {
                         report_type: type,
                         report_text: text,
                         user_email: reportData.userEmail,
-                        screenshot_url: screenshotUrl || 'Geen screenshot',
                         app_url: window.location.href
                     }
                 })
@@ -1670,11 +1639,11 @@ window.submitReport = async () => {
     }
 </script>
 
-<!-- REPORT MODAL — altijd als laatste element voor maximale z-index werking -->
+<!-- REPORT MODAL -->
 <div id="report-overlay" onclick="closeReportOnOverlay(event)">
   <div id="report-modal">
     <h2>📣 Feedback &amp; Bug Report</h2>
-    <p>Bedankt voor je hulp! Vermeld zoveel mogelijk detail. Optioneel: voeg een screenshot toe.</p>
+    <p>Bedankt voor je hulp! Vermeld zoveel mogelijk detail in je bericht.</p>
     <select id="report-type" class="rfield">
       <option value="">— Wat wil je melden? —</option>
       <option value="Bug">🐛 Bug / Fout in de app</option>
@@ -1684,11 +1653,6 @@ window.submitReport = async () => {
       <option value="Anders">💬 Anders</option>
     </select>
     <textarea id="report-text" class="rfield" rows="5" placeholder="Beschrijf het probleem of je idee zo duidelijk mogelijk..."></textarea>
-    <input type="file" id="report-file" accept="image/*" style="display:none;" onchange="previewScreenshot(event)">
-    <label for="report-file" class="upload-btn">
-      📷 <span id="upload-label">Voeg screenshot toe (optioneel)</span>
-    </label>
-    <img id="report-screenshot-preview" alt="Screenshot preview">
     <div id="report-status"></div>
     <div style="display:flex;gap:10px;margin-top:8px;">
       <button class="btn btn-s" style="flex:1;" onclick="closeReport()">Annuleren</button>
