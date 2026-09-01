@@ -660,9 +660,8 @@ const EX=[
  {id:'pl3',cat:'puttLong',clubHint:'putter',name:'Cross-Slope Lag Putting',dur:9,dif:'Moeilijk',balls:8,ballType:'own',sets:1,goal:null,desc:'Sla 8 putts diagonaal over een helling. Combineer afstandscontrole met break-lezen.',tip:'💡 Schuine greens zijn de moeilijkste situatie – train dit actief.',yt:'Cross-Slope Lag Putting golf drill'},
  {id:'pl4',cat:'puttLong',clubHint:'putter',name:'Twee-Putt Garantie',dur:9,dif:'Gemiddeld',balls:10,ballType:'own',sets:null,goal:'≥ 8/10 twee-putts (5 van 10m + 5 van 12m)',desc:'5 ballen van 10m, dan 5 ballen van 12m. De eerste putt moet eindigen op tap-in afstand. Noteer je score (X/10).',tip:'💡 3-putt voorkomen begint bij de eerste putt – niet bij de tweede.',yt:'Twee-Putt Garantie golf drill'},
  {id:'pl5',cat:'puttLong',clubHint:'putter',name:'Links/Rechts Afwisseling',dur:8,dif:'Moeilijk',balls:8,ballType:'own',sets:2,goal:null,desc:'2 sets van 4: afwisselend links- en rechtsbrekende putt van 8m. Leer bewust te compenseren. Noteer je gemiddelde eindafstand.',tip:'💡 Rechtshandige golfers struikelen vaker over rechts-brekende putts.',yt:'Links/Rechts Afwisseling golf drill'},
- {id:'pl6',cat:'puttLong',clubHint:'putter',name:'Grote Green Simulatie',dur:8,dif:'Gemiddeld',balls:8,ballType:'own',sets:1,goal:null,desc:'Sla 8 putts van extreem ver (12m+). Focus puur op stoppen dichtbij. Noteer je gemiddelde eindafstand.',tip:'💡 Lag conservatief van ver – met de ambitie om dichtbij te stoppen.'}
+ {id:'pl6',cat:'puttLong',clubHint:'putter',name:'Grote Green Simulatie',dur:8,dif:'Gemiddeld',balls:8,ballType:'own',sets:1,goal:null,desc:'Sla 8 putts van extreem ver (12m+). Focus puur op stoppen dichtbij. Noteer je gemiddelde eindafstand.',tip:'💡 Lag conservatief van ver – met de ambitie om dichtbij te stoppen.',yt:'Grote Green Simulatie golf drill'}
 ];
-
 
 /* ═══════════════════════════════════════════════════════
    CONSTANTS & UTILS
@@ -671,7 +670,7 @@ const CAT_LBL={drive:'🏌️ Afslag',approach:'🎯 Approach',chip:'🏌 Chip/P
 const CAT_COL={drive:'#e3f2fd',approach:'#e8f5e9',chip:'#f3e5f5',puttShort:'#fce4ec',puttMedium:'#fff3e0',puttLong:'#e0f2f1'};
 
 const SESS=[
-    {id:'spotlight',lbl:'Spotlight Focus',     icon:'🎯',bc:'bd1',desc:'Maximale focus op je zwakste punt',yt:'Grote Green Simulatie golf drill'},
+    {id:'spotlight',lbl:'Spotlight Focus',     icon:'🎯',bc:'bd1',desc:'Maximale focus op je zwakste punt'},
     {id:'balance',  lbl:'Gebalanceerde Aanval',icon:'⚖️',bc:'bd2',desc:'Top 3 zwaktes gelijk aanpakken'},
     {id:'full',     lbl:'Volledig Programma',  icon:'🔄',bc:'bd3',desc:'Alle categorieën gewogen op zwaktes'},
     {id:'gamesim',  lbl:'Game Simulatie',      icon:'🏆',bc:'bd4',desc:'Verdeling zoals een echte ronde'}
@@ -1202,15 +1201,26 @@ window.genSessions = async () => {
         }
 
         const exs = buildSess(base.id, lat.ws, targetForBuild, used, hcp);
-        // Inject Weekly Challenge into Session 1
-    if (newPlan.length > 0 && currentWeekEx) {
+        
+        newPlan.push({
+            id: base.id + '_' + i,
+            lbl: base.lbl,
+            icon: base.icon,
+            bc: base.bc,
+            desc: base.desc,
+            exs: exs,
+            mins: mins
+        });
+    }
+
+    // Inject Weekly Challenge into Session 1
+    if (newPlan.length > 0 && typeof currentWeekEx !== 'undefined' && currentWeekEx) {
         if (!newPlan[0].exs.find(e => e.id === currentWeekEx.id)) {
             newPlan[0].exs.unshift({...currentWeekEx, isWeeklyChallenge: true});
         } else {
             const ex = newPlan[0].exs.find(e => e.id === currentWeekEx.id);
             if(ex) ex.isWeeklyChallenge = true;
         }
-    }
     }
 
     activePlan = newPlan;
