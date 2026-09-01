@@ -166,10 +166,6 @@
         .loader{border:3px solid #f3f3f3;border-top:3px solid var(--gd);border-radius:50%;width:20px;height:20px;animation:spin 1s linear infinite;display:inline-block;vertical-align:middle;margin-right:8px;}
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* Floating Report Button */
-        #report-fab{position:fixed;bottom:calc(var(--nav)+16px);right:16px;height:40px;padding:0 14px;border-radius:20px;background:var(--rd);color:#fff;border:none;font-size:13px;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,.35);cursor:pointer;z-index:9999;display:flex;align-items:center;gap:6px;white-space:nowrap;transform:translateZ(0);transition:opacity .2s;}
-        #report-fab:active{opacity:.8;}
-
         /* Report Modal */
         #report-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9998;display:none;align-items:flex-end;justify-content:center;}
         #report-overlay.open{display:flex;}
@@ -225,6 +221,7 @@
         </div>
         <div style="display:flex; gap:8px;">
             <button class="logout-btn" onclick="window.shareApp()" style="background:#e8f5e9;color:#1b5e20;">📤 Deel</button>
+            <button class="logout-btn" onclick="openReport()" style="background:#ffebee;color:#c62828;">🐛 Report</button>
             <button class="logout-btn" onclick="handleLogout()">Uitloggen</button>
         </div>
     </div>
@@ -616,6 +613,7 @@ const EX=[
  {id:'a10',cat:'approach',clubHint:'short_iron',distHint:null,name:'IJzer Consistentie Tracker',dur:10,dif:'Gemiddeld',balls:30,ballType:'range',sets:1,goal:null,desc:'10 ballen per club: 7-ijzer → 8-ijzer → 9-ijzer (30 ballen). Noteer je beste 7/10 per club. Vergelijk over sessies.',tip:'💡 Consistentie bouw je alleen door meting en herhaling.'},
  {id:'a11',cat:'approach',clubHint:'short_iron',distHint:120,name:'GIR Simulatie',dur:9,dif:'Moeilijk',balls:9,ballType:'range',sets:null,goal:'3/3 greens geraakt per set',desc:'3 scenarios: 150m, 125m, 90m (3 ballen elk). Noteer: green geraakt? Ja/Nee. Bij minder dan 3/3: herhaal de set (max 3×).',tip:'💡 Game-realistische oefening geeft het meeste transfereffect.'},
  {id:'a12',cat:'approach',clubHint:'short_iron',distHint:135,name:'Cirkel van 6 Meter',dur:8,dif:'Gemiddeld',balls:10,ballType:'range',sets:null,goal:'≥ 7/10 ballen binnen 6m van vlag',desc:'Sla 10 approach shots naar een doelgebied van 6m rondom een vlag. Noteer je score (X/10).',tip:'💡 6 meter is een realistische GIR-definitie voor amateurs.'},
+ {id:'a13',cat:'approach',clubHint:null,distHint:null,name:'Trackman Bag Update (1 Club)',dur:10,dif:'Gemakkelijk',balls:10,ballType:'range',sets:1,goal:'10 zuivere stock-swings voor perfecte data',desc:'Kies zélf één club in je tas waarvan je de afstanden wilt updaten. Open "Track My Bag" of "Shot Analysis" in Trackman. Sla 10 normale basisswings en gooi de extreme missers weg. Update direct daarna je Carry-afstand in het Profiel-tabblad van de app!',tip:'💡 Doe dit altijd aan het begin van je sessie als je nog 100% fris bent, direct na je warming-up.'},
 
  {id:'c1',cat:'chip',clubHint:'short_iron',name:'Phil\'s Hinge & Hold',dur:7,dif:'Gemiddeld',balls:20,ballType:'own',sets:1,goal:null,desc:'De bekende chiptechniek van Phil Mickelson: polsen direct "hingen" (knikken) in de backswing, en die hoek "holden" door de impact heen. 20 chips rond de green.',tip:'💡 Nooit je polsen laten flippen bij impact. Handen leiden de clubhead.'},
  {id:'c2',cat:'chip',clubHint:'wedge',name:'Precisie Chip (Hoogste Wedge)',dur:8,dif:'Gemiddeld',balls:20,ballType:'own',sets:1,goal:null,desc:'Korte precisie chips met je hoogste wedge (meeste loft). Focus op een specifieke landingszone op 1m van de pin. 20 chips.',tip:'💡 Chip naar een landingszone – de bal rolt daarna vanzelf.'},
@@ -1672,9 +1670,7 @@ window.submitReport = async () => {
     }
 </script>
 
-<!-- FLOATING REPORT BUTTON & MODAL — altijd als laatste element voor maximale z-index werking -->
-<button id="report-fab" onclick="openReport()" title="Bug of Feature melden">🐛 Report</button>
-
+<!-- REPORT MODAL — altijd als laatste element voor maximale z-index werking -->
 <div id="report-overlay" onclick="closeReportOnOverlay(event)">
   <div id="report-modal">
     <h2>📣 Feedback &amp; Bug Report</h2>
