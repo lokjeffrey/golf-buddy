@@ -525,18 +525,29 @@ window.handleLogout = async () => {
 
 let userData = {};
 let activePlan = null;
+let userUnsub = null;
 
 async function loadUserData(){
-    try {
-        const docSnap = await getDoc(doc(db, "users", currentUser.uid));
-        if(docSnap.exists()){
-            userData = docSnap.data();
-            entriesData = userData.entries || [];
-            clubsData = userData.clubs || [];
-            challengeScores = userData.challengeScores || {};
-            activePlan = userData.activePlan || null;
-        }
-    } catch(e){ console.error("Error loading data:", e); toast("Fout bij laden data"); }
+    return new Promise((resolve) => {
+        if(userUnsub) userUnsub();
+        userUnsub = onSnapshot(doc(db, "users", currentUser.uid), (docSnap) => {
+            if(docSnap.exists()){
+                userData = docSnap.data();
+                entriesData = userData.entries || [];
+                clubsData = userData.clubs || [];
+                challengeScores = userData.challengeScores || {};
+                activePlan = userData.activePlan || null;
+            }
+            // Always refresh UI when data changes in background
+            initAppUI();
+            if(window.currentMode === 'manual') drawManualFocus();
+            if(document.getElementById('tc-active').style.display === 'block') renderSessions();
+            resolve();
+        }, (e) => {
+            console.error("Error loading data:", e); toast("Fout bij laden data");
+            resolve();
+        });
+    });
 }
 
 async function saveToDb(){
@@ -782,64 +793,65 @@ function shuffle(arr){return arr.slice().sort(()=>Math.random()-.5);}
 
 function buildSess(type,sc,mins,usedIds,hcp){
     const h=hcp?+hcp:14;
-    const base=mins<=45?1:mins<=80?2:3;
     const rank=rankCats(sc);
-    let plan=[];
+    let planCats=[];
     
+    // Bepaal welke categorieën in deze sessie komen op basis van type
     if(type==='spotlight'){
-        const top=rank[0];
-        const topMax=Math.min(base+(top.score>25?2:1),4);
-        plan.push({cat:top.cat,maxEx:topMax});
-        rank.slice(1,1+Math.min(base,2)).forEach(r=>plan.push({cat:r.cat,maxEx:1}));
+        planCats.push(rank[0].cat, rank[0].cat); // top weakness gets double weight
+        if(rank[1]) planCats.push(rank[1].cat);
+        if(rank[2]) planCats.push(rank[2].cat);
     }else if(type==='balance'){
-        const nCats=mins<=45?2:3;
-        rank.slice(0,nCats).forEach(r=>plan.push({cat:r.cat,maxEx:r.score>15?base+1:base}));
+        rank.slice(0, 3).forEach(r=>planCats.push(r.cat));
     }else if(type==='full'){
-        const nCats=mins<=45?3:mins<=80?4:mins<=105?5:6;
-        rank.slice(0,nCats).forEach(r=>{
-            const mx=r.score>25?base+1:r.score>5?base:Math.max(1,base-1);
-            plan.push({cat:r.cat,maxEx:mx});
-        });
+        rank.slice(0, 5).forEach(r=>planCats.push(r.cat));
     }else{
-        ['drive','approach','chip','puttShort','puttMedium','puttLong'].forEach(cat=>{
-            plan.push({cat,maxEx:(sc[cat]||0)>15?Math.min(base,2):1});
-        });
+        planCats = ['drive','approach','chip','puttShort','puttMedium','puttLong'];
     }
 
     const bycat={};
     Object.keys(CAT_LBL).forEach(cat=>{
-        let pool=EX.filter(e=>e.cat===cat);
+        let pool=EX.filter(e=>e.cat===cat && e.id !== 'a13'); // uitsluiten van trackman (wordt later geforceerd)
         if(h>27) pool=pool.filter(e=>e.dif==='Gemakkelijk');
         else if(h>18) pool=pool.filter(e=>e.dif!=='Moeilijk');
         bycat[cat]=shuffle(pool);
     });
 
     const result=[];
+    let currentDur = 0;
     let moeilijkUsed=0;
     const moeilijkLimit=h<=9?99:h<=18?1:0;
+    const targetMins = mins - 5; // 5 min warmup eraf
 
-    for(const{cat,maxEx}of plan){
-        const pool=bycat[cat]||[];
-        let added=0;
-        for(const ex of pool){
-            if(added>=maxEx) break;
-            if(usedIds.has(ex.id)) continue;
-            if(ex.dif==='Moeilijk'&&moeilijkUsed>=moeilijkLimit) continue;
-            result.push({...ex});
-            usedIds.add(ex.id);
-            if(ex.dif==='Moeilijk') moeilijkUsed++;
-            added++;
-        }
-        for(const ex of pool){
-            if(added>=maxEx) break;
-            if(usedIds.has(ex.id)&&!result.find(r=>r.id===ex.id)){
-                if(ex.dif==='Moeilijk'&&moeilijkUsed>=moeilijkLimit) continue;
+    // Blijf round-robin oefeningen toevoegen tot we de tijd bereiken
+    let catIndex = 0;
+    let attempts = 0;
+    
+    while(currentDur < targetMins && attempts < 50) {
+        attempts++;
+        const cat = planCats[catIndex % planCats.length];
+        const pool = bycat[cat];
+        
+        if(pool && pool.length > 0) {
+            // Zoek een oefening in deze categorie
+            let exIndex = pool.findIndex(e => !usedIds.has(e.id) && (e.dif !== 'Moeilijk' || moeilijkUsed < moeilijkLimit));
+            
+            // Als alles al gebruikt is in deze categorie, accepteer dan dubbelingen
+            if(exIndex === -1) {
+                exIndex = pool.findIndex(e => e.dif !== 'Moeilijk' || moeilijkUsed < moeilijkLimit);
+            }
+            
+            if(exIndex !== -1) {
+                const ex = pool.splice(exIndex, 1)[0]; // haal uit pool
                 result.push({...ex});
-                if(ex.dif==='Moeilijk') moeilijkUsed++;
-                added++;
+                usedIds.add(ex.id);
+                currentDur += ex.dur;
+                if(ex.dif === 'Moeilijk') moeilijkUsed++;
             }
         }
+        catIndex++;
     }
+    
     return result;
 }
 
@@ -1159,10 +1171,18 @@ window.genSessions = async () => {
     const newPlan = [];
     for(let i=0; i<planLen; i++) {
         const base = SESS[i % SESS.length];
+        const exs = buildSess(base.id, lat.ws, mins, used, hcp);
+        
+        // Inject Trackman Bag Update (a13) at the very top
+        const trackmanEx = EX.find(e => e.id === 'a13');
+        if (trackmanEx && !exs.find(e => e.id === 'a13')) {
+            exs.unshift({...trackmanEx, isTrackman: true});
+        }
+
         newPlan.push({
             ...base,
             id: base.id + '_' + i, // unique ID per block instance
-            exs: buildSess(base.id, lat.ws, mins, used, hcp),
+            exs: exs,
             mins,
             completed: false
         });
@@ -1171,6 +1191,8 @@ window.genSessions = async () => {
     // Inject Weekly Challenge into Session 1
     if (newPlan.length > 0 && currentWeekEx) {
         if (!newPlan[0].exs.find(e => e.id === currentWeekEx.id)) {
+            // Unshift places it at the very top (even before trackman), which is fine, 
+            // or we can put it after trackman. Let's unshift, so Weekly Challenge is first.
             newPlan[0].exs.unshift({...currentWeekEx, isWeeklyChallenge: true});
         } else {
             const ex = newPlan[0].exs.find(e => e.id === currentWeekEx.id);
@@ -1243,7 +1265,14 @@ window.recalcSession = async (idx) => {
     
     const baseId = activePlan[idx].id.split('_')[0];
     activePlan[idx].mins = newMins;
-    activePlan[idx].exs = buildSess(baseId, lat.ws, newMins, new Set(), lat.stats?.hcp);
+    const exs = buildSess(baseId, lat.ws, newMins, new Set(), lat.stats?.hcp);
+    
+    const trackmanEx = EX.find(e => e.id === 'a13');
+    if (trackmanEx && !exs.find(e => e.id === 'a13')) {
+        exs.unshift({...trackmanEx, isTrackman: true});
+    }
+
+    activePlan[idx].exs = exs;
     
     if(idx === 0 && currentWeekEx) {
          if (!activePlan[0].exs.find(e => e.id === currentWeekEx.id)) {
