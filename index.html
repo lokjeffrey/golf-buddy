@@ -165,6 +165,23 @@
         
         .loader{border:3px solid #f3f3f3;border-top:3px solid var(--gd);border-radius:50%;width:20px;height:20px;animation:spin 1s linear infinite;display:inline-block;vertical-align:middle;margin-right:8px;}
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Floating Report Button */
+        #report-fab{position:fixed;bottom:calc(var(--nav)+16px);right:16px;width:46px;height:46px;border-radius:50%;background:var(--rd);color:#fff;border:none;font-size:20px;box-shadow:0 4px 14px rgba(0,0,0,.25);cursor:pointer;z-index:190;display:flex;align-items:center;justify-content:center;transition:transform .2s;}
+        #report-fab:active{transform:scale(.93);}
+
+        /* Report Modal */
+        #report-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;display:none;align-items:flex-end;justify-content:center;}
+        #report-overlay.open{display:flex;}
+        #report-modal{background:#fff;border-radius:20px 20px 0 0;padding:24px 20px 32px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;animation:slideUp .28s ease;}
+        @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+        #report-modal h2{font-size:17px;font-weight:800;color:var(--gd);margin-bottom:4px;}
+        #report-modal p{font-size:12px;color:var(--mu);margin-bottom:16px;}
+        .rfield{width:100%;padding:12px;border:1.5px solid var(--bd);border-radius:10px;font-size:14px;font-family:inherit;background:#fff;margin-bottom:10px;}
+        .rfield:focus{outline:none;border-color:var(--gm);}
+        #report-screenshot-preview{display:none;width:100%;border-radius:10px;margin-bottom:10px;border:1.5px solid var(--bd);}
+        .upload-btn{display:flex;align-items:center;gap:8px;background:var(--gp);border:1.5px dashed var(--gm);border-radius:10px;padding:10px 14px;font-size:13px;color:var(--gd);font-weight:600;cursor:pointer;margin-bottom:10px;width:100%;}
+        #report-status{font-size:12px;font-weight:700;text-align:center;margin-top:4px;min-height:18px;}
     </style>
 </head>
 <body>
@@ -420,11 +437,47 @@
 </div>
 <div class="toast" id="toast"></div>
 
+<!-- FLOATING REPORT BUTTON -->
+<button id="report-fab" onclick="openReport()" title="Bug of Feature melden">🐛</button>
+
+<!-- REPORT MODAL -->
+<div id="report-overlay" onclick="closeReportOnOverlay(event)">
+  <div id="report-modal">
+    <h2>📣 Feedback &amp; Bug Report</h2>
+    <p>Bedankt voor je hulp! Vermeld zoveel mogelijk detail. Optioneel: voeg een screenshot toe.</p>
+
+    <select id="report-type" class="rfield">
+      <option value="">— Wat wil je melden? —</option>
+      <option value="Bug">🐛 Bug / Fout in de app</option>
+      <option value="Feature Request">💡 Nieuwe feature</option>
+      <option value="Verbetering">✏️ Verbetering</option>
+      <option value="Vraag">❓ Vraag</option>
+      <option value="Anders">💬 Anders</option>
+    </select>
+
+    <textarea id="report-text" class="rfield" rows="5" placeholder="Beschrijf het probleem of je idee zo duidelijk mogelijk..."></textarea>
+
+    <input type="file" id="report-file" accept="image/*" style="display:none;" onchange="previewScreenshot(event)">
+    <label for="report-file" class="upload-btn">
+      📷 <span id="upload-label">Voeg screenshot toe (optioneel)</span>
+    </label>
+    <img id="report-screenshot-preview" alt="Screenshot preview">
+
+    <div id="report-status"></div>
+
+    <div style="display:flex;gap:10px;margin-top:8px;">
+      <button class="btn btn-s" style="flex:1;" onclick="closeReport()">Annuleren</button>
+      <button class="btn btn-p" style="flex:2;margin:0;" id="btn-send-report" onclick="submitReport()">📤 Versturen</button>
+    </div>
+  </div>
+</div>
+
 <!-- FIREBASE & APP SCRIPT -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc, collection, query, orderBy, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+import { getFirestore, doc, setDoc, getDoc, addDoc, collection, query, orderBy, limit, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-storage.js";
 
 // Firebase config
 const firebaseConfig = {
@@ -439,6 +492,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+const storage = getStorage(app);
 
 let currentUser = null;
 let entriesData = [];
@@ -1524,6 +1578,120 @@ window.shareApp = () => {
         }).catch(console.error);
     } else {
         toast('Delen wordt niet ondersteund in deze browser.');
+    }
+};
+
+/* ═══════════════════════════════════════════════════════
+   FEEDBACK / BUG REPORT
+═══════════════════════════════════════════════════════ */
+
+// ⚠️  Vul hieronder je EmailJS-gegevens in nadat je een account hebt aangemaakt:
+const EMAILJS_SERVICE_ID  = 'service_idr820o';
+const EMAILJS_TEMPLATE_ID = 'template_kbqma66';
+const EMAILJS_PUBLIC_KEY  = 'jzVmLlIDZFyFhy4tx';
+
+let reportScreenshotFile = null;
+
+window.openReport = () => {
+    document.getElementById('report-overlay').classList.add('open');
+    document.getElementById('report-type').value = '';
+    document.getElementById('report-text').value = '';
+    document.getElementById('report-status').textContent = '';
+    document.getElementById('report-screenshot-preview').style.display = 'none';
+    document.getElementById('upload-label').textContent = 'Voeg screenshot toe (optioneel)';
+    reportScreenshotFile = null;
+    document.getElementById('report-file').value = '';
+};
+
+window.closeReport = () => {
+    document.getElementById('report-overlay').classList.remove('open');
+};
+
+window.closeReportOnOverlay = (e) => {
+    if (e.target === document.getElementById('report-overlay')) closeReport();
+};
+
+window.previewScreenshot = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    reportScreenshotFile = file;
+    const reader = new FileReader();
+    reader.onload = ev => {
+        const img = document.getElementById('report-screenshot-preview');
+        img.src = ev.target.result;
+        img.style.display = 'block';
+        document.getElementById('upload-label').textContent = `✅ ${file.name}`;
+    };
+    reader.readAsDataURL(file);
+};
+
+window.submitReport = async () => {
+    const type = document.getElementById('report-type').value;
+    const text = document.getElementById('report-text').value.trim();
+    const status = document.getElementById('report-status');
+    const btn = document.getElementById('btn-send-report');
+
+    if (!type) { status.textContent = '⚠️ Kies een type melding.'; status.style.color = 'var(--rd)'; return; }
+    if (!text) { status.textContent = '⚠️ Schrijf een beschrijving.'; status.style.color = 'var(--rd)'; return; }
+
+    btn.disabled = true;
+    btn.innerHTML = '<div class="loader"></div> Versturen...';
+    status.textContent = '';
+
+    try {
+        let screenshotUrl = null;
+
+        // 1. Upload screenshot naar Firebase Storage (als aanwezig)
+        if (reportScreenshotFile) {
+            const fileRef = storageRef(storage, `reports/${Date.now()}_${reportScreenshotFile.name}`);
+            const snap = await uploadBytes(fileRef, reportScreenshotFile);
+            screenshotUrl = await getDownloadURL(snap.ref);
+        }
+
+        // 2. Sla rapport op in Firestore
+        const reportData = {
+            type,
+            text,
+            screenshotUrl,
+            userEmail: currentUser?.email || 'Niet ingelogd',
+            userId: currentUser?.uid || null,
+            createdAt: serverTimestamp(),
+            appVersion: '1.0',
+            userAgent: navigator.userAgent
+        };
+        await addDoc(collection(db, 'reports'), reportData);
+
+        // 3. Stuur e-mail via EmailJS (gratis CDN versie)
+        if (EMAILJS_SERVICE_ID !== 'JOUW_SERVICE_ID') {
+            await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    service_id: EMAILJS_SERVICE_ID,
+                    template_id: EMAILJS_TEMPLATE_ID,
+                    user_id: EMAILJS_PUBLIC_KEY,
+                    template_params: {
+                        report_type: type,
+                        report_text: text,
+                        user_email: reportData.userEmail,
+                        screenshot_url: screenshotUrl || 'Geen screenshot',
+                        app_url: window.location.href
+                    }
+                })
+            });
+        }
+
+        status.textContent = '✅ Melding verstuurd! Bedankt.';
+        status.style.color = 'var(--gm)';
+        btn.innerHTML = '✅ Verstuurd!';
+        setTimeout(() => closeReport(), 1800);
+
+    } catch(err) {
+        console.error('Report error:', err);
+        status.textContent = '❌ Er ging iets mis. Probeer opnieuw.';
+        status.style.color = 'var(--rd)';
+        btn.innerHTML = '📤 Versturen';
+        btn.disabled = false;
     }
 };
 </script>
