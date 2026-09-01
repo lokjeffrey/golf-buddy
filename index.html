@@ -1351,24 +1351,30 @@ const DRIVE_HINT_ORDER = {long_iron:0, hybrid:1, wood:2, driver:3};
 function renderExList(exs, sessIdx=0){
     if(!exs.length)return'<p style="color:var(--mu);font-size:13px;padding:10px 0;">Geen oefeningen voor deze configuratie.</p>';
 
-    // Sorteer afslag-oefeningen (driver als laatste)
+    // Sorteer afslag-oefeningen (driver als laatste) en haal a13 naar voren
     const reordered = (() => {
-        const drives = exs.filter(e => e.cat==='drive');
-        const others = exs.filter(e => e.cat!=='drive');
+        const trackman = exs.filter(e => e.id === 'a13');
+        const remaining = exs.filter(e => e.id !== 'a13');
+        
+        const drives = remaining.filter(e => e.cat==='drive');
+        const others = remaining.filter(e => e.cat!=='drive');
+        
+        let sortedRemaining = remaining;
         if(drives.length > 1){
-            const sorted = [...drives].sort((a,b)=>
+            const sortedDrives = [...drives].sort((a,b)=>
                 (DRIVE_HINT_ORDER[a.clubHint]??99) - (DRIVE_HINT_ORDER[b.clubHint]??99)
             );
-            return [...sorted, ...others];
+            sortedRemaining = [...others, ...sortedDrives];
         }
-        return exs;
+        
+        return [...trackman, ...sortedRemaining];
     })();
 
-    // Pick the challenge: first with a measurable goal, else hardest
+    // Pick the challenge: first with a measurable goal, else hardest, excl. a13
     const challengeIdx = (() => {
-        let idx = reordered.findIndex(e => e.goal);
-        if(idx < 0) idx = reordered.findIndex(e => e.dif === 'Moeilijk');
-        if(idx < 0) idx = 0;
+        let idx = reordered.findIndex(e => e.goal && e.id !== 'a13');
+        if(idx < 0) idx = reordered.findIndex(e => e.dif === 'Moeilijk' && e.id !== 'a13');
+        if(idx < 0) idx = reordered.findIndex(e => e.id !== 'a13');
         return idx;
     })();
 
