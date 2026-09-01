@@ -594,73 +594,72 @@ window.saveChallengeScore = (exId, val) => {
 ═══════════════════════════════════════════════════════ */
 const EX=[
  // clubHint: 'driver'|'wood'|'hybrid'|'long_iron'|'short_iron'|'wedge'|'putter'|null
- {id:'d1',cat:'drive',clubHint:'driver',name:'Alignment Stick – Swinglijn',dur:8,dif:'Gemakkelijk',balls:20,ballType:'range',sets:1,goal:null,desc:'Leg een alignment stick parallel aan je doellijn. Sla 20 ballen met je driver en let op dat je clubpad langs de stick loopt.',tip:'💡 Sla met 70% kracht. Vorm gaat boven snelheid.'},
- {id:'d2',cat:'drive',clubHint:'driver',name:'Slow Motion Herhaling',dur:6,dif:'Gemakkelijk',balls:20,ballType:'range',sets:5,goal:null,desc:'Sla in slow motion (±20% snelheid) met je driver. 5 sets van 4 ballen. Focus op elke fase: grip → takeaway → top → impact → follow-through.',tip:'💡 Traint spiergeheugen beter dan 20 volle snelle swings.'},
- {id:'d3',cat:'drive',clubHint:'driver',name:'Tee Hoogte Variaties',dur:7,dif:'Gemakkelijk',balls:15,ballType:'range',sets:1,goal:null,desc:'5 ballen hoge tee → 5 lage tee → 5 mix. Voel het verschil in aanslaan (upswing vs flat contact).',tip:'💡 Ideale driver: bovenste rand clubface = equator van de bal.'},
- {id:'d4',cat:'drive',clubHint:'long_iron',name:'Voeten Bij Elkaar Drill',dur:6,dif:'Gemakkelijk',balls:15,ballType:'range',sets:1,goal:null,desc:'Sla 15 ballen met een lang ijzer (bijv. 5-ijzer) met voeten vlak naast elkaar. Dwingt balans en rotatie af.',tip:'💡 Wiebel je? Dan roteer je heupen te weinig.'},
- {id:'d5',cat:'drive',clubHint:'wood',name:'¾ Swing Controle (Fairway Hout)',dur:8,dif:'Gemiddeld',balls:20,ballType:'range',sets:1,goal:null,desc:'Pak je 3-hout of 5-hout. Gebruik slechts ¾ backswing. Focus op consistente impact en rechte balvlucht. 20 ballen.',tip:'💡 Veel amateurs treffen de bal beter met ¾ swing – zeker met een fairway hout.'},
- {id:'d6',cat:'drive',clubHint:'driver',name:'Step-Through Drill',dur:7,dif:'Gemiddeld',balls:15,ballType:'range',sets:3,goal:null,desc:'Begin met gewicht op rechtervoet. Terwijl je neerswingt, stap voorwaarts met linkervoet. 3 sets van 5 met driver.',tip:'💡 Goed als je "achterop blijft" met je gewicht bij impact.'},
- {id:'d7',cat:'drive',clubHint:'driver',name:'Bucket Challenge: 5 Op Rij',dur:10,dif:'Gemiddeld',balls:25,ballType:'range',sets:null,goal:'5 drives op rij in de fairway',desc:'5 ballen met driver moeten achter elkaar een imaginaire fairway (30m breed) raken. Bij een miss begin je opnieuw bij 0. Noteer hoeveel pogingen je nodig hebt.',tip:'💡 Simuleert echte rondedruk op de eerste tee.'},
- {id:'d8',cat:'drive',clubHint:'hybrid',name:'Gate Drill (Hybride)',dur:7,dif:'Gemiddeld',balls:20,ballType:'range',sets:1,goal:null,desc:'Zet twee tees vlak naast de bal, net iets breder dan je hybride. Club mag ze niet raken = rechte swinglijn. 20 ballen.',tip:'💡 Begin met tees verder en breng ze dichterbij naarmate je beter wordt.'},
- {id:'d9',cat:'drive',clubHint:'driver',name:'Pause At Top Drill',dur:6,dif:'Gemakkelijk',balls:15,ballType:'range',sets:1,goal:null,desc:'Pauzeer 1 volle seconde bovenin je backswing met driver. Voorkomt haast bij het neerkomen. 15 ballen.',tip:'💡 Meest voorkomende fout: te snel neerkomen vanuit de top.'},
- {id:'d10',cat:'drive',clubHint:'long_iron',name:'Eén-Hand Drill (Links)',dur:7,dif:'Moeilijk',balls:20,ballType:'range',sets:2,goal:null,desc:'2 sets van 10 ballen met alleen je linkerhand, gebruik een lang ijzer (5- of 6-ijzer). Traint de leidende hand.',tip:'💡 De linkerhand stuurt de swing – de rechter geeft kracht.'},
- {id:'d11',cat:'drive',clubHint:'long_iron',name:'Eén-Hand Drill (Rechts)',dur:7,dif:'Moeilijk',balls:20,ballType:'range',sets:2,goal:null,desc:'2 sets van 10 ballen met alleen je rechterhand, gebruik een lang ijzer. Traint kracht en rotatie. Korte backswing, volle follow-through.',tip:'💡 Rechterhand te dominant? Dit oefent een evenwichtige bijdrage.'},
- {id:'d12',cat:'drive',clubHint:'wood',name:'Afstandsdoelwit Series (Hout)',dur:9,dif:'Gemiddeld',balls:15,ballType:'range',sets:1,goal:null,desc:'Pak je 3- of 5-hout. 5 ballen naar 100m → 5 naar 150m → 5 naar 200m. Let op consistentie per doelwit.',tip:'💡 Fairway hout is de meest gebruikte club na een gemiste fairway.'},
- {id:'d13',cat:'drive',clubHint:'driver',name:'Fairway Nauwkeurigheid Test',dur:8,dif:'Gemiddeld',balls:20,ballType:'range',sets:null,goal:'≥ 10/20 drives in de fairway',desc:'Sla 20 ballen met driver. Houd bij hoeveel een imaginaire fairway (30m breed) raken. Streef naar ≥ 10/20 en noteer je score.',tip:'💡 Nauwkeurigheid > afstand op de meeste holes.'},
- {id:'d14',cat:'drive',clubHint:'long_iron',name:'Impact Bag Training',dur:6,dif:'Gemakkelijk',balls:0,ballType:'none',sets:3,goal:null,desc:'Geen ballen nodig. Pak een oud ijzer en sla met hands-first positie tegen een opgerolde handdoek. 3 sets van 10 herhalingen.',tip:'💡 Meest onderschatte trainingshulp voor de volle swing.'},
- {id:'d15',cat:'drive',clubHint:'driver',name:'Hips Lead Challenge',dur:7,dif:'Moeilijk',balls:15,ballType:'range',sets:3,goal:null,desc:'3 sets van 5 ballen met driver. Start de downswing bewust met heupdraai (NIET schouders). Heupen gaan altijd eerst.',tip:'💡 Heupen leiden = meer power + minder slice.'},
+ {id:'d1',cat:'drive',clubHint:'driver',name:'Alignment Stick – Swinglijn',dur:8,dif:'Gemakkelijk',balls:20,ballType:'range',sets:1,goal:null,desc:'Leg een alignment stick op de grond, nét buiten de bal en parallel aan je doellijn. Sla 20 ballen. Focus puur op je vertreklijn.',tip:'💡 De bal moet parallel aan de stick starten. Check je clubface bij adressering!',yt:'Alignment Stick – Swinglijn golf drill'},
+ {id:'d2',cat:'drive',clubHint:'driver',name:'Slow Motion Herhaling',dur:6,dif:'Gemakkelijk',balls:20,ballType:'range',sets:5,goal:null,desc:'Sla 4 ballen met een super trage, gecontroleerde swing (50% snelheid). Leg daarna je club even neer en neem rust. Herhaal dit 5 keer.',tip:'💡 Traint spiergeheugen beter dan 20 volle snelle swings.',yt:'Slow Motion Herhaling golf drill'},
+ {id:'d3',cat:'drive',clubHint:'driver',name:'Tee Hoogte Variaties',dur:7,dif:'Gemakkelijk',balls:15,ballType:'range',sets:1,goal:null,desc:'5 ballen hoge tee → 5 lage tee → 5 mix. Voel het verschil in aanslaan (upswing vs flat contact).',tip:'💡 Ideale driver: bovenste rand clubface = equator van de bal.',yt:'Tee Hoogte Variaties golf drill'},
+ {id:'d4',cat:'drive',clubHint:'long_iron',name:'Voeten Bij Elkaar Drill',dur:6,dif:'Gemakkelijk',balls:15,ballType:'range',sets:1,goal:null,desc:'Sla 15 ballen met een lang ijzer (bijv. 5-ijzer) met voeten vlak naast elkaar. Dwingt balans en rotatie af.',tip:'💡 Wiebel je? Dan roteer je heupen te weinig.',yt:'Voeten Bij Elkaar Drill golf drill'},
+ {id:'d5',cat:'drive',clubHint:'wood',name:'¾ Swing Controle (Fairway Hout)',dur:8,dif:'Gemiddeld',balls:20,ballType:'range',sets:1,goal:null,desc:'Pak je 3-hout of 5-hout. Gebruik slechts ¾ backswing. Focus op consistente impact en rechte balvlucht. 20 ballen.',tip:'💡 Veel amateurs treffen de bal beter met ¾ swing – zeker met een fairway hout.',yt:'¾ Swing Controle (Fairway Hout) golf drill'},
+ {id:'d6',cat:'drive',clubHint:'driver',name:'Step-Through Drill',dur:7,dif:'Gemiddeld',balls:15,ballType:'range',sets:3,goal:null,desc:'Begin met gewicht op rechtervoet. Terwijl je neerswingt, stap voorwaarts met linkervoet. 3 sets van 5 met driver.',tip:'💡 Goed als je "achterop blijft" met je gewicht bij impact.',yt:'Step-Through Drill golf drill'},
+ {id:'d7',cat:'drive',clubHint:'driver',name:'Bucket Challenge: 5 Op Rij',dur:10,dif:'Gemiddeld',balls:25,ballType:'range',sets:null,goal:'5 drives op rij in de fairway',desc:'5 ballen met driver moeten achter elkaar een imaginaire fairway (30m breed) raken. Bij een miss begin je opnieuw bij 0. Noteer hoeveel pogingen je nodig hebt.',tip:'💡 Simuleert echte rondedruk op de eerste tee.',yt:'Bucket Challenge: 5 Op Rij golf drill'},
+ {id:'d8',cat:'drive',clubHint:'hybrid',name:'Gate Drill (Hybride)',dur:7,dif:'Gemiddeld',balls:20,ballType:'range',sets:1,goal:null,desc:'Zet twee tees vlak naast de bal, net iets breder dan je hybride. Club mag ze niet raken = rechte swinglijn. 20 ballen.',tip:'💡 Begin met tees verder en breng ze dichterbij naarmate je beter wordt.',yt:'Gate Drill (Hybride) golf drill'},
+ {id:'d9',cat:'drive',clubHint:'driver',name:'Pause At Top Drill',dur:6,dif:'Gemakkelijk',balls:15,ballType:'range',sets:1,goal:null,desc:'Pauzeer 1 volle seconde bovenin je backswing met driver. Voorkomt haast bij het neerkomen. 15 ballen.',tip:'💡 Meest voorkomende fout: te snel neerkomen vanuit de top.',yt:'Pause At Top Drill golf drill'},
+ {id:'d10',cat:'drive',clubHint:'long_iron',name:'Eén-Hand Drill (Links)',dur:7,dif:'Moeilijk',balls:20,ballType:'range',sets:2,goal:null,desc:'2 sets van 10 ballen met alleen je linkerhand, gebruik een lang ijzer (5- of 6-ijzer). Traint de leidende hand.',tip:'💡 De linkerhand stuurt de swing – de rechter geeft kracht.',yt:'Eén-Hand Drill (Links) golf drill'},
+ {id:'d11',cat:'drive',clubHint:'long_iron',name:'Eén-Hand Drill (Rechts)',dur:7,dif:'Moeilijk',balls:20,ballType:'range',sets:2,goal:null,desc:'2 sets van 10 ballen met alleen je rechterhand, gebruik een lang ijzer. Traint kracht en rotatie. Korte backswing, volle follow-through.',tip:'💡 Rechterhand te dominant? Dit oefent een evenwichtige bijdrage.',yt:'Eén-Hand Drill (Rechts) golf drill'},
+ {id:'d12',cat:'drive',clubHint:'wood',name:'Afstandsdoelwit Series (Hout)',dur:9,dif:'Gemiddeld',balls:15,ballType:'range',sets:1,goal:null,desc:'Pak je 3- of 5-hout. 5 ballen naar 100m → 5 naar 150m → 5 naar 200m. Let op consistentie per doelwit.',tip:'💡 Fairway hout is de meest gebruikte club na een gemiste fairway.',yt:'Afstandsdoelwit Series (Hout) golf drill'},
+ {id:'d13',cat:'drive',clubHint:'driver',name:'Fairway Nauwkeurigheid Test',dur:8,dif:'Gemiddeld',balls:20,ballType:'range',sets:null,goal:'≥ 10/20 drives in de fairway',desc:'Sla 20 ballen met driver. Houd bij hoeveel een imaginaire fairway (30m breed) raken. Streef naar ≥ 10/20 en noteer je score.',tip:'💡 Nauwkeurigheid > afstand op de meeste holes.',yt:'Fairway Nauwkeurigheid Test golf drill'},
+ {id:'d14',cat:'drive',clubHint:'long_iron',name:'Impact Bag Training',dur:6,dif:'Gemakkelijk',balls:0,ballType:'none',sets:3,goal:null,desc:'Geen ballen nodig. Pak een oud ijzer en sla met hands-first positie tegen een opgerolde handdoek. 3 sets van 10 herhalingen.',tip:'💡 Meest onderschatte trainingshulp voor de volle swing.',yt:'Impact Bag Training golf drill'},
+ {id:'d15',cat:'drive',clubHint:'driver',name:'Hips Lead Challenge',dur:7,dif:'Moeilijk',balls:15,ballType:'range',sets:3,goal:null,desc:'3 sets van 5 ballen met driver. Start de downswing bewust met heupdraai (NIET schouders). Heupen gaan altijd eerst.',tip:'💡 Heupen leiden = meer power + minder slice.',yt:'Hips Lead Challenge golf drill'},
 
- {id:'a1',cat:'approach',clubHint:'short_iron',distHint:null,name:'9-to-9 Drill',dur:8,dif:'Gemakkelijk',balls:20,ballType:'range',sets:1,goal:null,desc:'Korte swing: backswing tot handenhoogte (9 uur), follow-through tot handenhoogte (3 uur). 20 ballen met een kort ijzer. Focus: zuivere impact vóór de bal.',tip:'💡 Profis beginnen elke sessie hier. Gevoel voor "hitting down".'},
- {id:'a2',cat:'approach',clubHint:'short_iron',distHint:null,name:'Divot Before Ball Drill',dur:7,dif:'Gemiddeld',balls:15,ballType:'range',sets:1,goal:null,desc:'Plak een stuk tape 5cm vóór de bal. Je impact moet beginnen nadat je over de tape bent. 15 ballen.',tip:'💡 Ijzers zijn bedoeld om naar beneden te slaan – nooit te "scoopen".'},
- {id:'a3',cat:'approach',clubHint:'long_iron',distHint:150,name:'Lang IJzer Afstandscontrole (150m)',dur:9,dif:'Gemiddeld',balls:20,ballType:'range',sets:null,goal:'spreiding van 20 ballen < 15m',desc:'Sla 20 ballen op ±150m en noteer de spreiding. Streef naar een spreidingszone < 15m. Elke sessie bijhouden.',tip:'💡 Ken je exacte afstanden per club – cruciaal voor lay-ups.'},
- {id:'a4',cat:'approach',clubHint:'short_iron',distHint:null,name:'Vlag als Doelwit',dur:8,dif:'Gemiddeld',balls:10,ballType:'range',sets:null,goal:'gemiddeld < 10m van de vlag',desc:'Kies een specifieke vlag op een comfortabele afstand. Sla 10 ballen en noteer de gemiddelde afstand tot de vlag.',tip:'💡 Train altijd naar een specifiek doelwit – nooit "zomaar slaan".'},
- {id:'a5',cat:'approach',clubHint:'short_iron',distHint:91,name:'100 Yard Benchmark',dur:8,dif:'Gemiddeld',balls:10,ballType:'range',sets:null,goal:'≥ 7/10 ballen binnen 15m van vlag',desc:'Elke sessie: 10 ballen van 100 yard (91m). Noteer je score (hoeveel binnen 15m). Dit is je vaste ijkmeter over weken.',tip:'💡 De 100-yard shot is de meest gespeelde approach.'},
- {id:'a6',cat:'approach',clubHint:'short_iron',distHint:130,name:'Punch Shot (Lage Vlucht)',dur:7,dif:'Gemiddeld',balls:15,ballType:'range',sets:1,goal:null,desc:'Korte follow-through, handen voor de bal, gewicht links. Bal vliegt laag. 15 ballen. Essentieel bij wind.',tip:'💡 Punch = minder backswing + 70% kracht + gewicht altijd links.'},
- {id:'a7',cat:'approach',clubHint:'long_iron',distHint:150,name:'Fade / Draw Controle',dur:9,dif:'Moeilijk',balls:20,ballType:'range',sets:2,goal:null,desc:'2 sets: 5 ballen bewuste fade + 5 ballen bewuste draw met een lang ijzer. Curvecontrole is essentieel voor doelwitbendering.',tip:'💡 Fade: open stance + open face. Draw: gesloten stance + inside-out pad.'},
- {id:'a8',cat:'approach',clubHint:'short_iron',distHint:100,name:'Half Swing Nauwkeurigheid',dur:7,dif:'Gemakkelijk',balls:15,ballType:'range',sets:1,goal:null,desc:'Half swing (backswing tot schouderhoogte) met een kort ijzer. 15 ballen. Welke afstand en spreiding geeft dit?',tip:'💡 Half swing = meer controle in krappe situaties.'},
- {id:'a9',cat:'approach',clubHint:'hybrid',distHint:180,name:'Hybride Approach (180m)',dur:8,dif:'Gemiddeld',balls:15,ballType:'range',sets:1,goal:null,desc:'Sla 15 ballen met hybride of hout van ±180m. Focus op contact en nauwkeurigheid.',tip:'💡 Vervang lange ijzers door hybriden als je GIR laag is.'},
- {id:'a10',cat:'approach',clubHint:'short_iron',distHint:null,name:'IJzer Consistentie Tracker',dur:10,dif:'Gemiddeld',balls:30,ballType:'range',sets:1,goal:null,desc:'10 ballen per club: 7-ijzer → 8-ijzer → 9-ijzer (30 ballen). Noteer je beste 7/10 per club. Vergelijk over sessies.',tip:'💡 Consistentie bouw je alleen door meting en herhaling.'},
- {id:'a11',cat:'approach',clubHint:'short_iron',distHint:120,name:'GIR Simulatie',dur:9,dif:'Moeilijk',balls:9,ballType:'range',sets:null,goal:'3/3 greens geraakt per set',desc:'3 scenarios: 150m, 125m, 90m (3 ballen elk). Noteer: green geraakt? Ja/Nee. Bij minder dan 3/3: herhaal de set (max 3×).',tip:'💡 Game-realistische oefening geeft het meeste transfereffect.'},
- {id:'a12',cat:'approach',clubHint:'short_iron',distHint:135,name:'Cirkel van 6 Meter',dur:8,dif:'Gemiddeld',balls:10,ballType:'range',sets:null,goal:'≥ 7/10 ballen binnen 6m van vlag',desc:'Sla 10 approach shots naar een doelgebied van 6m rondom een vlag. Noteer je score (X/10).',tip:'💡 6 meter is een realistische GIR-definitie voor amateurs.'},
- {id:'a13',cat:'approach',clubHint:null,distHint:null,name:'Trackman Bag Update (1 Club)',dur:10,dif:'Gemakkelijk',balls:10,ballType:'range',sets:1,goal:'10 zuivere stock-swings voor perfecte data',desc:'Kies zélf één club in je tas waarvan je de afstanden wilt updaten. Open "Track My Bag" of "Shot Analysis" in Trackman. Sla 10 normale basisswings en gooi de extreme missers weg. Update direct daarna je Carry-afstand in het Profiel-tabblad van de app!',tip:'💡 Doe dit altijd aan het begin van je sessie als je nog 100% fris bent, direct na je warming-up.'},
+ {id:'a1',cat:'approach',clubHint:'short_iron',distHint:null,name:'9-to-9 Drill',dur:8,dif:'Gemakkelijk',balls:20,ballType:'range',sets:1,goal:null,desc:'Korte swing: backswing tot handenhoogte (9 uur), follow-through tot handenhoogte (3 uur). 20 ballen met een kort ijzer. Focus: zuivere impact vóór de bal.',tip:'💡 Profis beginnen elke sessie hier. Gevoel voor "hitting down".',yt:'9-to-9 Drill golf drill'},
+ {id:'a2',cat:'approach',clubHint:'short_iron',distHint:null,name:'Divot Before Ball Drill',dur:7,dif:'Gemiddeld',balls:15,ballType:'range',sets:1,goal:null,desc:'Plak een stuk tape 5cm vóór de bal. Je impact moet beginnen nadat je over de tape bent. 15 ballen.',tip:'💡 Ijzers zijn bedoeld om naar beneden te slaan – nooit te "scoopen".',yt:'Divot Before Ball Drill golf drill'},
+ {id:'a3',cat:'approach',clubHint:'long_iron',distHint:150,name:'Lang IJzer Afstandscontrole (150m)',dur:9,dif:'Gemiddeld',balls:20,ballType:'range',sets:null,goal:'spreiding van 20 ballen < 15m',desc:'Sla 20 ballen op ±150m en noteer de spreiding. Streef naar een spreidingszone < 15m. Elke sessie bijhouden.',tip:'💡 Ken je exacte afstanden per club – cruciaal voor lay-ups.',yt:'Lang IJzer Afstandscontrole (150m) golf drill'},
+ {id:'a4',cat:'approach',clubHint:'short_iron',distHint:null,name:'Vlag als Doelwit',dur:8,dif:'Gemiddeld',balls:10,ballType:'range',sets:null,goal:'gemiddeld < 10m van de vlag',desc:'Kies een specifieke vlag op een comfortabele afstand. Sla 10 ballen en noteer de gemiddelde afstand tot de vlag.',tip:'💡 Train altijd naar een specifiek doelwit – nooit "zomaar slaan".',yt:'Vlag als Doelwit golf drill'},
+ {id:'a5',cat:'approach',clubHint:'short_iron',distHint:91,name:'100 Yard Benchmark',dur:8,dif:'Gemiddeld',balls:10,ballType:'range',sets:null,goal:'≥ 7/10 ballen binnen 15m van vlag',desc:'Elke sessie: 10 ballen van 100 yard (91m). Noteer je score (hoeveel binnen 15m). Dit is je vaste ijkmeter over weken.',tip:'💡 De 100-yard shot is de meest gespeelde approach.',yt:'100 Yard Benchmark golf drill'},
+ {id:'a6',cat:'approach',clubHint:'short_iron',distHint:130,name:'Punch Shot (Lage Vlucht)',dur:7,dif:'Gemiddeld',balls:15,ballType:'range',sets:1,goal:null,desc:'Korte follow-through, handen voor de bal, gewicht links. Bal vliegt laag. 15 ballen. Essentieel bij wind.',tip:'💡 Punch = minder backswing + 70% kracht + gewicht altijd links.',yt:'Punch Shot (Lage Vlucht) golf drill'},
+ {id:'a7',cat:'approach',clubHint:'long_iron',distHint:150,name:'Fade / Draw Controle',dur:9,dif:'Moeilijk',balls:20,ballType:'range',sets:2,goal:null,desc:'2 sets: 5 ballen bewuste fade + 5 ballen bewuste draw met een lang ijzer. Curvecontrole is essentieel voor doelwitbendering.',tip:'💡 Fade: open stance + open face. Draw: gesloten stance + inside-out pad.',yt:'Fade / Draw Controle golf drill'},
+ {id:'a8',cat:'approach',clubHint:'short_iron',distHint:100,name:'Half Swing Nauwkeurigheid',dur:7,dif:'Gemakkelijk',balls:15,ballType:'range',sets:1,goal:null,desc:'Half swing (backswing tot schouderhoogte) met een kort ijzer. 15 ballen. Welke afstand en spreiding geeft dit?',tip:'💡 Half swing = meer controle in krappe situaties.',yt:'Half Swing Nauwkeurigheid golf drill'},
+ {id:'a9',cat:'approach',clubHint:'hybrid',distHint:180,name:'Hybride Approach (180m)',dur:8,dif:'Gemiddeld',balls:15,ballType:'range',sets:1,goal:null,desc:'Sla 15 ballen met hybride of hout van ±180m. Focus op contact en nauwkeurigheid.',tip:'💡 Vervang lange ijzers door hybriden als je GIR laag is.',yt:'Hybride Approach (180m) golf drill'},
+ {id:'a10',cat:'approach',clubHint:'short_iron',distHint:null,name:'IJzer Consistentie Tracker',dur:10,dif:'Gemiddeld',balls:30,ballType:'range',sets:1,goal:null,desc:'10 ballen per club: 7-ijzer → 8-ijzer → 9-ijzer (30 ballen). Noteer je beste 7/10 per club. Vergelijk over sessies.',tip:'💡 Consistentie bouw je alleen door meting en herhaling.',yt:'IJzer Consistentie Tracker golf drill'},
+ {id:'a11',cat:'approach',clubHint:'short_iron',distHint:120,name:'GIR Simulatie',dur:9,dif:'Moeilijk',balls:9,ballType:'range',sets:null,goal:'3/3 greens geraakt per set',desc:'3 scenarios: 150m, 125m, 90m (3 ballen elk). Noteer: green geraakt? Ja/Nee. Bij minder dan 3/3: herhaal de set (max 3×).',tip:'💡 Game-realistische oefening geeft het meeste transfereffect.',yt:'GIR Simulatie golf drill'},
+ {id:'a12',cat:'approach',clubHint:'short_iron',distHint:135,name:'Cirkel van 6 Meter',dur:8,dif:'Gemiddeld',balls:10,ballType:'range',sets:null,goal:'≥ 7/10 ballen binnen 6m van vlag',desc:'Sla 10 approach shots naar een doelgebied van 6m rondom een vlag. Noteer je score (X/10).',tip:'💡 6 meter is een realistische GIR-definitie voor amateurs.',yt:'Cirkel van 6 Meter golf drill'},
 
- {id:'c1',cat:'chip',clubHint:'short_iron',name:'Phil\'s Hinge & Hold',dur:7,dif:'Gemiddeld',balls:20,ballType:'own',sets:1,goal:null,desc:'De bekende chiptechniek van Phil Mickelson: polsen direct "hingen" (knikken) in de backswing, en die hoek "holden" door de impact heen. 20 chips rond de green.',tip:'💡 Nooit je polsen laten flippen bij impact. Handen leiden de clubhead.'},
- {id:'c2',cat:'chip',clubHint:'wedge',name:'Precisie Chip (Hoogste Wedge)',dur:8,dif:'Gemiddeld',balls:20,ballType:'own',sets:1,goal:null,desc:'Korte precisie chips met je hoogste wedge (meeste loft). Focus op een specifieke landingszone op 1m van de pin. 20 chips.',tip:'💡 Chip naar een landingszone – de bal rolt daarna vanzelf.'},
- {id:'c3',cat:'chip',clubHint:'wedge',name:'Cirkel van 3 Meter',dur:8,dif:'Gemiddeld',balls:15,ballType:'own',sets:null,goal:'≥ 10/15 ballen binnen 3m van hole',desc:'Chip 15 ballen met je wedge – allemaal moeten binnen 3 meter van de hole stoppen. Noteer je score.',tip:'💡 3 meter = tap-in zone. Dit is je veiligheidszone voor up-and-downs.'},
- {id:'c4',cat:'chip',clubHint:'wedge',name:'Flop Shot Training',dur:9,dif:'Moeilijk',balls:10,ballType:'own',sets:1,goal:null,desc:'Open stance, open face, bal vooraan. Sla 10 hoge chips over een denkbeeldig obstakel met je loftrijkste wedge.',tip:'💡 Flop shot = open face + extra acceleratie. Nooit decelereren!'},
- {id:'c5',cat:'chip',clubHint:'wedge',name:'Tight Lie Chip',dur:7,dif:'Moeilijk',balls:15,ballType:'own',sets:1,goal:null,desc:'Chip van harde mat of kaal gras (tight lie). 15 chips met een wedge. Bal iets achteraan in stance, handen voor de bal.',tip:'💡 Tight lie = bal achteraan + handen altijd voor.'},
- {id:'c6',cat:'chip',clubHint:'wedge',name:'Helling Chips (Op/Neer)',dur:8,dif:'Moeilijk',balls:10,ballType:'own',sets:2,goal:null,desc:'Set 1: 5 chips van opgaande helling. Set 2: 5 chips van neergaande helling. Pas stand en balpositionering aan.',tip:'💡 Opgaand: bal voor in stance. Neergaand: bal achter in stance.'},
- {id:'c7',cat:'chip',clubHint:'wedge',name:'Up-and-Down Game (9 Holes)',dur:12,dif:'Gemiddeld',balls:3,ballType:'own',sets:null,goal:'9 holes spelen, up-and-down score bijhouden',desc:'Speel een 9-hole chip-putt ronde rondom de practice green (3 eigen ballen). Noteer je score.',tip:'💡 Dit is de meest game-realistische oefening voor de korte game.'},
- {id:'c8',cat:'chip',clubHint:'wedge',name:'Landing Zone Drill',dur:7,dif:'Gemiddeld',balls:15,ballType:'own',sets:null,goal:'chip landt IN de gemarkeerde zone',desc:'Markeer een 1×1m landingszone met tees. Chip 15 ballen. Doel: bal moet IN die zone landen.',tip:'💡 Landingspuntcontrole is de sleutel tot consistente chipping.'},
- {id:'c9',cat:'chip',clubHint:'wedge',name:'Clockwork Chip',dur:10,dif:'Gemiddeld',balls:12,ballType:'own',sets:1,goal:null,desc:'Chip vanuit 12 posities rondom de hole (als klokwijzers, 2m afstand). Elke positie = andere hoek. 1 bal per positie.',tip:'💡 Elke positie heeft andere break en ligkans – traint aanpassingsvermogen.'},
- {id:'c10',cat:'chip',clubHint:'wedge',name:'Rough Chip Oefening',dur:7,dif:'Moeilijk',balls:15,ballType:'own',sets:1,goal:null,desc:'Leg de bal op langere mat (rough simulatie). Oefen 15 chips met je sand wedge. Open face en meer acceleratie vereist.',tip:'💡 Rough = meer loft + meer kracht + kortere follow-through.'},
- {id:'c11',cat:'chip',clubHint:'wedge',name:'Twee-Wedge Vergelijking',dur:8,dif:'Gemiddeld',balls:10,ballType:'own',sets:2,goal:null,desc:'Set 1: 5 chips met je meest loftige wedge. Set 2: 5 chips met je tweede wedge – zelfde situatie. Voel het verschil in roll en hoogte.',tip:'💡 Ken welke wedge welke roll geeft – dan kies je bewuster op de baan.'},
- {id:'c12',cat:'chip',clubHint:'wedge',name:'Pitch Afstandsreeks',dur:9,dif:'Gemiddeld',balls:15,ballType:'range',sets:3,goal:null,desc:'3 sets: 5 ballen van 10m → 5 van 20m → 5 van 30m. Gebruik dezelfde wedge. Pas alleen de armlengte aan, niet de snelheid.',tip:'💡 Afstand controleer je met armlengte, niet met zwingsnelheid.'},
- {id:'c13',cat:'chip',clubHint:'wedge',name:'Eén-Arm Chip (Links)',dur:6,dif:'Moeilijk',balls:10,ballType:'own',sets:1,goal:null,desc:'Chip met alleen je linkerhand en een wedge. 10 ballen. Kleine, beheerste beweging.',tip:'💡 Verbetert de non-dominante hand die bij veel golfers passief is.'},
- {id:'c14',cat:'chip',clubHint:'short_iron',name:'Fringe: Chippen of Putten?',dur:7,dif:'Gemiddeld',balls:8,ballType:'own',sets:1,goal:null,desc:'Leg 8 ballen op de fringe. Oefen de beslissing: chippen (8-ijzer) of putten? Probeer beide methodes voor dezelfde bal.',tip:'💡 Helder pad → putter. Ongelijk gras → chip met je 8-ijzer.'},
- {id:'c15',cat:'chip',clubHint:'wedge',name:'Bunker Basisoefening',dur:8,dif:'Moeilijk',balls:0,ballType:'none',sets:null,goal:'12 bunkerswings met juiste techniek',desc:'Geen ballen nodig. Open face, open stance, swingoefening 3cm achter denkbeeldige bal met je sand wedge. 12 herhalingen.',tip:'💡 Denk "zand tussen club en bal" bij elke bunkerslag.'},
+ {id:'c1',cat:'chip',clubHint:'wedge',name:'Phil\'s Hinge & Hold',dur:7,dif:'Gemiddeld',balls:20,ballType:'own',sets:1,goal:null,desc:'De bekende chiptechniek: knik (hinge) je polsen direct in de backswing, en houd (hold) deze hoek strak door de impact heen. 20 chips rond de green.',tip:'💡 Nooit je polsen laten flippen bij impact. Handen leiden de clubhead.',yt:'Phil\ golf drill'},
+ {id:'c2',cat:'chip',clubHint:'wedge',name:'Precisie Chip (Hoogste Wedge)',dur:8,dif:'Gemiddeld',balls:20,ballType:'own',sets:1,goal:null,desc:'Korte precisie chips met je hoogste wedge (meeste loft). Focus op een specifieke landingszone op 1m van de pin. 20 chips.',tip:'💡 Chip naar een landingszone – de bal rolt daarna vanzelf.',yt:'Precisie Chip (Hoogste Wedge) golf drill'},
+ {id:'c3',cat:'chip',clubHint:'wedge',name:'Cirkel van 3 Meter',dur:8,dif:'Gemiddeld',balls:15,ballType:'own',sets:null,goal:'≥ 10/15 ballen binnen 3m van hole',desc:'Chip 15 ballen met je wedge – allemaal moeten binnen 3 meter van de hole stoppen. Noteer je score.',tip:'💡 3 meter = tap-in zone. Dit is je veiligheidszone voor up-and-downs.',yt:'Cirkel van 3 Meter golf drill'},
+ {id:'c4',cat:'chip',clubHint:'wedge',name:'Flop Shot Training',dur:9,dif:'Moeilijk',balls:10,ballType:'own',sets:1,goal:null,desc:'Open stance, open face, bal vooraan. Sla 10 hoge chips over een denkbeeldig obstakel met je loftrijkste wedge.',tip:'💡 Flop shot = open face + extra acceleratie. Nooit decelereren!',yt:'Flop Shot Training golf drill'},
+ {id:'c5',cat:'chip',clubHint:'wedge',name:'Tight Lie Chip',dur:7,dif:'Moeilijk',balls:15,ballType:'own',sets:1,goal:null,desc:'Chip van harde mat of kaal gras (tight lie). 15 chips met een wedge. Bal iets achteraan in stance, handen voor de bal.',tip:'💡 Tight lie = bal achteraan + handen altijd voor.',yt:'Tight Lie Chip golf drill'},
+ {id:'c6',cat:'chip',clubHint:'wedge',name:'Helling Chips (Op/Neer)',dur:8,dif:'Moeilijk',balls:10,ballType:'own',sets:2,goal:null,desc:'Set 1: 5 chips van opgaande helling. Set 2: 5 chips van neergaande helling. Pas stand en balpositionering aan.',tip:'💡 Opgaand: bal voor in stance. Neergaand: bal achter in stance.',yt:'Helling Chips (Op/Neer) golf drill'},
+ {id:'c7',cat:'chip',clubHint:'wedge',name:'Up-and-Down Game (9 Holes)',dur:12,dif:'Gemiddeld',balls:3,ballType:'own',sets:null,goal:'9 holes spelen, up-and-down score bijhouden',desc:'Speel een 9-hole chip-putt ronde rondom de practice green (3 eigen ballen). Noteer je score.',tip:'💡 Dit is de meest game-realistische oefening voor de korte game.',yt:'Up-and-Down Game (9 Holes) golf drill'},
+ {id:'c8',cat:'chip',clubHint:'wedge',name:'Landing Zone Drill',dur:7,dif:'Gemiddeld',balls:15,ballType:'own',sets:null,goal:'chip landt IN de gemarkeerde zone',desc:'Markeer een 1×1m landingszone met tees. Chip 15 ballen. Doel: bal moet IN die zone landen.',tip:'💡 Landingspuntcontrole is de sleutel tot consistente chipping.',yt:'Landing Zone Drill golf drill'},
+ {id:'c9',cat:'chip',clubHint:'wedge',name:'Clockwork Chip',dur:10,dif:'Gemiddeld',balls:12,ballType:'own',sets:1,goal:null,desc:'Chip vanuit 12 posities rondom de hole (als klokwijzers, 2m afstand). Elke positie = andere hoek. 1 bal per positie.',tip:'💡 Elke positie heeft andere break en ligkans – traint aanpassingsvermogen.',yt:'Clockwork Chip golf drill'},
+ {id:'c10',cat:'chip',clubHint:'wedge',name:'Rough Chip Oefening',dur:7,dif:'Moeilijk',balls:15,ballType:'own',sets:1,goal:null,desc:'Leg de bal op langere mat (rough simulatie). Oefen 15 chips met je sand wedge. Open face en meer acceleratie vereist.',tip:'💡 Rough = meer loft + meer kracht + kortere follow-through.',yt:'Rough Chip Oefening golf drill'},
+ {id:'c11',cat:'chip',clubHint:'wedge',name:'Twee-Wedge Vergelijking',dur:8,dif:'Gemiddeld',balls:10,ballType:'own',sets:2,goal:null,desc:'Set 1: 5 chips met je meest loftige wedge. Set 2: 5 chips met je tweede wedge – zelfde situatie. Voel het verschil in roll en hoogte.',tip:'💡 Ken welke wedge welke roll geeft – dan kies je bewuster op de baan.',yt:'Twee-Wedge Vergelijking golf drill'},
+ {id:'c12',cat:'chip',clubHint:'wedge',name:'Pitch Afstandsreeks',dur:9,dif:'Gemiddeld',balls:15,ballType:'range',sets:3,goal:null,desc:'3 sets: 5 ballen van 10m → 5 van 20m → 5 van 30m. Gebruik dezelfde wedge. Pas alleen de armlengte aan, niet de snelheid.',tip:'💡 Afstand controleer je met armlengte, niet met zwingsnelheid.',yt:'Pitch Afstandsreeks golf drill'},
+ {id:'c13',cat:'chip',clubHint:'wedge',name:'Eén-Arm Chip (Links)',dur:6,dif:'Moeilijk',balls:10,ballType:'own',sets:1,goal:null,desc:'Chip met alleen je linkerhand en een wedge. 10 ballen. Kleine, beheerste beweging.',tip:'💡 Verbetert de non-dominante hand die bij veel golfers passief is.',yt:'Eén-Arm Chip (Links) golf drill'},
+ {id:'c14',cat:'chip',clubHint:'short_iron',name:'Fringe: Chippen of Putten?',dur:7,dif:'Gemiddeld',balls:8,ballType:'own',sets:1,goal:null,desc:'Leg 8 ballen op de fringe. Oefen de beslissing: chippen (8-ijzer) of putten? Probeer beide methodes voor dezelfde bal.',tip:'💡 Helder pad → putter. Ongelijk gras → chip met je 8-ijzer.',yt:'Fringe: Chippen of Putten? golf drill'},
+ {id:'c15',cat:'chip',clubHint:'wedge',name:'Bunker Basisoefening',dur:8,dif:'Moeilijk',balls:0,ballType:'none',sets:null,goal:'12 bunkerswings met juiste techniek',desc:'Geen ballen nodig. Open face, open stance, swingoefening 3cm achter denkbeeldige bal met je sand wedge. 12 herhalingen.',tip:'💡 Denk "zand tussen club en bal" bij elke bunkerslag.',yt:'Bunker Basisoefening golf drill'},
 
- {id:'ps1',cat:'puttShort',clubHint:'putter',name:'Dave Pelz 3-Voet Cirkel',dur:8,dif:'Gemakkelijk',balls:6,ballType:'own',sets:3,goal:null,desc:'De gouden standaard van Dave Pelz. Leg 6 ballen in een cirkel op 3 voet (±1 meter). Maak ze allemaal. Herhaal 3x.',tip:'💡 Op 3 voet verlies je de meeste slagen als je twijfelt. Train op automatisme.'},
- {id:'ps2',cat:'puttShort',clubHint:'putter',name:'Tiger\'s Gate Drill',dur:7,dif:'Gemakkelijk',balls:9,ballType:'own',sets:null,goal:'putter raakt de tees niet',desc:'Dé opwarmoefening van Tiger Woods. Zet twee tees net iets breder dan je putter face. 9 putts van 1,5m. Raak de tees niet!',tip:'💡 De ultieme feedback voor een square clubface bij impact.'},
- {id:'ps3',cat:'puttShort',clubHint:'putter',name:'String Line Training',dur:8,dif:'Gemiddeld',balls:10,ballType:'own',sets:1,goal:null,desc:'Span een stukje draad van bal naar hole. Sla 10 putts langs de draad voor perfecte lijnvisualisatie.',tip:'💡 String Line is het meest effectieve hulpmiddel voor putterlijngevoel.'},
- {id:'ps4',cat:'puttShort',clubHint:'putter',name:'Make 10 Op Rij Challenge',dur:9,dif:'Moeilijk',balls:10,ballType:'own',sets:null,goal:'10 putts op rij van 1m (bij miss: opnieuw bij 0)',desc:'10 putts achter elkaar van 1m. Elke miss = opnieuw bij 0 beginnen. Noteer hoeveel pogingen tot je 10 op rij haalt.',tip:'💡 Routine is de sleutel. Pre-shot routine moet altijd identiek zijn.'},
- {id:'ps5',cat:'puttShort',clubHint:'putter',name:'Pre-Shot Routine Herhaling',dur:6,dif:'Gemakkelijk',balls:20,ballType:'own',sets:4,goal:null,desc:'4 sets van 5 putts. Focus puur op vaste routine: aanlijn → 2 blikken → stance → sla. Denk niet aan de uitkomst.',tip:'💡 Routine verwijdert twijfel. Twijfel verstoort het tempo.'},
- {id:'ps6',cat:'puttShort',clubHint:'putter',name:'Ogen Dicht Putt',dur:6,dif:'Gemiddeld',balls:10,ballType:'own',sets:1,goal:null,desc:'Lees de lijn, sla de putt met ogen dicht. Hoor de bal. 10 putts. Ontwikkelt puur gevoel.',tip:'💡 Ogen dicht = meer intuïtie, minder technische over-analyse.'},
- {id:'ps7',cat:'puttShort',clubHint:'putter',name:'Metronoom Tempo',dur:7,dif:'Gemiddeld',balls:20,ballType:'own',sets:1,goal:null,desc:'Gebruik een metronoom-app (80 BPM). Backswing op beat 1, impact op beat 2. 20 putts.',tip:'💡 Ideale puttverhouding: backswing en follow-through even lang (1:1).'},
- {id:'ps8',cat:'puttShort',clubHint:'putter',name:'Face Impact Check',dur:6,dif:'Gemakkelijk',balls:15,ballType:'own',sets:1,goal:null,desc:'Plak tape op het midden van je putter face. Sla 15 putts. Zie je exact waar je impact valt.',tip:'💡 Impact buiten het sweetspot = verlies van afstandscontrole en lijn.'},
+ {id:'ps1',cat:'puttShort',clubHint:'putter',name:'Dave Pelz 3-Voet Cirkel',dur:8,dif:'Gemakkelijk',balls:6,ballType:'own',sets:3,goal:null,desc:'De gouden standaard van Dave Pelz. Leg 6 ballen in een cirkel op 3 voet (±1 meter). Maak ze allemaal. Herhaal 3x.',tip:'💡 Op 3 voet verlies je de meeste slagen als je twijfelt. Train op automatisme.',yt:'Dave Pelz 3-Voet Cirkel golf drill'},
+ {id:'ps2',cat:'puttShort',clubHint:'putter',name:'Tiger\'s Gate Drill',dur:7,dif:'Gemakkelijk',balls:9,ballType:'own',sets:null,goal:'putter raakt de tees niet',desc:'Dé opwarmoefening van Tiger Woods. Zet twee tees net iets breder dan je putter face. 9 putts van 1,5m. Raak de tees niet!',tip:'💡 De ultieme feedback voor een square clubface bij impact.',yt:'Tiger\ golf drill'},
+ {id:'ps3',cat:'puttShort',clubHint:'putter',name:'String Line Training',dur:8,dif:'Gemiddeld',balls:10,ballType:'own',sets:1,goal:null,desc:'Span een stukje draad van bal naar hole. Sla 10 putts langs de draad voor perfecte lijnvisualisatie.',tip:'💡 String Line is het meest effectieve hulpmiddel voor putterlijngevoel.',yt:'String Line Training golf drill'},
+ {id:'ps4',cat:'puttShort',clubHint:'putter',name:'Make 10 Op Rij Challenge',dur:9,dif:'Moeilijk',balls:10,ballType:'own',sets:null,goal:'10 putts op rij van 1m (bij miss: opnieuw bij 0)',desc:'10 putts achter elkaar van 1m. Elke miss = opnieuw bij 0 beginnen. Noteer hoeveel pogingen tot je 10 op rij haalt.',tip:'💡 Routine is de sleutel. Pre-shot routine moet altijd identiek zijn.',yt:'Make 10 Op Rij Challenge golf drill'},
+ {id:'ps5',cat:'puttShort',clubHint:'putter',name:'Pre-Shot Routine Herhaling',dur:6,dif:'Gemakkelijk',balls:20,ballType:'own',sets:4,goal:null,desc:'4 sets van 5 putts. Focus puur op vaste routine: aanlijn → 2 blikken → stance → sla. Denk niet aan de uitkomst.',tip:'💡 Routine verwijdert twijfel. Twijfel verstoort het tempo.',yt:'Pre-Shot Routine Herhaling golf drill'},
+ {id:'ps6',cat:'puttShort',clubHint:'putter',name:'Ogen Dicht Putt',dur:6,dif:'Gemiddeld',balls:10,ballType:'own',sets:1,goal:null,desc:'Lees de lijn, sla de putt met ogen dicht. Hoor de bal. 10 putts. Ontwikkelt puur gevoel.',tip:'💡 Ogen dicht = meer intuïtie, minder technische over-analyse.',yt:'Ogen Dicht Putt golf drill'},
+ {id:'ps7',cat:'puttShort',clubHint:'putter',name:'Metronoom Tempo',dur:7,dif:'Gemiddeld',balls:20,ballType:'own',sets:1,goal:null,desc:'Gebruik een metronoom-app (80 BPM). Backswing op beat 1, impact op beat 2. 20 putts.',tip:'💡 Ideale puttverhouding: backswing en follow-through even lang (1:1).',yt:'Metronoom Tempo golf drill'},
+ {id:'ps8',cat:'puttShort',clubHint:'putter',name:'Face Impact Check',dur:6,dif:'Gemakkelijk',balls:15,ballType:'own',sets:1,goal:null,desc:'Plak tape op het midden van je putter face. Sla 15 putts. Zie je exact waar je impact valt.',tip:'💡 Impact buiten het sweetspot = verlies van afstandscontrole en lijn.',yt:'Face Impact Check golf drill'},
 
- {id:'pm1',cat:'puttMedium',clubHint:'putter',name:'Ladder Drill (3-6m)',dur:9,dif:'Gemiddeld',balls:4,ballType:'own',sets:null,goal:'4 afstanden op volgorde in 1 putt',desc:'Leg 4 ballen op 3m, 4m, 5m en 6m. Probeer elke putt in één slag. Mis je er één? Herhaal die afstand direct opnieuw. Lukt de hele ladder? Herhaal hem (max 3×). Noteer hoeveel pogingen je per afstand nodig had.',tip:'💡 Ladder drill is dé klassieke oefening voor afstandsgevoel bij medium putts.'},
- {id:'pm2',cat:'puttMedium',clubHint:'putter',name:'2-Putt Zone Training',dur:8,dif:'Gemiddeld',balls:10,ballType:'own',sets:null,goal:'≥ 8/10 eerste putts stoppen binnen 1m',desc:'Leg 10 ballen op 5m afstand van de hole. De eerste putt mag niet bedoeld zijn om in te gaan – hij moet stoppen binnen 1m van de hole (in de "tap-in zone"). Noteer hoeveel eerste putts binnen 1m stoppen (doel: 8/10).',tip:'💡 Eerste putt op "tap-in afstand" zetten = 3-putt voorkomen.'},
- {id:'pm3',cat:'puttMedium',clubHint:'putter',name:'Break Lezen Training',dur:9,dif:'Moeilijk',balls:8,ballType:'own',sets:1,goal:null,desc:'Lees de lijn van achter de hole (laagste kant). Maak een voorspelling (links/rechts breekt, hoeveel cm). Sla dan en vergelijk. 8 putts.',tip:'💡 Lees altijd van de laagste kant. De bal breekt altijd naar het laagste punt.'},
- {id:'pm4',cat:'puttMedium',clubHint:'putter',name:'9-Hole Putting Ronde',dur:15,dif:'Gemiddeld',balls:1,ballType:'own',sets:null,goal:'9-hole ronde ≤ 9 putts totaal',desc:'Speel een volledige 9-hole ronde op de practice green van ±4m afstand. Noteer je totale puttaantal.',tip:'💡 Competitieve context traint beter dan losse oefening.'},
- {id:'pm5',cat:'puttMedium',clubHint:'putter',name:'Target Putt (Poortje)',dur:8,dif:'Gemiddeld',balls:15,ballType:'own',sets:null,goal:'putts door het poortje van 4m',desc:'Zet twee tees 30cm breed voor de hole als "poortje". Van 4m: sla 15 putts en tel hoeveel er door het poortje gaan.',tip:'💡 Maak het poortje smaller naarmate je beter wordt.'},
- {id:'pm6',cat:'puttMedium',clubHint:'putter',name:'Afstandsgevoel Test',dur:7,dif:'Gemiddeld',balls:10,ballType:'own',sets:1,goal:null,desc:'Sluit ogen na het lezen van de lijn. Sla een putt van 5m. Open ogen: hoe ver over of kort? 10 herhalingen. Noteer het gemiddelde.',tip:'💡 Dwingt je brein om afstandsgevoel intern te kalibreren.'},
+ {id:'pm1',cat:'puttMedium',clubHint:'putter',name:'Ladder Drill (3-6m)',dur:9,dif:'Gemiddeld',balls:4,ballType:'own',sets:null,goal:'4 afstanden op volgorde in 1 putt',desc:'Leg 4 ballen op 3m, 4m, 5m en 6m. Probeer elke putt in één slag. Mis je er één? Herhaal die afstand direct opnieuw. Lukt de hele ladder? Herhaal hem (max 3×). Noteer hoeveel pogingen je per afstand nodig had.',tip:'💡 Ladder drill is dé klassieke oefening voor afstandsgevoel bij medium putts.',yt:'Ladder Drill (3-6m) golf drill'},
+ {id:'pm2',cat:'puttMedium',clubHint:'putter',name:'2-Putt Zone Training',dur:8,dif:'Gemiddeld',balls:10,ballType:'own',sets:null,goal:'≥ 8/10 eerste putts stoppen binnen 1m',desc:'Leg 10 ballen op 5m afstand van de hole. De eerste putt mag niet bedoeld zijn om in te gaan – hij moet stoppen binnen 1m van de hole (in de "tap-in zone"). Noteer hoeveel eerste putts binnen 1m stoppen (doel: 8/10).',tip:'💡 Eerste putt op "tap-in afstand" zetten = 3-putt voorkomen.',yt:'2-Putt Zone Training golf drill'},
+ {id:'pm3',cat:'puttMedium',clubHint:'putter',name:'Break Lezen Training',dur:9,dif:'Moeilijk',balls:8,ballType:'own',sets:1,goal:null,desc:'Lees de lijn van achter de hole (laagste kant). Maak een voorspelling (links/rechts breekt, hoeveel cm). Sla dan en vergelijk. 8 putts.',tip:'💡 Lees altijd van de laagste kant. De bal breekt altijd naar het laagste punt.',yt:'Break Lezen Training golf drill'},
+ {id:'pm4',cat:'puttMedium',clubHint:'putter',name:'9-Hole Putting Ronde',dur:15,dif:'Gemiddeld',balls:1,ballType:'own',sets:null,goal:'9-hole ronde ≤ 9 putts totaal',desc:'Speel een volledige 9-hole ronde op de practice green van ±4m afstand. Noteer je totale puttaantal.',tip:'💡 Competitieve context traint beter dan losse oefening.',yt:'9-Hole Putting Ronde golf drill'},
+ {id:'pm5',cat:'puttMedium',clubHint:'putter',name:'Target Putt (Poortje)',dur:8,dif:'Gemiddeld',balls:15,ballType:'own',sets:null,goal:'putts door het poortje van 4m',desc:'Zet twee tees 30cm breed voor de hole als "poortje". Van 4m: sla 15 putts en tel hoeveel er door het poortje gaan.',tip:'💡 Maak het poortje smaller naarmate je beter wordt.',yt:'Target Putt (Poortje) golf drill'},
+ {id:'pm6',cat:'puttMedium',clubHint:'putter',name:'Afstandsgevoel Test',dur:7,dif:'Gemiddeld',balls:10,ballType:'own',sets:1,goal:null,desc:'Sluit ogen na het lezen van de lijn. Sla een putt van 5m. Open ogen: hoe ver over of kort? 10 herhalingen. Noteer het gemiddelde.',tip:'💡 Dwingt je brein om afstandsgevoel intern te kalibreren.',yt:'Afstandsgevoel Test golf drill'},
 
- {id:'pl1',cat:'puttLong',clubHint:'putter',name:'Distance Ladder (6-12m)',dur:10,dif:'Gemiddeld',balls:4,ballType:'own',sets:null,goal:'elke putt eindigt binnen 1m (6→8→10→12m)',desc:'Leg 4 ballen op 6m, 8m, 10m en 12m. Elke eerste putt moet eindigen binnen 1m van de hole. Noteer hoeveel je haalt.',tip:'💡 Van ver: focus op "stoppen dichtbij" – niet op "erin putten".'},
- {id:'pl2',cat:'puttLong',clubHint:'putter',name:'Bucket Challenge (10m)',dur:8,dif:'Gemiddeld',balls:10,ballType:'own',sets:null,goal:'alle 10 ballen eindigen binnen 1m van 10m',desc:'Van 10m: sla 10 putts. Alle eerste putts moeten eindigen binnen 1m van de hole. Noteer je score (X/10).',tip:'💡 Minder dan 1m = tap-in = 3-putt voorkomen.'},
- {id:'pl3',cat:'puttLong',clubHint:'putter',name:'Cross-Slope Lag Putting',dur:9,dif:'Moeilijk',balls:8,ballType:'own',sets:1,goal:null,desc:'Sla 8 putts diagonaal over een helling. Combineer afstandscontrole met break-lezen.',tip:'💡 Schuine greens zijn de moeilijkste situatie – train dit actief.'},
- {id:'pl4',cat:'puttLong',clubHint:'putter',name:'Twee-Putt Garantie',dur:9,dif:'Gemiddeld',balls:10,ballType:'own',sets:null,goal:'≥ 8/10 twee-putts (5 van 10m + 5 van 12m)',desc:'5 ballen van 10m, dan 5 ballen van 12m. De eerste putt moet eindigen op tap-in afstand. Noteer je score (X/10).',tip:'💡 3-putt voorkomen begint bij de eerste putt – niet bij de tweede.'},
- {id:'pl5',cat:'puttLong',clubHint:'putter',name:'Links/Rechts Afwisseling',dur:8,dif:'Moeilijk',balls:8,ballType:'own',sets:2,goal:null,desc:'2 sets van 4: afwisselend links- en rechtsbrekende putt van 8m. Leer bewust te compenseren. Noteer je gemiddelde eindafstand.',tip:'💡 Rechtshandige golfers struikelen vaker over rechts-brekende putts.'},
+ {id:'pl1',cat:'puttLong',clubHint:'putter',name:'Distance Ladder (6-12m)',dur:10,dif:'Gemiddeld',balls:4,ballType:'own',sets:null,goal:'elke putt eindigt binnen 1m (6→8→10→12m)',desc:'Leg 4 ballen op 6m, 8m, 10m en 12m. Elke eerste putt moet eindigen binnen 1m van de hole. Noteer hoeveel je haalt.',tip:'💡 Van ver: focus op "stoppen dichtbij" – niet op "erin putten".',yt:'Distance Ladder (6-12m) golf drill'},
+ {id:'pl2',cat:'puttLong',clubHint:'putter',name:'Bucket Challenge (10m)',dur:8,dif:'Gemiddeld',balls:10,ballType:'own',sets:null,goal:'alle 10 ballen eindigen binnen 1m van 10m',desc:'Van 10m: sla 10 putts. Alle eerste putts moeten eindigen binnen 1m van de hole. Noteer je score (X/10).',tip:'💡 Minder dan 1m = tap-in = 3-putt voorkomen.',yt:'Bucket Challenge (10m) golf drill'},
+ {id:'pl3',cat:'puttLong',clubHint:'putter',name:'Cross-Slope Lag Putting',dur:9,dif:'Moeilijk',balls:8,ballType:'own',sets:1,goal:null,desc:'Sla 8 putts diagonaal over een helling. Combineer afstandscontrole met break-lezen.',tip:'💡 Schuine greens zijn de moeilijkste situatie – train dit actief.',yt:'Cross-Slope Lag Putting golf drill'},
+ {id:'pl4',cat:'puttLong',clubHint:'putter',name:'Twee-Putt Garantie',dur:9,dif:'Gemiddeld',balls:10,ballType:'own',sets:null,goal:'≥ 8/10 twee-putts (5 van 10m + 5 van 12m)',desc:'5 ballen van 10m, dan 5 ballen van 12m. De eerste putt moet eindigen op tap-in afstand. Noteer je score (X/10).',tip:'💡 3-putt voorkomen begint bij de eerste putt – niet bij de tweede.',yt:'Twee-Putt Garantie golf drill'},
+ {id:'pl5',cat:'puttLong',clubHint:'putter',name:'Links/Rechts Afwisseling',dur:8,dif:'Moeilijk',balls:8,ballType:'own',sets:2,goal:null,desc:'2 sets van 4: afwisselend links- en rechtsbrekende putt van 8m. Leer bewust te compenseren. Noteer je gemiddelde eindafstand.',tip:'💡 Rechtshandige golfers struikelen vaker over rechts-brekende putts.',yt:'Links/Rechts Afwisseling golf drill'},
  {id:'pl6',cat:'puttLong',clubHint:'putter',name:'Grote Green Simulatie',dur:8,dif:'Gemiddeld',balls:8,ballType:'own',sets:1,goal:null,desc:'Sla 8 putts van extreem ver (12m+). Focus puur op stoppen dichtbij. Noteer je gemiddelde eindafstand.',tip:'💡 Lag conservatief van ver – met de ambitie om dichtbij te stoppen.'}
 ];
 
@@ -672,7 +671,7 @@ const CAT_LBL={drive:'🏌️ Afslag',approach:'🎯 Approach',chip:'🏌 Chip/P
 const CAT_COL={drive:'#e3f2fd',approach:'#e8f5e9',chip:'#f3e5f5',puttShort:'#fce4ec',puttMedium:'#fff3e0',puttLong:'#e0f2f1'};
 
 const SESS=[
-    {id:'spotlight',lbl:'Spotlight Focus',     icon:'🎯',bc:'bd1',desc:'Maximale focus op je zwakste punt'},
+    {id:'spotlight',lbl:'Spotlight Focus',     icon:'🎯',bc:'bd1',desc:'Maximale focus op je zwakste punt',yt:'Grote Green Simulatie golf drill'},
     {id:'balance',  lbl:'Gebalanceerde Aanval',icon:'⚖️',bc:'bd2',desc:'Top 3 zwaktes gelijk aanpakken'},
     {id:'full',     lbl:'Volledig Programma',  icon:'🔄',bc:'bd3',desc:'Alle categorieën gewogen op zwaktes'},
     {id:'gamesim',  lbl:'Game Simulatie',      icon:'🏆',bc:'bd4',desc:'Verdeling zoals een echte ronde'}
@@ -796,9 +795,8 @@ function buildSess(type,sc,mins,usedIds,hcp){
     const rank=rankCats(sc);
     let planCats=[];
     
-    // Bepaal welke categorieën in deze sessie komen op basis van type
     if(type==='spotlight'){
-        planCats.push(rank[0].cat, rank[0].cat); // top weakness gets double weight
+        planCats.push(rank[0].cat, rank[0].cat);
         if(rank[1]) planCats.push(rank[1].cat);
         if(rank[2]) planCats.push(rank[2].cat);
     }else if(type==='balance'){
@@ -811,7 +809,7 @@ function buildSess(type,sc,mins,usedIds,hcp){
 
     const bycat={};
     Object.keys(CAT_LBL).forEach(cat=>{
-        let pool=EX.filter(e=>e.cat===cat && e.id !== 'a13'); // uitsluiten van trackman (wordt later geforceerd)
+        let pool=EX.filter(e=>e.cat===cat);
         if(h>27) pool=pool.filter(e=>e.dif==='Gemakkelijk');
         else if(h>18) pool=pool.filter(e=>e.dif!=='Moeilijk');
         bycat[cat]=shuffle(pool);
@@ -823,9 +821,11 @@ function buildSess(type,sc,mins,usedIds,hcp){
     const moeilijkLimit=h<=9?99:h<=18?1:0;
     const targetMins = mins - 5; // 5 min warmup eraf
 
-    // Blijf round-robin oefeningen toevoegen tot we de tijd bereiken
     let catIndex = 0;
     let attempts = 0;
+    
+    let driveCount = 0;
+    let fullSwingBalls = 0;
     
     while(currentDur < targetMins && attempts < 50) {
         attempts++;
@@ -833,20 +833,42 @@ function buildSess(type,sc,mins,usedIds,hcp){
         const pool = bycat[cat];
         
         if(pool && pool.length > 0) {
-            // Zoek een oefening in deze categorie
-            let exIndex = pool.findIndex(e => !usedIds.has(e.id) && (e.dif !== 'Moeilijk' || moeilijkUsed < moeilijkLimit));
+            if(cat === 'drive' && driveCount >= 2) {
+                catIndex++;
+                continue;
+            }
             
-            // Als alles al gebruikt is in deze categorie, accepteer dan dubbelingen
+            let exIndex = pool.findIndex(e => {
+                if(usedIds.has(e.id)) return false;
+                if(e.dif === 'Moeilijk' && moeilijkUsed >= moeilijkLimit) return false;
+                if((cat === 'drive' || cat === 'approach') && e.ballType === 'range' && e.balls) {
+                    const ballsToAdd = e.sets ? e.balls * e.sets : e.balls;
+                    if(fullSwingBalls + ballsToAdd > 65) return false;
+                }
+                return true;
+            });
+            
             if(exIndex === -1) {
-                exIndex = pool.findIndex(e => e.dif !== 'Moeilijk' || moeilijkUsed < moeilijkLimit);
+                exIndex = pool.findIndex(e => {
+                    if(e.dif === 'Moeilijk' && moeilijkUsed >= moeilijkLimit) return false;
+                    if((cat === 'drive' || cat === 'approach') && e.ballType === 'range' && e.balls) {
+                        const ballsToAdd = e.sets ? e.balls * e.sets : e.balls;
+                        if(fullSwingBalls + ballsToAdd > 65) return false;
+                    }
+                    return true;
+                });
             }
             
             if(exIndex !== -1) {
-                const ex = pool.splice(exIndex, 1)[0]; // haal uit pool
+                const ex = pool.splice(exIndex, 1)[0];
                 result.push({...ex});
                 usedIds.add(ex.id);
                 currentDur += ex.dur;
                 if(ex.dif === 'Moeilijk') moeilijkUsed++;
+                if(cat === 'drive') driveCount++;
+                if((cat === 'drive' || cat === 'approach') && ex.ballType === 'range' && ex.balls) {
+                    fullSwingBalls += ex.sets ? ex.balls * ex.sets : ex.balls;
+                }
             }
         }
         catIndex++;
@@ -1172,10 +1194,7 @@ window.genSessions = async () => {
     for(let i=0; i<planLen; i++) {
         const base = SESS[i % SESS.length];
         
-        let targetForBuild = mins;
-        
-        // Trackman wordt altijd geïnjecteerd en duurt 10 minuten
-        targetForBuild -= 10; 
+        let targetForBuild = mins; 
         
         // Weekly Challenge wordt geïnjecteerd in sessie 1
         if (i === 0 && currentWeekEx) {
@@ -1183,32 +1202,15 @@ window.genSessions = async () => {
         }
 
         const exs = buildSess(base.id, lat.ws, targetForBuild, used, hcp);
-        
-        // Inject Trackman Bag Update (a13) at the very top
-        const trackmanEx = EX.find(e => e.id === 'a13');
-        if (trackmanEx && !exs.find(e => e.id === 'a13')) {
-            exs.unshift({...trackmanEx, isTrackman: true});
-        }
-
-        newPlan.push({
-            ...base,
-            id: base.id + '_' + i, // unique ID per block instance
-            exs: exs,
-            mins,
-            completed: false
-        });
-    }
-
-    // Inject Weekly Challenge into Session 1
+        // Inject Weekly Challenge into Session 1
     if (newPlan.length > 0 && currentWeekEx) {
         if (!newPlan[0].exs.find(e => e.id === currentWeekEx.id)) {
-            // Unshift places it at the very top (even before trackman), which is fine, 
-            // or we can put it after trackman. Let's unshift, so Weekly Challenge is first.
             newPlan[0].exs.unshift({...currentWeekEx, isWeeklyChallenge: true});
         } else {
             const ex = newPlan[0].exs.find(e => e.id === currentWeekEx.id);
             if(ex) ex.isWeeklyChallenge = true;
         }
+    }
     }
 
     activePlan = newPlan;
@@ -1285,15 +1287,9 @@ window.recalcSession = async (idx) => {
     activePlan[idx].mins = newMins;
     
     let targetForBuild = newMins;
-    targetForBuild -= 10; // Trackman
     if(idx === 0 && currentWeekEx) targetForBuild -= currentWeekEx.dur; // Weekly Challenge
     
     const exs = buildSess(baseId, lat.ws, targetForBuild, new Set(), lat.stats?.hcp);
-    
-    const trackmanEx = EX.find(e => e.id === 'a13');
-    if (trackmanEx && !exs.find(e => e.id === 'a13')) {
-        exs.unshift({...trackmanEx, isTrackman: true});
-    }
 
     activePlan[idx].exs = exs;
     
@@ -1355,39 +1351,38 @@ function difBadge(dif){
 // Volgorde voor afslag: kort naar lang
 const DRIVE_HINT_ORDER = {long_iron:0, hybrid:1, wood:2, driver:3};
 
+const CAT_ORDER = { drive: 1, approach: 2, chip: 3, puttShort: 4, puttMedium: 5, puttLong: 6 };
+
 function renderExList(exs, sessIdx=0){
     if(!exs.length)return'<p style="color:var(--mu);font-size:13px;padding:10px 0;">Geen oefeningen voor deze configuratie.</p>';
 
-    // Sorteer afslag-oefeningen (driver als laatste) en haal a13 naar voren
-    const reordered = (() => {
-        const trackman = exs.filter(e => e.id === 'a13');
-        const remaining = exs.filter(e => e.id !== 'a13');
+    // Sorteer op fysieke locatie (Range -> Chipping -> Putting)
+    const reordered = [...exs].sort((a,b) => {
+        // Zorg dat Weekly Challenge altijd bovenaan staat (als we dat willen), of gewoon locatie.
+        // We houden de fysieke locatie aan als hoofdregel.
+        const orderA = CAT_ORDER[a.cat] || 99;
+        const orderB = CAT_ORDER[b.cat] || 99;
         
-        const drives = remaining.filter(e => e.cat==='drive');
-        const others = remaining.filter(e => e.cat!=='drive');
+        if (orderA !== orderB) return orderA - orderB;
         
-        let sortedRemaining = remaining;
-        if(drives.length > 1){
-            const sortedDrives = [...drives].sort((a,b)=>
-                (DRIVE_HINT_ORDER[a.clubHint]??99) - (DRIVE_HINT_ORDER[b.clubHint]??99)
-            );
-            sortedRemaining = [...others, ...sortedDrives];
+        // Binnen drive: sorteer op clubHint indien van toepassing
+        if (a.cat === 'drive' && b.cat === 'drive') {
+            return (DRIVE_HINT_ORDER[a.clubHint]??99) - (DRIVE_HINT_ORDER[b.clubHint]??99);
         }
-        
-        return [...trackman, ...sortedRemaining];
-    })();
+        return 0;
+    });
 
-    // Pick the challenge: first with a measurable goal, else hardest, excl. a13
+    // Pick the challenge: first with a measurable goal, else hardest
     const challengeIdx = (() => {
-        let idx = reordered.findIndex(e => e.goal && e.id !== 'a13');
-        if(idx < 0) idx = reordered.findIndex(e => e.dif === 'Moeilijk' && e.id !== 'a13');
-        if(idx < 0) idx = reordered.findIndex(e => e.id !== 'a13');
+        let idx = reordered.findIndex(e => e.goal);
+        if(idx < 0) idx = reordered.findIndex(e => e.dif === 'Moeilijk');
+        if(idx < 0) idx = 0;
         return idx;
     })();
 
     return reordered.map((e,i)=>{
         const isWeekly = e.isWeeklyChallenge;
-        const isChallenge = i === challengeIdx && !isWeekly; // Use standard challenge layout only if not weekly
+        const isChallenge = i === challengeIdx && !isWeekly;
         const savedScore = challengeScores[e.id] || '';
         
         let challengeHtml = '';
@@ -1409,17 +1404,58 @@ function renderExList(exs, sessIdx=0){
                </div>`;
         }
 
+        const ytHtml = e.yt ? `<a href="https://www.youtube.com/results?search_query=${encodeURIComponent(e.yt)}" target="_blank" style="text-decoration:none;font-size:10px;background:#ffebee;color:#c62828;padding:3px 6px;border-radius:4px;font-weight:800;display:inline-flex;align-items:center;margin-left:6px;box-shadow:0 1px 2px rgba(0,0,0,0.1);">📺 YouTube</a>` : '';
         const headerBg = isWeekly ? 'background:#e3f2fd;border-radius:8px;padding:4px 8px;' : isChallenge ? 'background:#fffde7;border-radius:8px;padding:4px 8px;' : '';
         const borderStyle = isWeekly ? 'border-bottom:2px solid #1565C0;' : isChallenge ? 'border-bottom:2px solid #f9a825;' : '';
+        
+        // ExState logic for checkboxes
+        const exState = (activePlan[sessIdx].exState || {})[e.id] || { done: false, rating: null };
+        const isD = exState.done;
+        const isR = exState.rating;
+        const rClass = (r) => isR === r ? 'opacity:1;transform:scale(1.2);filter:grayscale(0%);' : 'opacity:0.4;filter:grayscale(100%);';
+
+        const interactionHtml = `<div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:10px;border-top:1px dashed var(--bd);">
+            <label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:800;color:${isD?'var(--gm)':'var(--mu)'};cursor:pointer;user-select:none;">
+                <input type="checkbox" ${isD?'checked':''} onchange="toggleExDone(${sessIdx}, '${e.id}', this.checked)" style="width:18px;height:18px;accent-color:var(--gm);cursor:pointer;">
+                ${isD?'Afgerond 🎉':'Markeer als voltooid'}
+            </label>
+            <div style="display:flex;gap:10px;font-size:22px;user-select:none;">
+                <span style="cursor:pointer;transition:all 0.2s;${rClass('bad')}" onclick="rateEx(${sessIdx}, '${e.id}', 'bad')" title="Ging slecht">😔</span>
+                <span style="cursor:pointer;transition:all 0.2s;${rClass('ok')}" onclick="rateEx(${sessIdx}, '${e.id}', 'ok')" title="Ging oké">😐</span>
+                <span style="cursor:pointer;transition:all 0.2s;${rClass('good')}" onclick="rateEx(${sessIdx}, '${e.id}', 'good')" title="Ging super">😀</span>
+            </div>
+        </div>`;
+
         return `<div class="ei" style="${borderStyle}">
-        <div class="eih" style="${headerBg}"><div class="ein">${isWeekly||isChallenge ? '🏆 ' : ''}${e.name}</div><div class="eid">${e.dur} min</div></div>
+        <div class="eih" style="${headerBg}"><div class="ein">${isWeekly||isChallenge ? '🏆 ' : ''}${e.name}${ytHtml}</div><div class="eid">${e.dur} min</div></div>
         ${challengeHtml}${exMetaHtml(e)}
         <div class="eidesc">${e.desc}</div>
         <div class="eitip">${e.tip}</div>
         <span class="eicat" style="background:${CAT_COL[e.cat]||'#f5f5f5'};color:#333;">${CAT_LBL[e.cat]||e.cat}</span>${difBadge(e.dif)}
+        ${interactionHtml}
     </div>`;
     }).join('');
 }
+
+window.toggleExDone = async (sessIdx, exId, checked) => {
+    if(!activePlan || !activePlan[sessIdx]) return;
+    if(!activePlan[sessIdx].exState) activePlan[sessIdx].exState = {};
+    if(!activePlan[sessIdx].exState[exId]) activePlan[sessIdx].exState[exId] = { done: false, rating: null };
+    activePlan[sessIdx].exState[exId].done = checked;
+    
+    // Check if all exercises are done to auto-complete session? Optional.
+    renderSessions();
+    if(currentUser) await saveToDb();
+};
+
+window.rateEx = async (sessIdx, exId, rating) => {
+    if(!activePlan || !activePlan[sessIdx]) return;
+    if(!activePlan[sessIdx].exState) activePlan[sessIdx].exState = {};
+    if(!activePlan[sessIdx].exState[exId]) activePlan[sessIdx].exState[exId] = { done: false, rating: null };
+    activePlan[sessIdx].exState[exId].rating = rating;
+    renderSessions();
+    if(currentUser) await saveToDb();
+};
 
 
 
