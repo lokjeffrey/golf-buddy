@@ -167,8 +167,8 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         /* Floating Report Button */
-        #report-fab{position:fixed;bottom:calc(var(--nav)+16px);right:16px;width:46px;height:46px;border-radius:50%;background:var(--rd);color:#fff;border:none;font-size:20px;box-shadow:0 4px 14px rgba(0,0,0,.25);cursor:pointer;z-index:190;display:flex;align-items:center;justify-content:center;transition:transform .2s;}
-        #report-fab:active{transform:scale(.93);}
+        #report-fab{position:fixed;bottom:calc(var(--nav)+16px);right:16px;height:40px;padding:0 14px;border-radius:20px;background:var(--rd);color:#fff;border:none;font-size:13px;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,.25);cursor:pointer;z-index:190;display:flex;align-items:center;gap:6px;white-space:nowrap;transition:transform .2s;}
+        #report-fab:active{transform:scale(.95);}
 
         /* Report Modal */
         #report-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;display:none;align-items:flex-end;justify-content:center;}
@@ -427,18 +427,18 @@
     </div>
 
     <nav class="bnav">
-        <button class="nbtn active" id="nav-data"      onclick="showTab('data')">      <span class="ico">📋</span>Data</button>
-        <button class="nbtn"        id="nav-analyse"   onclick="showTab('analyse')">   <span class="ico">📊</span>Stats</button>
+        <button class="nbtn active" id="nav-data"      onclick="showTab('data')">      <span class="ico">✏️</span>Data</button>
+        <button class="nbtn"        id="nav-analyse"   onclick="showTab('analyse')">   <span class="ico">🎯</span>Stats</button>
         <button class="nbtn"        id="nav-training"  onclick="showTab('training')">  <span class="ico">🏌️</span>Train</button>
-        <button class="nbtn"        id="nav-comm"      onclick="showTab('comm')">      <span class="ico">🏆</span>Comm</button>
-        <button class="nbtn"        id="nav-voortgang" onclick="showTab('voortgang')"> <span class="ico">📈</span>Groei</button>
+        <button class="nbtn"        id="nav-comm"      onclick="showTab('comm')">      <span class="ico">🏆</span>Challenge</button>
+        <button class="nbtn"        id="nav-voortgang" onclick="showTab('voortgang')"> <span class="ico">📊</span>Progress</button>
         <button class="nbtn"        id="nav-clubs"     onclick="showTab('profiel')">   <span class="ico">👤</span>Profiel</button>
     </nav>
 </div>
 <div class="toast" id="toast"></div>
 
 <!-- FLOATING REPORT BUTTON -->
-<button id="report-fab" onclick="openReport()" title="Bug of Feature melden">🐛</button>
+<button id="report-fab" onclick="openReport()" title="Bug of Feature melden">🐛 Report</button>
 
 <!-- REPORT MODAL -->
 <div id="report-overlay" onclick="closeReportOnOverlay(event)">
