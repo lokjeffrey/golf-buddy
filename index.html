@@ -635,7 +635,7 @@ const EX=[
  {id:'c9',cat:'chip',clubHint:'wedge',name:'Clockwork Chip',dur:10,dif:'Gemiddeld',balls:12,ballType:'own',sets:1,goal:null,desc:'Chip vanuit 12 posities rondom de hole (als klokwijzers, 2m afstand). Elke positie = andere hoek. 1 bal per positie.',tip:'💡 Elke positie heeft andere break en ligkans – traint aanpassingsvermogen.'},
  {id:'c10',cat:'chip',clubHint:'wedge',name:'Rough Chip Oefening',dur:7,dif:'Moeilijk',balls:15,ballType:'own',sets:1,goal:null,desc:'Leg de bal op langere mat (rough simulatie). Oefen 15 chips met je sand wedge. Open face en meer acceleratie vereist.',tip:'💡 Rough = meer loft + meer kracht + kortere follow-through.'},
  {id:'c11',cat:'chip',clubHint:'wedge',name:'Twee-Wedge Vergelijking',dur:8,dif:'Gemiddeld',balls:10,ballType:'own',sets:2,goal:null,desc:'Set 1: 5 chips met je meest loftige wedge. Set 2: 5 chips met je tweede wedge – zelfde situatie. Voel het verschil in roll en hoogte.',tip:'💡 Ken welke wedge welke roll geeft – dan kies je bewuster op de baan.'},
- {id:'c12',cat:'chip',clubHint:'wedge',name:'Pitch Afstandsreeks',dur:9,dif:'Gemiddeld',balls:15,ballType:'own',sets:3,goal:null,desc:'3 sets: 5 ballen van 10m → 5 van 20m → 5 van 30m. Gebruik dezelfde wedge. Pas alleen de armlengte aan, niet de snelheid.',tip:'💡 Afstand controleer je met armlengte, niet met zwingsnelheid.'},
+ {id:'c12',cat:'chip',clubHint:'wedge',name:'Pitch Afstandsreeks',dur:9,dif:'Gemiddeld',balls:15,ballType:'range',sets:3,goal:null,desc:'3 sets: 5 ballen van 10m → 5 van 20m → 5 van 30m. Gebruik dezelfde wedge. Pas alleen de armlengte aan, niet de snelheid.',tip:'💡 Afstand controleer je met armlengte, niet met zwingsnelheid.'},
  {id:'c13',cat:'chip',clubHint:'wedge',name:'Eén-Arm Chip (Links)',dur:6,dif:'Moeilijk',balls:10,ballType:'own',sets:1,goal:null,desc:'Chip met alleen je linkerhand en een wedge. 10 ballen. Kleine, beheerste beweging.',tip:'💡 Verbetert de non-dominante hand die bij veel golfers passief is.'},
  {id:'c14',cat:'chip',clubHint:'short_iron',name:'Fringe: Chippen of Putten?',dur:7,dif:'Gemiddeld',balls:8,ballType:'own',sets:1,goal:null,desc:'Leg 8 ballen op de fringe. Oefen de beslissing: chippen (8-ijzer) of putten? Probeer beide methodes voor dezelfde bal.',tip:'💡 Helder pad → putter. Ongelijk gras → chip met je 8-ijzer.'},
  {id:'c15',cat:'chip',clubHint:'wedge',name:'Bunker Basisoefening',dur:8,dif:'Moeilijk',balls:0,ballType:'none',sets:null,goal:'12 bunkerswings met juiste techniek',desc:'Geen ballen nodig. Open face, open stance, swingoefening 3cm achter denkbeeldige bal met je sand wedge. 12 herhalingen.',tip:'💡 Denk "zand tussen club en bal" bij elke bunkerslag.'},
@@ -1241,6 +1241,13 @@ function renderSessions(){
 
     document.getElementById('sess-container').innerHTML = activePlan.map((sess,i)=>{
         const tot = sess.exs.reduce((s,e)=>s+e.dur,0);
+        let rangeBalls = 15; // 15 balls for warmup
+        sess.exs.forEach(e => {
+            if(e.ballType === 'range' && typeof e.balls === 'number') {
+                rangeBalls += (e.sets ? e.balls * e.sets : e.balls);
+            }
+        });
+
         const done = sess.completed;
         const opacity = done ? '0.6' : '1';
         const bg = done ? 'background:#f5f5f5;' : '';
@@ -1257,7 +1264,7 @@ function renderSessions(){
                 <div class="shl">
                     ${badgeHtml}
                     <div><div class="stit" style="${done?'text-decoration:line-through;color:var(--mu);':''}">Sessie ${i+1}: ${sess.lbl}</div>
-                    <div class="smeta">${sess.desc} · ~${tot+5} min · ${sess.exs.length} oefeningen</div></div>
+                    <div class="smeta">${sess.desc} · ~${tot+5} min · 🟡 ~${rangeBalls} range ballen</div></div>
                 </div>
                 <div class="schev" id="chev-${i}">▼</div>
             </div>
