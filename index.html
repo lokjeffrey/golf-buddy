@@ -338,12 +338,12 @@
                 <div class="ctit">📅 Nieuw Trainingsblok Starten</div>
                 <div class="info-strip">Stel hier je komende reeks trainingen in op basis van je actuele zwaktes.</div>
                 
-                <label style="font-size:11px;font-weight:700;color:var(--mu);">Aantal Sessies in dit blok</label>
+                <label style="font-size:11px;font-weight:700;color:var(--mu);">Lengte van dit Trainingsblok</label>
                 <select id="plan-len" class="fi" style="margin-top:4px;margin-bottom:12px;">
-                    <option value="2">2 Sessies</option>
-                    <option value="4" selected>4 Sessies (Aanbevolen)</option>
-                    <option value="6">6 Sessies (Actieve trainer)</option>
-                    <option value="8">8 Sessies</option>
+                    <option value="2">2 Sessies (Korte boost)</option>
+                    <option value="4" selected>4 Sessies (1 maand focus - Aanbevolen)</option>
+                    <option value="6">6 Sessies (1,5 maand programma)</option>
+                    <option value="8">8 Sessies (2 maanden intensief)</option>
                 </select>
 
                 <div class="ctit">⏱️ Standaard duur per sessie</div>
@@ -703,7 +703,23 @@ const EX=[
  {id:'pl3',cat:'puttLong',clubHint:'putter',name:'Cross-Slope Lag Putting',dur:9,dif:'Moeilijk',balls:8,ballType:'own',sets:1,goal:null,desc:'Sla 8 putts diagonaal over een helling. Combineer afstandscontrole met break-lezen.',tip:'💡 Schuine greens zijn de moeilijkste situatie – train dit actief.'},
  {id:'pl4',cat:'puttLong',clubHint:'putter',name:'Twee-Putt Garantie',dur:9,dif:'Gemiddeld',balls:10,ballType:'own',sets:null,goal:'≥ 8/10 twee-putts (5 van 10m + 5 van 12m)',desc:'5 ballen van 10m, dan 5 ballen van 12m. De eerste putt moet eindigen op tap-in afstand. Noteer je score (X/10).',tip:'💡 3-putt voorkomen begint bij de eerste putt – niet bij de tweede.'},
  {id:'pl5',cat:'puttLong',clubHint:'putter',name:'Links/Rechts Afwisseling',dur:8,dif:'Moeilijk',balls:8,ballType:'own',sets:2,goal:null,desc:'2 sets van 4: afwisselend links- en rechtsbrekende putt van 8m. Leer bewust te compenseren. Noteer je gemiddelde eindafstand.',tip:'💡 Rechtshandige golfers struikelen vaker over rechts-brekende putts.'},
- {id:'pl6',cat:'puttLong',clubHint:'putter',name:'Grote Green Simulatie',dur:8,dif:'Gemiddeld',balls:8,ballType:'own',sets:1,goal:null,desc:'Sla 8 putts van extreem ver (12m+). Focus puur op stoppen dichtbij. Noteer je gemiddelde eindafstand.',tip:'💡 Lag conservatief van ver – met de ambitie om dichtbij te stoppen.'}
+ {id:'pl6',cat:'puttLong',clubHint:'putter',name:'Grote Green Simulatie',dur:8,dif:'Gemiddeld',balls:8,ballType:'own',sets:1,goal:null,desc:'Sla 8 putts van extreem ver (12m+). Focus puur op stoppen dichtbij. Noteer je gemiddelde eindafstand.',tip:'💡 Lag conservatief van ver – met de ambitie om dichtbij te stoppen.'},
+ 
+ // --- NIEUWE AANVULLINGEN CODE-CADDY ---
+ {id:'d16',cat:'drive',clubHint:'driver',name:'Snelheid & Balans Test',dur:8,dif:'Gemiddeld',balls:15,ballType:'range',sets:1,goal:null,desc:'Sla 15 ballen met je driver op 100% maximale snelheid (sneller dan je normale swing). De enige regel: je móét je eindhouding 3 volle seconden perfect in balans vast kunnen houden.',tip:'💡 Snelheid is pas bruikbaar als je lichaam in balans blijft. Val je om? Dan was je té wild.',yt:'https://www.youtube.com/results?search_query=golf+driver+balance+drill'},
+ {id:'a13',cat:'approach',clubHint:'short_iron',distHint:null,name:'Hoog en Laag (Traject Controle)',dur:10,dif:'Moeilijk',balls:20,ballType:'range',sets:2,goal:null,desc:'Set 1 (10 ballen): Sla de bal extreem hoog (bal iets meer voorin je stand, hoge follow-through). Set 2 (10 ballen): Sla de bal extreem laag "onder de takken door" (bal achterin stand, korte punch-follow-through).',tip:'💡 Balvlucht controleren is de sleutel tot golf in de wind.'},
+ {id:'a14',cat:'approach',clubHint:'long_iron',distHint:160,name:'De 9-Ball Shot-Shaper',dur:10,dif:'Moeilijk',balls:9,ballType:'range',sets:1,goal:'Sla 3 fades, 3 rechte ballen, 3 draws',desc:'Kies een doel op ±160m. Je mag pas door naar de volgende bal als je de gevraagde balvlucht succesvol hebt geproduceerd: eerst 3 bewuste fades, dan 3 kaarsrechte ballen, dan 3 bewuste draws. Herhaal tot het lukt.',tip:'💡 Begrijp hoe je clubface en swingpad samenwerken om curve te maken.'},
+ {id:'c18',cat:'chip',clubHint:'wedge',name:'Handdoek Landing Zone',dur:8,dif:'Gemiddeld',balls:15,ballType:'own',sets:null,goal:'Raak de handdoek ≥ 8 keer',desc:'Leg een handdoek op de green, precies op de plek waar je de bal wilt laten landen (zodat hij daarna naar de hole rolt). Sla 15 chips. Tel hoeveel er daadwerkelijk OP de handdoek landen.',tip:'💡 Een goede chipper kijkt nooit naar de hole, maar altijd naar het landingspunt.'},
+ {id:'c19',cat:'chip',clubHint:'wedge',name:'Worst-Case Scenario (Slechte ligging)',dur:8,dif:'Moeilijk',balls:10,ballType:'own',sets:1,goal:null,desc:'Zoek de slechtste liggingen op rond de oefengreen: in een divot, dikke rough, bergop, bergaf, of modder. Sla 10 chips vanuit deze lastige situaties.',tip:'💡 In de baan ligt de bal zelden perfect. Leer improviseren met je clubface.'},
+ {id:'ps9',cat:'puttShort',clubHint:'putter',name:'Rondje om de Wereld (Compass Drill)',dur:7,dif:'Gemiddeld',balls:4,ballType:'own',sets:3,goal:'Alle 4 erin per set',desc:'Leg 4 ballen rondom de hole op 1,5 meter afstand (Noord, Oost, Zuid, West). Elke putt heeft een andere break (uphill, downhill, links-rechts). Maak ze alle vier achter elkaar. Mis? Begin de set opnieuw.',tip:'💡 Korte putts breken meer dan je denkt als ze langzamer rollen.'},
+ {id:'pl7',cat:'puttLong',clubHint:'putter',name:'Heen en Terug (Lag Putting)',dur:8,dif:'Gemiddeld',balls:10,ballType:'own',sets:1,goal:null,desc:'Sla een putt van 10 meter. Loop naar de bal toe, pak hem op, en put hem nu exact via dezelfde lijn weer TERUG naar het startpunt. 5x heen en weer (10 putts totaal).',tip:'💡 Door dezelfde lijn terug te putten, ervaar je direct het verschil tussen uphill en downhill rollen op dezelfde slope.'},
+ 
+ // --- EXTRA AANVULLINGEN (Antigravity's Keuze) ---
+ {id:'d17',cat:'drive',clubHint:'short_iron',name:'Handdoek Connectie Drill',dur:8,dif:'Gemiddeld',balls:15,ballType:'range',sets:1,goal:null,desc:'Klem een handdoekje onder beide oksels. Sla 15 ballen (korte swings, niet full speed) zonder de handdoek te laten vallen. Dit traint de connectie tussen je armen en je torso.',tip:'💡 Als de handdoek valt, werkten je armen onafhankelijk van je lichaamsrotatie. Blijf compact!'},
+ {id:'a15',cat:'approach',clubHint:'wedge',name:'Bodemcontrole (Lijn in het zand)',dur:6,dif:'Gemakkelijk',balls:10,ballType:'none',sets:1,goal:null,desc:'Ga de bunker in (zonder bal) of trek een lange krijtlijn op de mat. Oefen je swing waarbij je exact OP of nét na de lijn het zand/matje raakt, nooit ervóór.',tip:'💡 Fat shots (de grond voor de bal raken) ontstaan als je zwaartepunt te ver naar achteren blijft.'},
+ {id:'c20',cat:'chip',clubHint:'wedge',name:'Leapfrog (Afstandscontrole)',dur:8,dif:'Moeilijk',balls:10,ballType:'own',sets:1,goal:null,desc:'Kies een ruimte van ±15 meter. Chip de 1e bal zo kort mogelijk. De 2e bal móét voorbij de 1e vliegen en landen. De 3e moet voorbij de 2e. Kun je alle 10 ballen achter elkaar "Leapfroggen"?',tip:'💡 Je leert continu kleine variaties in swingsnelheid en loft toe te passen, cruciaal voor delicaat chippen.'},
+ {id:'pm7',cat:'puttMedium',clubHint:'putter',name:'Pull-Back Drill',dur:10,dif:'Moeilijk',balls:5,ballType:'own',sets:1,goal:'5 "holes" afronden met de minste slagen',desc:'Speel 5 holes vanaf 6 meter. Mis je de eerste putt? Trek de bal dan exact 1 volle clublengte (± 90cm) achteruit (weg van de hole) en maak je 2e putt. Bij wéér een miss: weer terugtrekken.',tip:'💡 Dit creëert enorme wedstrijddruk: een gemiste putt of slechte lag-putt wordt onmiddellijk afgestraft met een veel moeilijkere tweede putt.'},
+ {id:'ps10',cat:'puttShort',clubHint:'putter',name:'Tee Gate (Sweetspot Focus)',dur:5,dif:'Gemiddeld',balls:10,ballType:'own',sets:1,goal:null,desc:'Prik twee tees in de green vlak naast je putterhoofd: eentje net buiten de teen, eentje net binnen de hiel (slechts 1 cm speling). Put 10 ballen vanaf 2 meter door dit "poortje".',tip:'💡 Als je een tee raakt, raak je de bal niet in het midden van het clubblad. Dit kost onbewust enorm veel controle en snelheid!'}
 ];
 
 /* ═══════════════════════════════════════════════════════
@@ -770,11 +786,29 @@ function getClubAdvice(ex){
     const validClubs = clubsData.filter(x => x.name && x.name.trim() !== '' && x.name !== 'Kies Club...');
     if(!validClubs.length) return null;
 
+    const fmt = c => `${c.name}${c.carry ? ` (carry ${c.carry}m)` : ''}`;
+
+    // 1. Nieuwe, slimmere logica: Als er een specifieke afstand (distHint) wordt gevraagd in de oefening!
+    if (ex.distHint) {
+        // Filter putters en drivers eruit voor approach slagen
+        const validForDist = validClubs.filter(x => (+x.carry > 0 || +x.total > 0) && !x.name.match(/putter|driver/i));
+        
+        if (validForDist.length > 0) {
+            // Zoek de club die het dichtst bij de gevraagde afstand komt (we checken primair op carry, fallback op total)
+            const nearest = validForDist.sort((a,b) => {
+                const distA = +a.carry || +a.total;
+                const distB = +b.carry || +b.total;
+                return Math.abs(distA - ex.distHint) - Math.abs(distB - ex.distHint);
+            })[0];
+            return `⛳ ${fmt(nearest)}`;
+        }
+    }
+
+    // 2. Fallback logica als er geen specifieke afstand is (generieke drills)
     const hint = ex.clubHint;
     const wedgeRx = /wedge|pw|sw|lw|gw|aw|pitching|\b4[2-9]|°\b4[2-9]|\b5[0-9]|\b6[0-4]/i;
     const find = rx => validClubs.find(x => rx.test(x.name));
     const findAll = rx => validClubs.filter(x => rx.test(x.name));
-    const fmt = c => `${c.name}${c.carry ? ` (carry ${c.carry}m)` : ''}`;
 
     if(hint === 'driver'){
         const c = find(/driver/i);
@@ -802,7 +836,6 @@ function getClubAdvice(ex){
     }
     if(hint === 'wedge'){
         if(ex.id === 'c11'){
-            // Twee-Wedge Vergelijking: show two highest-loft wedges
             const wedges = findAll(wedgeRx)
                 .filter(x => !x.name.match(/putter/i))
                 .sort((a,b) => {
@@ -819,14 +852,6 @@ function getClubAdvice(ex){
     if(hint === 'putter'){
         const c = find(/putter/i);
         return c ? `🎱 ${fmt(c)}` : null;
-    }
-    // approach with distHint fallback
-    if(ex.cat === 'approach' && ex.distHint){
-        const valid = validClubs.filter(x => +x.carry > 0 && !x.name.match(/putter|driver/i));
-        if(valid.length){
-            const nearest = valid.sort((a,b) => Math.abs(+a.carry-ex.distHint)-Math.abs(+b.carry-ex.distHint))[0];
-            return `⛳ ${fmt(nearest)}`;
-        }
     }
     return null;
 }
