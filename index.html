@@ -339,7 +339,16 @@
                 <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--mu);margin-top:4px;"><span>30 min</span><span>120 min</span></div>
                 
                 <button class="btn btn-p" onclick="genSessions()" style="margin-top:16px;">🚀 Start Trainingsblok</button>
-                <button class="btn btn-s" onclick="startPreRound()" style="margin-top:10px;background:#fff9c4;color:#7b5e00;border:1.5px solid #f9a825;">⛳ Start Pre-Round Warm-up</button>
+            </div>
+            
+            <div class="card" style="margin-top:12px;">
+                <div class="ctit">⛳ Baan-voorbereiding (Pre-Round)</div>
+                <div class="info-strip">Start een vast warm-up schema voordat je de baan in gaat (precies 1 mandje range ballen).</div>
+                <div style="display:flex;gap:8px;margin-top:8px;">
+                    <button class="btn btn-s" onclick="startWarmup('short')" style="flex:1;margin:0;background:#fff9c4;color:#7b5e00;border:1.5px solid #f9a825;font-weight:700;">Kort (20 min)</button>
+                    <button class="btn btn-s" onclick="startWarmup('medium')" style="flex:1;margin:0;background:#fff9c4;color:#7b5e00;border:1.5px solid #f9a825;font-weight:700;">Medium (30 min)</button>
+                    <button class="btn btn-s" onclick="startWarmup('long')" style="flex:1;margin:0;background:#fff9c4;color:#7b5e00;border:1.5px solid #f9a825;font-weight:700;">Lang (50 min)</button>
+                </div>
             </div>
         </div>
 
@@ -347,7 +356,12 @@
         <div id="tc-active" style="display:none;">
             <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:12px; padding: 0 4px;">
                 <div style="font-size:19px;font-weight:800;color:var(--gd);">Je Trainingsblok</div>
-                <button class="btn btn-s" style="margin:0;padding:6px 12px;font-size:11px;width:auto;" onclick="cancelPlan()">🗑️ Wissen</button>
+                <div style="display:flex; gap:8px;">
+                    <button class="btn btn-s" style="margin:0;padding:6px 8px;font-size:11px;width:auto;background:#fff9c4;color:#7b5e00;border:1.5px solid #f9a825;" onclick="startWarmup('short')">⛳ 20m</button>
+                    <button class="btn btn-s" style="margin:0;padding:6px 8px;font-size:11px;width:auto;background:#fff9c4;color:#7b5e00;border:1.5px solid #f9a825;" onclick="startWarmup('medium')">⛳ 30m</button>
+                    <button class="btn btn-s" style="margin:0;padding:6px 8px;font-size:11px;width:auto;background:#fff9c4;color:#7b5e00;border:1.5px solid #f9a825;" onclick="startWarmup('long')">⛳ 50m</button>
+                    <button class="btn btn-s" style="margin:0;padding:6px 12px;font-size:11px;width:auto;" onclick="cancelPlan()">🗑️</button>
+                </div>
             </div>
             
             <div style="background:#fff;border-radius:12px;padding:16px;margin-bottom:16px;box-shadow:var(--sh);">
@@ -977,7 +991,11 @@ function initComm() {
     const weekNo = Math.ceil(( ( (d - yearStart) / 86400000) + 1)/7);
     currentWeekStr = `${d.getUTCFullYear()}_W${weekNo}`;
     
-    const chExs = EX.filter(e => e.goal && !e.desc.includes('pogingen') && e.dif !== 'Moeilijk');
+    // Gedefinieerde, zware challenges voor de maand
+    const MONTHLY_IDS = ['ps4', 'a11', 'c7', 'pm4', 'pl4', 'a5', 'a3'];
+    
+    // Week challenge: oefeningen met een score, die NIET in de maand-lijst staan
+    const chExs = EX.filter(e => e.goal && (e.desc.toLowerCase().includes('noteer') || e.desc.toLowerCase().includes('score')) && !MONTHLY_IDS.includes(e.id));
     currentWeekEx = chExs[weekNo % chExs.length];
     
     document.getElementById('comm-week-ex').innerHTML = `
@@ -1011,8 +1029,8 @@ function initComm() {
     const monthNo = d.getUTCMonth() + 1;
     currentMonthStr = `${d.getUTCFullYear()}_M${monthNo < 10 ? '0'+monthNo : monthNo}`;
     
-    // Monthly challenge: only hard challenges
-    const monthChExs = EX.filter(e => e.goal && e.dif === 'Moeilijk');
+    // Monthly challenge: uit de speciaal gedefinieerde zware lijst
+    const monthChExs = EX.filter(e => MONTHLY_IDS.includes(e.id));
     currentMonthEx = monthChExs[monthNo % monthChExs.length];
     
     document.getElementById('comm-month-ex').innerHTML = `
@@ -1243,50 +1261,53 @@ const WARMUP_HTML = `
         <div class="eidesc"><strong>1. Losdraaien (2 min)</strong> — Draai je schouders, heupen, knieën en polsen zachtjes los. Geen clubs nodig.<br><strong>2. Korte swings (3 min)</strong> — Pak je Sand Wedge of Pitching Wedge. Sla 10–15 halve, ontspannen slagen om het ritme te voelen.</div>
     </div>`;
 
-window.startPreRound = async () => {
-    // Variabele pre-round warmup logica
+window.startWarmup = async (type) => {
+    if (activePlan && activePlan.length > 0) {
+        if (!confirm('Dit overschrijft je huidige trainingsblok. Weet je het zeker?')) return;
+    }
+
     const pExs = [];
-    const used = new Set();
-    const getRandomEx = (cat, difficultyCondition, clubHintCondition, ballsOverride) => {
-        const cands = EX.filter(e => e.cat === cat && (!difficultyCondition || e.dif === difficultyCondition) && (!clubHintCondition || e.clubHint === clubHintCondition) && !used.has(e.id));
-        let e = cands.length ? cands[Math.floor(Math.random()*cands.length)] : EX.find(e => e.cat === cat && !used.has(e.id));
-        if(e) {
-            e = {...e};
-            used.add(e.id);
-            if(ballsOverride !== undefined) e.balls = ballsOverride;
-            pExs.push(e);
-        }
-    };
     
-    // 1 Wedge (Gemakkelijk/Gemiddeld, 10 ballen)
-    getRandomEx('chip', null, 'wedge', 10);
-    // 1 Ijzer (Gemakkelijk/Gemiddeld, 10 ballen)
-    getRandomEx('approach', null, 'short_iron', 10);
-    // 1 Driver (Gemakkelijk/Gemiddeld, 10 ballen)
-    getRandomEx('drive', null, 'driver', 10);
-    // 1 Korte Chip
-    getRandomEx('chip', 'Gemakkelijk');
-    // 1 Lag putt (Lang)
-    getRandomEx('puttLong');
-    // 1 Korte putt
-    getRandomEx('puttShort');
+    if (type === 'short') {
+        pExs.push({ id: 'wu_s1', cat: 'drive', name: 'Fysieke Warm-up', dur: 3, dif: 'Gemakkelijk', balls: 0, ballType: 'none', goal: null, desc: 'Losdraaien van schouders, heupen en knieën. Geen clubs nodig.', tip: 'Begin nooit stijf aan je ronde.' });
+        pExs.push({ id: 'wu_s2', cat: 'drive', name: 'Range Ritme', dur: 10, dif: 'Gemakkelijk', balls: 30, ballType: 'range', goal: null, desc: 'Sla 10 ballen met een wedge (soepel), 10 met een ijzer 7, en 10 met je driver. Visualiseer bij de laatste driver-slag de afslag van hole 1.', tip: 'Focus puur op je tempo, niet op perfecte techniek.' });
+        pExs.push({ id: 'wu_s3', cat: 'puttLong', name: 'Lag Putting & Confidence', dur: 7, dif: 'Gemakkelijk', balls: 3, ballType: 'own', goal: null, desc: '5 minuten lange putts (10+ meter) puur om de snelheid van de green te voelen. 2 minuten korte putts (1 meter) resoluut uitholen voor zelfvertrouwen.', tip: 'Kijk naar de hole tijdens je oefenswing voor afstandsgevoel.' });
+    } else if (type === 'medium') {
+        pExs.push({ id: 'wu_m1', cat: 'drive', name: 'Fysieke Warm-up', dur: 3, dif: 'Gemakkelijk', balls: 0, ballType: 'none', goal: null, desc: 'Dynamisch rekken en strekken. Maak je spieren warm voor de eerste afslag.', tip: 'Focus op de rotatie van je romp.' });
+        pExs.push({ id: 'wu_m2', cat: 'drive', name: 'Range Ritme', dur: 12, dif: 'Gemakkelijk', balls: 30, ballType: 'range', goal: null, desc: '10x Wedge, 10x Mid-ijzer, 10x Driver/Houten. Focus puur op ritme en balans, niet op techniek.', tip: 'Techniek train je op de range, ritme train je voor de ronde.' });
+        pExs.push({ id: 'wu_m3', cat: 'chip', name: 'Chippen', dur: 5, dif: 'Gemakkelijk', balls: 3, ballType: 'own', goal: null, desc: 'Voel hoe het gras rondom de green vandaag reageert. Test hoe de bal rolt na het landen.', tip: 'Houd je handen voor de bal bij impact.' });
+        pExs.push({ id: 'wu_m4', cat: 'puttLong', name: 'Putten', dur: 10, dif: 'Gemakkelijk', balls: 3, ballType: 'own', goal: null, desc: '6 minuten lange putts (snelheid kalibreren), 4 minuten korte putts (1 tot 1,5 meter).', tip: 'De snelheid van de green bepaalt de lijn van je putt.' });
+    } else if (type === 'long') {
+        pExs.push({ id: 'wu_l1', cat: 'drive', name: 'Fysieke Warm-up', dur: 5, dif: 'Gemakkelijk', balls: 0, ballType: 'none', goal: null, desc: 'Uitgebreid rekken, armcirkels en torso-rotaties.', tip: 'Neem de tijd om blessures te voorkomen.' });
+        pExs.push({ id: 'wu_l2', cat: 'drive', name: 'Range Opbouw', dur: 20, dif: 'Gemiddeld', balls: 30, ballType: 'range', goal: null, desc: '10x Wedge, 10x IJzers, 10x Woods/Driver. Wissel bij de laatste 5 ballen steeds je doelwit (alsof je al in de baan staat).', tip: 'Simuleer je eerste paar holes al op de range.' });
+        pExs.push({ id: 'wu_l3', cat: 'chip', name: 'Chippen & Pitchen', dur: 10, dif: 'Gemiddeld', balls: 3, ballType: 'own', goal: null, desc: 'Oefen verschillende liggingen (rough vs strak gras). Chip er een paar hoog en een paar laag.', tip: 'Wees creatief en voel de bounce van je club.' });
+        pExs.push({ id: 'wu_l4', cat: 'puttLong', name: 'Putten', dur: 15, dif: 'Gemiddeld', balls: 3, ballType: 'own', goal: null, desc: '10 minuten lange lag putts (minimaal 12 meter), 5 minuten korte \'makeables\' uitholen.', tip: 'Eindig met 3 gemaakte putts op rij voor maximaal zelfvertrouwen op hole 1.' });
+    }
 
-    const newPlan = [{
-        id: 'preround_1',
-        lbl: 'Pre-Round Warm-up',
-        icon: '⛳',
+    let lbl = 'Baan Voorbereiding';
+    let mins = 0;
+    if (type === 'short') { lbl = 'Korte Warm-up'; mins = 20; }
+    if (type === 'medium') { lbl = 'Medium Warm-up'; mins = 30; }
+    if (type === 'long') { lbl = 'Lange Warm-up'; mins = 50; }
+
+    const newSession = {
+        id: 'preround_' + Date.now(),
+        lbl: lbl,
+        icon: '🔥',
         bc: 'bd4',
-        desc: 'Een strak en vast schema voor de perfecte wedstrijdvoorbereiding.',
+        desc: 'Pre-round warm-up',
         exs: pExs,
-        mins: 30
-    }];
+        mins: mins,
+        completed: false
+    };
 
-    activePlan = newPlan;
+    activePlan = [newSession];
+    
     document.getElementById('tc-generate').style.display = 'none';
     document.getElementById('tc-active').style.display = 'block';
     
     renderSessions();
-    toast(`⛳ Pre-Round Warm-up geladen!`);
+    toast(`⛳ ${lbl} geladen!`);
     if(currentUser) await saveToDb();
 };
 
@@ -1367,7 +1388,8 @@ function renderSessions(){
 
     document.getElementById('sess-container').innerHTML = activePlan.map((sess,i)=>{
         const tot = sess.exs.reduce((s,e)=>s+e.dur,0);
-        let rangeBalls = 15; // 15 balls for warmup
+        const isPreRound = sess.id.startsWith('preround');
+        let rangeBalls = isPreRound ? 0 : 15; // 15 balls for default warmup
         sess.exs.forEach(e => {
             if(e.ballType === 'range' && typeof e.balls === 'number') {
                 rangeBalls += (e.sets ? e.balls * e.sets : e.balls);
@@ -1385,16 +1407,19 @@ function renderSessions(){
                </div>`
             : `<div style="text-align:center;color:var(--gm);font-weight:700;margin-top:16px;">Sessie Voltooid 🎉</div>`;
 
+        const isPreRound = sess.id.startsWith('preround');
+        const showWarmup = isPreRound ? '' : WARMUP_HTML;
+
         return `<div class="sc" style="${bg}opacity:${opacity};">
             <div class="sh" onclick="togSess(${i})">
                 <div class="shl">
                     ${badgeHtml}
                     <div><div class="stit" style="${done?'text-decoration:line-through;color:var(--mu);':''}">Sessie ${i+1}: ${sess.lbl}</div>
-                    <div class="smeta">${sess.desc} · ~${tot+5} min · 🟡 ~${rangeBalls} range ballen</div></div>
+                    <div class="smeta">${sess.desc} · ~${tot+(isPreRound?0:5)} min · 🟡 ~${rangeBalls} range ballen</div></div>
                 </div>
                 <div class="schev" id="chev-${i}">▼</div>
             </div>
-            <div class="ssb" id="sb-${i}">${WARMUP_HTML}${renderExList(sess.exs,i)}${btnHtml}</div>
+            <div class="ssb" id="sb-${i}">${showWarmup}${renderExList(sess.exs,i)}${btnHtml}</div>
         </div>`;
     }).join('');
 }
@@ -1517,29 +1542,24 @@ function renderExList(exs, sessIdx=0){
         const isR = exState.rating;
         const rClass = (r) => isR === r ? 'opacity:1;transform:scale(1.2);filter:grayscale(0%);' : 'opacity:0.4;filter:grayscale(100%);';
 
-        const interactionHtml = `<div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:10px;border-top:1px dashed var(--bd);">
-            <label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:800;color:${isD?'var(--gm)':'var(--mu)'};cursor:pointer;user-select:none;">
-                <input type="checkbox" ${isD?'checked':''} onchange="toggleExDone(${sessIdx}, '${e.id}', this.checked)" style="width:18px;height:18px;accent-color:var(--gm);cursor:pointer;">
-                ${isD?'Afgerond 🎉':'Markeer als voltooid'}
-            </label>
-            <div style="display:flex;gap:10px;font-size:22px;user-select:none;">
-                <span style="cursor:pointer;transition:all 0.2s;${rClass('bad')}" onclick="rateEx(${sessIdx}, '${e.id}', 'bad')" title="Ging slecht">😔</span>
-                <span style="cursor:pointer;transition:all 0.2s;${rClass('ok')}" onclick="rateEx(${sessIdx}, '${e.id}', 'ok')" title="Ging oké">😐</span>
-                <span style="cursor:pointer;transition:all 0.2s;${rClass('good')}" onclick="rateEx(${sessIdx}, '${e.id}', 'good')" title="Ging super">😀</span>
-            </div>
-        </div>`;
-
         const hist = exHistoryData[e.id] || [];
         const histHtml = hist.length ? `<div style="max-height:80px;overflow-y:auto;font-size:11px;color:var(--mu);margin-bottom:8px;">
             ${hist.slice(0, 5).map(h => `<div style="border-bottom:1px solid #eee;padding:4px 0;"><strong>${h.date.split('T')[0]}</strong>: ${h.note}</div>`).join('')}
         </div>` : '';
 
-        const logHtml = `<div style="margin-top:10px;background:#fcfcfc;border:1px solid #eee;border-radius:6px;padding:8px;">
-            <div style="font-size:11px;font-weight:700;margin-bottom:6px;color:#555;">📝 Persoonlijk Logboek</div>
+        const logHtml = `<div style="margin-top:10px;background:${isD?'#f0fdf4':'#fcfcfc'};border:1px solid ${isD?'#bbf7d0':'#eee'};border-radius:6px;padding:8px;transition:all 0.3s;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                <div style="font-size:11px;font-weight:700;color:${isD?'#166534':'#555'};">📝 Persoonlijk Logboek ${isD?'(Afgerond 🎉)':''}</div>
+                <div style="display:flex;gap:8px;font-size:20px;user-select:none;">
+                    <span style="cursor:pointer;transition:all 0.2s;${rClass('bad')}" onclick="rateEx(${sessIdx}, '${e.id}', 'bad')" title="Ging slecht">😔</span>
+                    <span style="cursor:pointer;transition:all 0.2s;${rClass('ok')}" onclick="rateEx(${sessIdx}, '${e.id}', 'ok')" title="Ging oké">😐</span>
+                    <span style="cursor:pointer;transition:all 0.2s;${rClass('good')}" onclick="rateEx(${sessIdx}, '${e.id}', 'good')" title="Ging super">😀</span>
+                </div>
+            </div>
             ${histHtml}
             <div style="display:flex;gap:6px;">
                 <input type="text" id="ex-note-input-${e.id}" placeholder="Voeg een notitie toe (bijv. 7/10 gehaald)..." style="flex:1;padding:6px;font-size:12px;border:1px solid #ccc;border-radius:4px;">
-                <button class="btn btn-s" onclick="saveExNote('${e.id}')" style="margin:0;padding:6px 12px;font-size:12px;">Opslaan</button>
+                <button class="btn btn-s" onclick="saveExNote(${sessIdx}, '${e.id}')" style="margin:0;padding:6px 12px;font-size:12px;">Opslaan</button>
             </div>
         </div>`;
 
@@ -1550,12 +1570,11 @@ function renderExList(exs, sessIdx=0){
         <div class="eitip">${e.tip}</div>
         <span class="eicat" style="background:${CAT_COL[e.cat]||'#f5f5f5'};color:#333;">${CAT_LBL[e.cat]||e.cat}</span>${difBadge(e.dif)}
         ${logHtml}
-        ${interactionHtml}
     </div>`;
     }).join('');
 }
 
-window.saveExNote = async (exId) => {
+window.saveExNote = async (sessIdx, exId) => {
     const input = document.getElementById(`ex-note-input-${exId}`);
     if(!input || !input.value.trim()) return;
     if(!exHistoryData[exId]) exHistoryData[exId] = [];
@@ -1564,27 +1583,32 @@ window.saveExNote = async (exId) => {
         note: input.value.trim()
     });
     input.value = '';
+    
+    if(activePlan && activePlan[sessIdx]) {
+        if(!activePlan[sessIdx].exState) activePlan[sessIdx].exState = {};
+        if(!activePlan[sessIdx].exState[exId]) activePlan[sessIdx].exState[exId] = { done: false, rating: null };
+        activePlan[sessIdx].exState[exId].done = true;
+    }
+    
     renderSessions();
     if(currentUser) await saveToDb();
     toast('Notitie opgeslagen!');
-};
-
-window.toggleExDone = async (sessIdx, exId, checked) => {
-    if(!activePlan || !activePlan[sessIdx]) return;
-    if(!activePlan[sessIdx].exState) activePlan[sessIdx].exState = {};
-    if(!activePlan[sessIdx].exState[exId]) activePlan[sessIdx].exState[exId] = { done: false, rating: null };
-    activePlan[sessIdx].exState[exId].done = checked;
-    
-    // Check if all exercises are done to auto-complete session? Optional.
-    renderSessions();
-    if(currentUser) await saveToDb();
 };
 
 window.rateEx = async (sessIdx, exId, rating) => {
     if(!activePlan || !activePlan[sessIdx]) return;
     if(!activePlan[sessIdx].exState) activePlan[sessIdx].exState = {};
     if(!activePlan[sessIdx].exState[exId]) activePlan[sessIdx].exState[exId] = { done: false, rating: null };
-    activePlan[sessIdx].exState[exId].rating = rating;
+    
+    // Toggle logica voor smileys
+    if (activePlan[sessIdx].exState[exId].rating === rating) {
+        activePlan[sessIdx].exState[exId].rating = null;
+        activePlan[sessIdx].exState[exId].done = false;
+    } else {
+        activePlan[sessIdx].exState[exId].rating = rating;
+        activePlan[sessIdx].exState[exId].done = true;
+    }
+    
     renderSessions();
     if(currentUser) await saveToDb();
 };
