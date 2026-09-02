@@ -1377,11 +1377,15 @@ function renderExList(exs, sessIdx=0){
         const orderA = CAT_ORDER[a.cat] || 99;
         const orderB = CAT_ORDER[b.cat] || 99;
         
+        // Eerst sorteren op categorie (locatie)
         if (orderA !== orderB) return orderA - orderB;
         
-        // Binnen drive en approach (de range): sorteer op CLUB_PROGRESSION (van wedges naar driver)
+        // Als ze in dezelfde categorie vallen (vooral belangrijk op de range: drive & approach):
+        // Sorteer dan op de CLUB_PROGRESSION (korte clubs eerst, driver als laatste)
         if ((a.cat === 'drive' || a.cat === 'approach') && (b.cat === 'drive' || b.cat === 'approach')) {
-            return (CLUB_PROGRESSION[a.clubHint]??99) - (CLUB_PROGRESSION[b.clubHint]??99);
+            const progA = CLUB_PROGRESSION[a.clubHint] || 99; // 99 als fallback
+            const progB = CLUB_PROGRESSION[b.clubHint] || 99;
+            return progA - progB;
         }
         return 0;
     });
@@ -1751,27 +1755,5 @@ window.submitReport = async () => {
         });
     }
 </script>
-
-<!-- REPORT MODAL -->
-<div id="report-overlay" onclick="closeReportOnOverlay(event)">
-  <div id="report-modal">
-    <h2>📣 Feedback &amp; Bug Report</h2>
-    <p>Bedankt voor je hulp! Vermeld zoveel mogelijk detail in je bericht.</p>
-    <select id="report-type" class="rfield">
-      <option value="">— Wat wil je melden? —</option>
-      <option value="Bug">🐛 Bug / Fout in de app</option>
-      <option value="Feature Request">💡 Nieuwe feature</option>
-      <option value="Verbetering">✏️ Verbetering</option>
-      <option value="Vraag">❓ Vraag</option>
-      <option value="Anders">💬 Anders</option>
-    </select>
-    <textarea id="report-text" class="rfield" rows="5" placeholder="Beschrijf het probleem of je idee zo duidelijk mogelijk..."></textarea>
-    <div id="report-status"></div>
-    <div style="display:flex;gap:10px;margin-top:8px;">
-      <button class="btn btn-s" style="flex:1;" onclick="closeReport()">Annuleren</button>
-      <button class="btn btn-p" style="flex:2;margin:0;" id="btn-send-report" onclick="submitReport()">📤 Versturen</button>
-    </div>
-  </div>
-</div>
 </body>
 </html>
