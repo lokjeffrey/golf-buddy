@@ -1407,7 +1407,6 @@ function renderSessions(){
                </div>`
             : `<div style="text-align:center;color:var(--gm);font-weight:700;margin-top:16px;">Sessie Voltooid 🎉</div>`;
 
-        const isPreRound = sess.id.startsWith('preround');
         const showWarmup = isPreRound ? '' : WARMUP_HTML;
 
         return `<div class="sc" style="${bg}opacity:${opacity};">
