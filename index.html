@@ -319,6 +319,19 @@
     <div id="tab-training" class="tab">
         <div class="empty" id="te"><div class="eico">🏌️</div><p>Sla eerst je data op of log in.</p></div>
         
+        <!-- Pre-Round UI Container -->
+        <div class="card" id="tc-preround-menu" style="margin-bottom:16px;">
+            <div class="ctit" style="color:#d84315;">⛳ Baan-voorbereiding (Pre-Round)</div>
+            <div class="info-strip">Ga je de baan in? Start een strak warm-up schema (precies 1 mandje range ballen).</div>
+            <div style="display:flex;gap:8px;margin-top:8px;">
+                <button class="btn btn-s" onclick="startWarmup('short')" style="flex:1;margin:0;background:#fff9c4;color:#7b5e00;border:1.5px solid #f9a825;font-weight:700;">Kort (20 min)</button>
+                <button class="btn btn-s" onclick="startWarmup('medium')" style="flex:1;margin:0;background:#fff9c4;color:#7b5e00;border:1.5px solid #f9a825;font-weight:700;">Medium (30 min)</button>
+                <button class="btn btn-s" onclick="startWarmup('long')" style="flex:1;margin:0;background:#fff9c4;color:#7b5e00;border:1.5px solid #f9a825;font-weight:700;">Lang (50 min)</button>
+            </div>
+        </div>
+
+        <div id="tc-preround-container" style="display:none; margin-bottom: 24px;"></div>
+
         <!-- Generate Plan UI -->
         <div id="tc-generate" style="display:none;">
             <div class="card">
@@ -340,16 +353,6 @@
                 
                 <button class="btn btn-p" onclick="genSessions()" style="margin-top:16px;">🚀 Start Trainingsblok</button>
             </div>
-            
-            <div class="card" style="margin-top:12px;">
-                <div class="ctit">⛳ Baan-voorbereiding (Pre-Round)</div>
-                <div class="info-strip">Start een vast warm-up schema voordat je de baan in gaat (precies 1 mandje range ballen).</div>
-                <div style="display:flex;gap:8px;margin-top:8px;">
-                    <button class="btn btn-s" onclick="startWarmup('short')" style="flex:1;margin:0;background:#fff9c4;color:#7b5e00;border:1.5px solid #f9a825;font-weight:700;">Kort (20 min)</button>
-                    <button class="btn btn-s" onclick="startWarmup('medium')" style="flex:1;margin:0;background:#fff9c4;color:#7b5e00;border:1.5px solid #f9a825;font-weight:700;">Medium (30 min)</button>
-                    <button class="btn btn-s" onclick="startWarmup('long')" style="flex:1;margin:0;background:#fff9c4;color:#7b5e00;border:1.5px solid #f9a825;font-weight:700;">Lang (50 min)</button>
-                </div>
-            </div>
         </div>
 
         <!-- Active Plan UI -->
@@ -357,10 +360,7 @@
             <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:12px; padding: 0 4px;">
                 <div style="font-size:19px;font-weight:800;color:var(--gd);">Je Trainingsblok</div>
                 <div style="display:flex; gap:8px;">
-                    <button class="btn btn-s" style="margin:0;padding:6px 8px;font-size:11px;width:auto;background:#fff9c4;color:#7b5e00;border:1.5px solid #f9a825;" onclick="startWarmup('short')">⛳ 20m</button>
-                    <button class="btn btn-s" style="margin:0;padding:6px 8px;font-size:11px;width:auto;background:#fff9c4;color:#7b5e00;border:1.5px solid #f9a825;" onclick="startWarmup('medium')">⛳ 30m</button>
-                    <button class="btn btn-s" style="margin:0;padding:6px 8px;font-size:11px;width:auto;background:#fff9c4;color:#7b5e00;border:1.5px solid #f9a825;" onclick="startWarmup('long')">⛳ 50m</button>
-                    <button class="btn btn-s" style="margin:0;padding:6px 12px;font-size:11px;width:auto;" onclick="cancelPlan()">🗑️</button>
+                    <button class="btn btn-s" style="margin:0;padding:6px 12px;font-size:11px;width:auto;" onclick="cancelPlan()">🗑️ Wissen</button>
                 </div>
             </div>
             
@@ -560,6 +560,7 @@ window.handleLogout = async () => {
 
 let userData = {};
 let activePlan = null;
+let activeWarmup = null;
 let userUnsub = null;
 
 async function loadUserData(){
@@ -573,11 +574,12 @@ async function loadUserData(){
                 challengeScores = userData.challengeScores || {};
                 exHistoryData = userData.exHistoryData || {};
                 activePlan = userData.activePlan || null;
+                activeWarmup = userData.activeWarmup || null;
             }
             // Always refresh UI when data changes in background
             initAppUI();
             if(window.currentMode === 'manual') drawManualFocus();
-            if(document.getElementById('tc-active').style.display === 'block') renderSessions();
+            if(document.getElementById('tc-active').style.display === 'block' || document.getElementById('tc-preround-container').style.display === 'block') renderSessions();
             resolve();
         }, (e) => {
             console.error("Error loading data:", e); toast("Fout bij laden data");
@@ -593,7 +595,8 @@ async function saveToDb(){
             clubs: clubsData,
             challengeScores: challengeScores,
             exHistoryData: exHistoryData,
-            activePlan: activePlan
+            activePlan: activePlan,
+            activeWarmup: activeWarmup
         }, { merge: true });
     } catch(e){ console.error("Error saving data:", e); toast("Fout bij opslaan in cloud"); throw e; }
 }
@@ -1262,8 +1265,8 @@ const WARMUP_HTML = `
     </div>`;
 
 window.startWarmup = async (type) => {
-    if (activePlan && activePlan.length > 0) {
-        if (!confirm('Dit overschrijft je huidige trainingsblok. Weet je het zeker?')) return;
+    if (activeWarmup) {
+        if (!confirm('Dit overschrijft je huidige warm-up. Weet je het zeker?')) return;
     }
 
     const pExs = [];
@@ -1301,10 +1304,7 @@ window.startWarmup = async (type) => {
         completed: false
     };
 
-    activePlan = [newSession];
-    
-    document.getElementById('tc-generate').style.display = 'none';
-    document.getElementById('tc-active').style.display = 'block';
+    activeWarmup = newSession;
     
     renderSessions();
     toast(`⛳ ${lbl} geladen!`);
@@ -1373,6 +1373,47 @@ window.genSessions = async () => {
 };
 
 function renderSessions(){
+    if (activeWarmup) {
+        document.getElementById('tc-preround-menu').style.display = 'none';
+        document.getElementById('tc-preround-container').style.display = 'block';
+        
+        const sess = activeWarmup;
+        const tot = sess.exs.reduce((s,e)=>s+e.dur,0);
+        let rangeBalls = 0;
+        sess.exs.forEach(e => {
+            if(e.ballType === 'range' && typeof e.balls === 'number') {
+                rangeBalls += (e.sets ? e.balls * e.sets : e.balls);
+            }
+        });
+
+        const done = sess.completed;
+        const opacity = done ? '0.6' : '1';
+        const bg = done ? 'background:#f5f5f5;' : '';
+        const badgeHtml = done ? `<div class="sbadge bg-gr">✅</div>` : `<div class="sbadge ${sess.bc}">${sess.icon}</div>`;
+        const btnHtml = !done 
+            ? `<div style="display:flex;gap:8px;margin-top:16px;">
+                 <button class="btn btn-s" style="flex:1;padding:8px 0;margin:0;background:#fff;border:1px solid #ccc;color:#555;" onclick="cancelWarmup()">🗑️ Sluiten</button>
+                 <button class="btn btn-p" style="flex:2;padding:8px 0;margin:0;" onclick="completeWarmup()">✅ Afronden</button>
+               </div>`
+            : `<div style="text-align:center;color:var(--gm);font-weight:700;margin-top:16px;">Warm-up Voltooid 🎉<br><button class="btn btn-s" style="margin-top:12px;background:#fff;border:1px solid #ccc;color:#555;" onclick="cancelWarmup()">Terug</button></div>`;
+
+        document.getElementById('tc-preround-container').innerHTML = `<div class="sc" style="${bg}opacity:${opacity};">
+            <div class="sh" onclick="togSess('warmup')">
+                <div class="shl">
+                    ${badgeHtml}
+                    <div><div class="stit" style="${done?'text-decoration:line-through;color:var(--mu);':''}">${sess.lbl}</div>
+                    <div class="smeta">${sess.desc} · ~${tot} min · 🟡 ~${rangeBalls} range ballen</div></div>
+                </div>
+                <div class="schev" id="chev-warmup">▼</div>
+            </div>
+            <div class="ssb" id="sb-warmup">${renderExList(sess.exs, 'warmup')}${btnHtml}</div>
+        </div>`;
+    } else {
+        document.getElementById('tc-preround-menu').style.display = 'block';
+        document.getElementById('tc-preround-container').style.display = 'none';
+        document.getElementById('tc-preround-container').innerHTML = '';
+    }
+
     if (!activePlan || activePlan.length === 0) {
         document.getElementById('tc-generate').style.display = 'block';
         document.getElementById('tc-active').style.display = 'none';
@@ -1388,8 +1429,7 @@ function renderSessions(){
 
     document.getElementById('sess-container').innerHTML = activePlan.map((sess,i)=>{
         const tot = sess.exs.reduce((s,e)=>s+e.dur,0);
-        const isPreRound = sess.id.startsWith('preround');
-        let rangeBalls = isPreRound ? 0 : 15; // 15 balls for default warmup
+        let rangeBalls = 15; // 15 balls for default warmup
         sess.exs.forEach(e => {
             if(e.ballType === 'range' && typeof e.balls === 'number') {
                 rangeBalls += (e.sets ? e.balls * e.sets : e.balls);
@@ -1407,18 +1447,16 @@ function renderSessions(){
                </div>`
             : `<div style="text-align:center;color:var(--gm);font-weight:700;margin-top:16px;">Sessie Voltooid 🎉</div>`;
 
-        const showWarmup = isPreRound ? '' : WARMUP_HTML;
-
         return `<div class="sc" style="${bg}opacity:${opacity};">
             <div class="sh" onclick="togSess(${i})">
                 <div class="shl">
                     ${badgeHtml}
                     <div><div class="stit" style="${done?'text-decoration:line-through;color:var(--mu);':''}">Sessie ${i+1}: ${sess.lbl}</div>
-                    <div class="smeta">${sess.desc} · ~${tot+(isPreRound?0:5)} min · 🟡 ~${rangeBalls} range ballen</div></div>
+                    <div class="smeta">${sess.desc} · ~${tot+5} min · 🟡 ~${rangeBalls} range ballen</div></div>
                 </div>
                 <div class="schev" id="chev-${i}">▼</div>
             </div>
-            <div class="ssb" id="sb-${i}">${showWarmup}${renderExList(sess.exs,i)}${btnHtml}</div>
+            <div class="ssb" id="sb-${i}">${WARMUP_HTML}${renderExList(sess.exs,i)}${btnHtml}</div>
         </div>`;
     }).join('');
 }
@@ -1450,6 +1488,20 @@ window.recalcSession = async (idx) => {
     renderSessions();
     if(currentUser) await saveToDb();
     toast('Tijd en oefeningen succesvol aangepast!');
+};
+
+window.cancelWarmup = async () => {
+    activeWarmup = null;
+    renderSessions();
+    if(currentUser) await saveToDb();
+};
+
+window.completeWarmup = async () => {
+    if(!activeWarmup) return;
+    activeWarmup.completed = true;
+    renderSessions();
+    if(currentUser) await saveToDb();
+    toast("Warm-up afgerond! Succes in de baan! ⛳");
 };
 
 window.completeSession = async (idx) => {
@@ -1535,8 +1587,8 @@ function renderExList(exs, sessIdx=0){
         const headerBg = isWeekly ? 'background:#e3f2fd;border-radius:8px;padding:4px 8px;' : '';
         const borderStyle = isWeekly ? 'border-bottom:2px solid #1565C0;' : '';
         
-        // ExState logic for checkboxes
-        const exState = (activePlan[sessIdx].exState || {})[e.id] || { done: false, rating: null };
+        const targetSess = sessIdx === 'warmup' ? activeWarmup : (activePlan ? activePlan[sessIdx] : null);
+        const exState = targetSess && targetSess.exState ? (targetSess.exState[e.id] || { done: false, rating: null }) : { done: false, rating: null };
         const isD = exState.done;
         const isR = exState.rating;
         const rClass = (r) => isR === r ? 'opacity:1;transform:scale(1.2);filter:grayscale(0%);' : 'opacity:0.4;filter:grayscale(100%);';
@@ -1550,15 +1602,15 @@ function renderExList(exs, sessIdx=0){
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
                 <div style="font-size:11px;font-weight:700;color:${isD?'#166534':'#555'};">📝 Persoonlijk Logboek ${isD?'(Afgerond 🎉)':''}</div>
                 <div style="display:flex;gap:8px;font-size:20px;user-select:none;">
-                    <span style="cursor:pointer;transition:all 0.2s;${rClass('bad')}" onclick="rateEx(${sessIdx}, '${e.id}', 'bad')" title="Ging slecht">😔</span>
-                    <span style="cursor:pointer;transition:all 0.2s;${rClass('ok')}" onclick="rateEx(${sessIdx}, '${e.id}', 'ok')" title="Ging oké">😐</span>
-                    <span style="cursor:pointer;transition:all 0.2s;${rClass('good')}" onclick="rateEx(${sessIdx}, '${e.id}', 'good')" title="Ging super">😀</span>
+                    <span style="cursor:pointer;transition:all 0.2s;${rClass('bad')}" onclick="rateEx('${sessIdx}', '${e.id}', 'bad')" title="Ging slecht">😔</span>
+                    <span style="cursor:pointer;transition:all 0.2s;${rClass('ok')}" onclick="rateEx('${sessIdx}', '${e.id}', 'ok')" title="Ging oké">😐</span>
+                    <span style="cursor:pointer;transition:all 0.2s;${rClass('good')}" onclick="rateEx('${sessIdx}', '${e.id}', 'good')" title="Ging super">😀</span>
                 </div>
             </div>
             ${histHtml}
             <div style="display:flex;gap:6px;">
                 <input type="text" id="ex-note-input-${e.id}" placeholder="Voeg een notitie toe (bijv. 7/10 gehaald)..." style="flex:1;padding:6px;font-size:12px;border:1px solid #ccc;border-radius:4px;">
-                <button class="btn btn-s" onclick="saveExNote(${sessIdx}, '${e.id}')" style="margin:0;padding:6px 12px;font-size:12px;">Opslaan</button>
+                <button class="btn btn-s" onclick="saveExNote('${sessIdx}', '${e.id}')" style="margin:0;padding:6px 12px;font-size:12px;">Opslaan</button>
             </div>
         </div>`;
 
@@ -1583,10 +1635,11 @@ window.saveExNote = async (sessIdx, exId) => {
     });
     input.value = '';
     
-    if(activePlan && activePlan[sessIdx]) {
-        if(!activePlan[sessIdx].exState) activePlan[sessIdx].exState = {};
-        if(!activePlan[sessIdx].exState[exId]) activePlan[sessIdx].exState[exId] = { done: false, rating: null };
-        activePlan[sessIdx].exState[exId].done = true;
+    let targetSess = sessIdx === 'warmup' ? activeWarmup : (activePlan ? activePlan[sessIdx] : null);
+    if(targetSess) {
+        if(!targetSess.exState) targetSess.exState = {};
+        if(!targetSess.exState[exId]) targetSess.exState[exId] = { done: false, rating: null };
+        targetSess.exState[exId].done = true;
     }
     
     renderSessions();
@@ -1595,17 +1648,18 @@ window.saveExNote = async (sessIdx, exId) => {
 };
 
 window.rateEx = async (sessIdx, exId, rating) => {
-    if(!activePlan || !activePlan[sessIdx]) return;
-    if(!activePlan[sessIdx].exState) activePlan[sessIdx].exState = {};
-    if(!activePlan[sessIdx].exState[exId]) activePlan[sessIdx].exState[exId] = { done: false, rating: null };
+    let targetSess = sessIdx === 'warmup' ? activeWarmup : (activePlan ? activePlan[sessIdx] : null);
+    if(!targetSess) return;
+    if(!targetSess.exState) targetSess.exState = {};
+    if(!targetSess.exState[exId]) targetSess.exState[exId] = { done: false, rating: null };
     
     // Toggle logica voor smileys
-    if (activePlan[sessIdx].exState[exId].rating === rating) {
-        activePlan[sessIdx].exState[exId].rating = null;
-        activePlan[sessIdx].exState[exId].done = false;
+    if (targetSess.exState[exId].rating === rating) {
+        targetSess.exState[exId].rating = null;
+        targetSess.exState[exId].done = false;
     } else {
-        activePlan[sessIdx].exState[exId].rating = rating;
-        activePlan[sessIdx].exState[exId].done = true;
+        targetSess.exState[exId].rating = rating;
+        targetSess.exState[exId].done = true;
     }
     
     renderSessions();
