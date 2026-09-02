@@ -660,7 +660,7 @@ const EX=[
  {id:'a8',cat:'approach',clubHint:'short_iron',distHint:100,name:'Half Swing Nauwkeurigheid',dur:7,dif:'Gemakkelijk',balls:15,ballType:'range',sets:1,goal:null,desc:'Half swing (backswing tot schouderhoogte) met een kort ijzer. 15 ballen. Welke afstand en spreiding geeft dit?',tip:'💡 Half swing = meer controle in krappe situaties.'},
  {id:'a9',cat:'approach',clubHint:'hybrid',distHint:180,name:'Hybride Approach (180m)',dur:8,dif:'Gemiddeld',balls:15,ballType:'range',sets:1,goal:null,desc:'Sla 15 ballen met hybride of hout van ±180m. Focus op contact en nauwkeurigheid.',tip:'💡 Vervang lange ijzers door hybriden als je GIR laag is.'},
  {id:'a10',cat:'approach',clubHint:'short_iron',distHint:null,name:'IJzer Consistentie Tracker',dur:10,dif:'Gemiddeld',balls:30,ballType:'range',sets:1,goal:null,desc:'10 ballen per club: 7-ijzer → 8-ijzer → 9-ijzer (30 ballen). Noteer je beste 7/10 per club. Vergelijk over sessies.',tip:'💡 Consistentie bouw je alleen door meting en herhaling.'},
- {id:'a11',cat:'approach',clubHint:'short_iron',distHint:120,name:'GIR Simulatie',dur:9,dif:'Moeilijk',balls:9,ballType:'range',sets:null,goal:'3/3 greens geraakt per set',desc:'3 scenarios: 150m, 125m, 90m (3 ballen elk). Noteer: green geraakt? Ja/Nee. Bij minder dan 3/3: herhaal de set (max 3×).',tip:'💡 Game-realistische oefening geeft het meeste transfereffect.'},
+ {id:'a11',cat:'approach',clubHint:null,name:'GIR Simulatie',dur:9,dif:'Moeilijk',balls:9,ballType:'range',sets:null,goal:'3/3 greens geraakt per set',desc:'Kies voor elk scenario de club uit je tas die daar het beste bij past. 3 scenarios: 150m, 125m, 90m (3 ballen elk). Noteer: green geraakt? Ja/Nee. Bij minder dan 3/3: herhaal de set (max 3×).',tip:'💡 Game-realistische oefening geeft het meeste transfereffect.'},
  {id:'a12',cat:'approach',clubHint:'short_iron',distHint:135,name:'Cirkel van 6 Meter',dur:8,dif:'Gemiddeld',balls:10,ballType:'range',sets:null,goal:'≥ 7/10 ballen binnen 6m van vlag',desc:'Sla 10 approach shots naar een doelgebied van 6m rondom een vlag. Noteer je score (X/10).',tip:'💡 6 meter is een realistische GIR-definitie voor amateurs.'},
 
  {id:'c1',cat:'chip',clubHint:'wedge',name:'Phil\'s Hinge & Hold',dur:7,dif:'Gemiddeld',balls:20,ballType:'own',sets:1,goal:null,desc:'De bekende chiptechniek: knik (hinge) je polsen direct in de backswing, en houd (hold) deze hoek strak door de impact heen. 20 chips rond de green.',tip:'💡 Nooit je polsen laten flippen bij impact. Handen leiden de clubhead.'},
@@ -1438,9 +1438,9 @@ function renderSessions(){
                     <div><div class="stit" style="${done?'text-decoration:line-through;color:var(--mu);':''}">${sess.lbl}</div>
                     <div class="smeta">${sess.desc} · ~${tot} min · 🟡 ~${rangeBalls} range ballen</div></div>
                 </div>
-                <div class="schev" id="chev-warmup">▼</div>
+                <div class="schev" id="chev-warmup" style="transform:rotate(180deg);">▼</div>
             </div>
-            <div class="ssb" id="sb-warmup">${renderExList(sess.exs, 'warmup')}${btnHtml}</div>
+            <div class="ssb" id="sb-warmup" style="display:block;">${renderExList(sess.exs, 'warmup')}${btnHtml}</div>
         </div>`;
     } else {
         document.getElementById('tc-preround-menu').style.display = 'block';
@@ -1591,20 +1591,22 @@ function renderExList(exs, sessIdx=0){
 
     // Sorteer op fysieke locatie (Range -> Chipping -> Putting)
     const reordered = [...exs].sort((a,b) => {
-        const orderA = CAT_ORDER[a.cat] || 99;
-        const orderB = CAT_ORDER[b.cat] || 99;
+        // Groepeer op locatie: 1. Range (Drive & Approach), 2. Chip, 3. Putt
+        const locA = (a.cat === 'drive' || a.cat === 'approach') ? 1 : CAT_ORDER[a.cat] || 99;
+        const locB = (b.cat === 'drive' || b.cat === 'approach') ? 1 : CAT_ORDER[b.cat] || 99;
         
-        // Eerst sorteren op categorie (locatie)
-        if (orderA !== orderB) return orderA - orderB;
-        
-        // Als ze in dezelfde categorie vallen (vooral belangrijk op de range: drive & approach):
-        // Sorteer dan op de CLUB_PROGRESSION (korte clubs eerst, driver als laatste)
-        if ((a.cat === 'drive' || a.cat === 'approach') && (b.cat === 'drive' || b.cat === 'approach')) {
-            const progA = CLUB_PROGRESSION[a.clubHint] || 99; // 99 als fallback
+        if (locA !== locB) return locA - locB; // Range vs Chip vs Putt
+
+        // BEIDE ZIJN OP DE RANGE:
+        if (locA === 1) {
+            // Nu sorteren we STRIKT op clublengte, ongeacht of het Drive of Approach heet
+            const progA = CLUB_PROGRESSION[a.clubHint] || 99;
             const progB = CLUB_PROGRESSION[b.clubHint] || 99;
             return progA - progB;
         }
-        return 0;
+        
+        // BEIDE ZIJN CHIP OF PUTT: behoud de originele volgorde binnen die categorieën
+        return (CAT_ORDER[a.cat]||99) - (CAT_ORDER[b.cat]||99);
     });
 
     return reordered.map((e,i)=>{
@@ -1633,7 +1635,7 @@ function renderExList(exs, sessIdx=0){
             ${hist.slice(0, 5).map(h => `<div style="border-bottom:1px solid #eee;padding:4px 0;"><strong>${h.date.split('T')[0]}</strong>: ${h.note}</div>`).join('')}
         </div>` : '';
 
-        const logHtml = `<div style="margin-top:10px;background:${isD?'#f0fdf4':'#fcfcfc'};border:1px solid ${isD?'#bbf7d0':'#eee'};border-radius:6px;padding:8px;transition:all 0.3s;">
+        const logHtml = sessIdx === 'warmup' ? '' : `<div style="margin-top:10px;background:${isD?'#f0fdf4':'#fcfcfc'};border:1px solid ${isD?'#bbf7d0':'#eee'};border-radius:6px;padding:8px;transition:all 0.3s;">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
                 <div style="font-size:11px;font-weight:700;color:${isD?'#166534':'#555'};">📝 Persoonlijk Logboek ${isD?'(Afgerond 🎉)':''}</div>
                 <div style="display:flex;gap:8px;font-size:20px;user-select:none;">
