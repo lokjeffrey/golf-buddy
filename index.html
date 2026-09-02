@@ -1310,7 +1310,7 @@ window.startWarmup = async (type) => {
     if (type === 'short') {
         title = "Korte Warm-up"; mins = 15;
         exs = [
-            { id:'wu_s1', cat:'drive', clubHint:null, name:'Fysiek & Ritme', dur:5, dif:'Gemakkelijk', balls:10, ballType:'range', sets:1, goal:null, desc:'Losdraaien en 10 ontspannen (halve) swings met een wedge.', tip:'💡 Voel de bodem van je swing en zoek je ritme.' },
+            { id:'wu_s1', cat:'drive', clubHint:'wedge', name:'Fysiek & Ritme', dur:5, dif:'Gemakkelijk', balls:10, ballType:'range', sets:1, goal:null, desc:'Losdraaien en 10 ontspannen (halve) swings met een wedge.', tip:'💡 Voel de bodem van je swing en zoek je ritme.' },
             { id:'wu_s2', cat:'drive', clubHint:'driver', name:'Eerste Afslag Visualisatie', dur:3, dif:'Gemakkelijk', balls:5, ballType:'range', sets:1, goal:null, desc:'Sla 5 ballen met de club die je op hole 1 gebruikt. Speel de hole in je hoofd.', tip:'💡 Focus puur op je pre-shot routine en ritme.' },
             { id:'wu_s3', cat:'puttLong', clubHint:'putter', name:'Green Snelheid', dur:5, dif:'Gemakkelijk', balls:3, ballType:'own', sets:1, goal:null, desc:'Sla putts van 10+ meter. Kijk niet naar de hole, maar naar een rand van de green.', tip:'💡 Het enige doel is voelen hoe hard het gras vandaag is.' },
             { id:'wu_s4', cat:'puttShort', clubHint:'putter', name:'Zelfvertrouwen Tanken', dur:2, dif:'Gemakkelijk', balls:3, ballType:'own', sets:1, goal:null, desc:'Putts van 1 meter. Sla ze er gedecideerd in.', tip:'💡 Hoor de bal vallen, neem dat geluid mee naar hole 1.' }
@@ -1621,9 +1621,9 @@ function renderExList(exs, sessIdx=0){
 
         // BEIDE ZIJN OP DE RANGE:
         if (locA === 1) {
-            // Nu sorteren we STRIKT op clublengte, ongeacht of het Drive of Approach heet
-            const progA = CLUB_PROGRESSION[a.clubHint] || 99;
-            const progB = CLUB_PROGRESSION[b.clubHint] || 99;
+            // Sorteer strikt op clublengte. Is er geen clubHint? Geef het de waarde 3.5 (tussen ijzers en hybride in)
+            const progA = a.clubHint ? (CLUB_PROGRESSION[a.clubHint] || 99) : 3.5;
+            const progB = b.clubHint ? (CLUB_PROGRESSION[b.clubHint] || 99) : 3.5;
             return progA - progB;
         }
         
