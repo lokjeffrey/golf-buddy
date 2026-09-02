@@ -324,7 +324,7 @@
             <div class="ctit" style="color:#d84315;">⛳ Baan-voorbereiding (Pre-Round)</div>
             <div class="info-strip">Ga je de baan in? Start een strak warm-up schema (precies 1 mandje range ballen).</div>
             <div style="display:flex;gap:8px;margin-top:8px;">
-                <button class="btn btn-s" onclick="startWarmup('short')" style="flex:1;margin:0;background:#fff9c4;color:#7b5e00;border:1.5px solid #f9a825;font-weight:700;">Kort (20 min)</button>
+                <button class="btn btn-s" onclick="startWarmup('short')" style="flex:1;margin:0;background:#fff9c4;color:#7b5e00;border:1.5px solid #f9a825;font-weight:700;">Kort (15 min)</button>
                 <button class="btn btn-s" onclick="startWarmup('medium')" style="flex:1;margin:0;background:#fff9c4;color:#7b5e00;border:1.5px solid #f9a825;font-weight:700;">Medium (30 min)</button>
                 <button class="btn btn-s" onclick="startWarmup('long')" style="flex:1;margin:0;background:#fff9c4;color:#7b5e00;border:1.5px solid #f9a825;font-weight:700;">Lang (50 min)</button>
             </div>
@@ -1260,8 +1260,10 @@ let genSessData=[];
 
 const WARMUP_HTML = `
     <div class="ei" style="background:var(--gp);border-radius:8px;margin-bottom:4px;">
-        <div class="eih"><div class="ein" style="color:var(--gd);">🧘 Warming-up (5 min)</div></div>
-        <div class="eidesc"><strong>1. Losdraaien (2 min)</strong> — Draai je schouders, heupen, knieën en polsen zachtjes los. Geen clubs nodig.<br><strong>2. Korte swings (3 min)</strong> — Pak je Sand Wedge of Pitching Wedge. Sla 10–15 halve, ontspannen slagen om het ritme te voelen.</div>
+        <div class="eih"><div class="ein" style="color:var(--gd);">🧘 Warming-up (10 min)</div></div>
+        <div class="eidesc"><strong>1. Losdraaien (2 min)</strong> — Draai schouders, heupen en polsen zachtjes los.<br>
+        <strong>2. Korte swings (3 min)</strong> — Sla 10 halve slagen met een wedge om het ritme te voelen.<br>
+        <strong>3. Inswingen (5 min)</strong> — Sla 10 tot 15 volle slagen met een kort/mid ijzer (bijv. ijzer 8). Zorg dat je rug en rotatie warm zijn voordat je aan de sessie-drills begint!</div>
     </div>`;
 
 window.startWarmup = async (type) => {
@@ -1269,37 +1271,44 @@ window.startWarmup = async (type) => {
         if (!confirm('Dit overschrijft je huidige warm-up. Weet je het zeker?')) return;
     }
 
-    const pExs = [];
-    
-    if (type === 'short') {
-        pExs.push({ id: 'wu_s1', cat: 'drive', name: 'Fysieke Warm-up', dur: 3, dif: 'Gemakkelijk', balls: 0, ballType: 'none', goal: null, desc: 'Losdraaien van schouders, heupen en knieën. Geen clubs nodig.', tip: 'Begin nooit stijf aan je ronde.' });
-        pExs.push({ id: 'wu_s2', cat: 'drive', name: 'Range Ritme', dur: 10, dif: 'Gemakkelijk', balls: 30, ballType: 'range', goal: null, desc: 'Sla 10 ballen met een wedge (soepel), 10 met een ijzer 7, en 10 met je driver. Visualiseer bij de laatste driver-slag de afslag van hole 1.', tip: 'Focus puur op je tempo, niet op perfecte techniek.' });
-        pExs.push({ id: 'wu_s3', cat: 'puttLong', name: 'Lag Putting & Confidence', dur: 7, dif: 'Gemakkelijk', balls: 3, ballType: 'own', goal: null, desc: '5 minuten lange putts (10+ meter) puur om de snelheid van de green te voelen. 2 minuten korte putts (1 meter) resoluut uitholen voor zelfvertrouwen.', tip: 'Kijk naar de hole tijdens je oefenswing voor afstandsgevoel.' });
-    } else if (type === 'medium') {
-        pExs.push({ id: 'wu_m1', cat: 'drive', name: 'Fysieke Warm-up', dur: 3, dif: 'Gemakkelijk', balls: 0, ballType: 'none', goal: null, desc: 'Dynamisch rekken en strekken. Maak je spieren warm voor de eerste afslag.', tip: 'Focus op de rotatie van je romp.' });
-        pExs.push({ id: 'wu_m2', cat: 'drive', name: 'Range Ritme', dur: 12, dif: 'Gemakkelijk', balls: 30, ballType: 'range', goal: null, desc: '10x Wedge, 10x Mid-ijzer, 10x Driver/Houten. Focus puur op ritme en balans, niet op techniek.', tip: 'Techniek train je op de range, ritme train je voor de ronde.' });
-        pExs.push({ id: 'wu_m3', cat: 'chip', name: 'Chippen', dur: 5, dif: 'Gemakkelijk', balls: 3, ballType: 'own', goal: null, desc: 'Voel hoe het gras rondom de green vandaag reageert. Test hoe de bal rolt na het landen.', tip: 'Houd je handen voor de bal bij impact.' });
-        pExs.push({ id: 'wu_m4', cat: 'puttLong', name: 'Putten', dur: 10, dif: 'Gemakkelijk', balls: 3, ballType: 'own', goal: null, desc: '6 minuten lange putts (snelheid kalibreren), 4 minuten korte putts (1 tot 1,5 meter).', tip: 'De snelheid van de green bepaalt de lijn van je putt.' });
-    } else if (type === 'long') {
-        pExs.push({ id: 'wu_l1', cat: 'drive', name: 'Fysieke Warm-up', dur: 5, dif: 'Gemakkelijk', balls: 0, ballType: 'none', goal: null, desc: 'Uitgebreid rekken, armcirkels en torso-rotaties.', tip: 'Neem de tijd om blessures te voorkomen.' });
-        pExs.push({ id: 'wu_l2', cat: 'drive', name: 'Range Opbouw', dur: 20, dif: 'Gemiddeld', balls: 30, ballType: 'range', goal: null, desc: '10x Wedge, 10x IJzers, 10x Woods/Driver. Wissel bij de laatste 5 ballen steeds je doelwit (alsof je al in de baan staat).', tip: 'Simuleer je eerste paar holes al op de range.' });
-        pExs.push({ id: 'wu_l3', cat: 'chip', name: 'Chippen & Pitchen', dur: 10, dif: 'Gemiddeld', balls: 3, ballType: 'own', goal: null, desc: 'Oefen verschillende liggingen (rough vs strak gras). Chip er een paar hoog en een paar laag.', tip: 'Wees creatief en voel de bounce van je club.' });
-        pExs.push({ id: 'wu_l4', cat: 'puttLong', name: 'Putten', dur: 15, dif: 'Gemiddeld', balls: 3, ballType: 'own', goal: null, desc: '10 minuten lange lag putts (minimaal 12 meter), 5 minuten korte \'makeables\' uitholen.', tip: 'Eindig met 3 gemaakte putts op rij voor maximaal zelfvertrouwen op hole 1.' });
-    }
+    let title, mins, exs = [];
 
-    let lbl = 'Baan Voorbereiding';
-    let mins = 0;
-    if (type === 'short') { lbl = 'Korte Warm-up'; mins = 20; }
-    if (type === 'medium') { lbl = 'Medium Warm-up'; mins = 30; }
-    if (type === 'long') { lbl = 'Lange Warm-up'; mins = 50; }
+    if (type === 'short') {
+        title = "Korte Warm-up"; mins = 15;
+        exs = [
+            { id:'wu_s1', cat:'drive', clubHint:null, name:'Fysiek & Ritme', dur:5, dif:'Gemakkelijk', balls:10, ballType:'range', sets:1, goal:null, desc:'Losdraaien en 10 ontspannen (halve) swings met een wedge.', tip:'💡 Voel de bodem van je swing en zoek je ritme.' },
+            { id:'wu_s2', cat:'drive', clubHint:'driver', name:'Eerste Afslag Visualisatie', dur:3, dif:'Gemakkelijk', balls:5, ballType:'range', sets:1, goal:null, desc:'Sla 5 ballen met de club die je op hole 1 gebruikt. Speel de hole in je hoofd.', tip:'💡 Focus puur op je pre-shot routine en ritme.' },
+            { id:'wu_s3', cat:'puttLong', clubHint:'putter', name:'Green Snelheid', dur:5, dif:'Gemakkelijk', balls:3, ballType:'own', sets:1, goal:null, desc:'Sla putts van 10+ meter. Kijk niet naar de hole, maar naar een rand van de green.', tip:'💡 Het enige doel is voelen hoe hard het gras vandaag is.' },
+            { id:'wu_s4', cat:'puttShort', clubHint:'putter', name:'Zelfvertrouwen Tanken', dur:2, dif:'Gemakkelijk', balls:3, ballType:'own', sets:1, goal:null, desc:'Putts van 1 meter. Sla ze er gedecideerd in.', tip:'💡 Hoor de bal vallen, neem dat geluid mee naar hole 1.' }
+        ];
+    } else if (type === 'medium') {
+        title = "Medium Warm-up"; mins = 30;
+        exs = [
+            { id:'wu_m1', cat:'drive', clubHint:'short_iron', name:'Wedge & IJzer Ritme', dur:10, dif:'Gemakkelijk', balls:20, ballType:'range', sets:1, goal:null, desc:'Fysiek rekken (3m). Daarna op de mat: 10 slagen met een wedge, 10 slagen met je ijzer 7. Werk aan balans.', tip:'💡 Techniek is voor trainingen. Vandaag draait alles om souplesse.' },
+            { id:'wu_m2', cat:'drive', clubHint:'driver', name:'Woods & Hole 1', dur:5, dif:'Gemiddeld', balls:10, ballType:'range', sets:1, goal:null, desc:'Sla 5 slagen met een houten/hybride. Eindig met 5 afslagen voor hole 1. Pak je volledige routine.', tip:'💡 Sluit de range altijd af met een perfecte drive.' },
+            { id:'wu_m3', cat:'chip', clubHint:'wedge', name:'Fringe Feel', dur:5, dif:'Gemakkelijk', balls:5, ballType:'own', sets:1, goal:null, desc:'Sla een paar chips en pitches. Voel hoe de wedge vandaag door de fringe en rough glijdt.', tip:'💡 Blijft de club hangen of glijdt hij er makkelijk doorheen?' },
+            { id:'wu_m4', cat:'puttLong', clubHint:'putter', name:'Lag Putting', dur:6, dif:'Gemakkelijk', balls:3, ballType:'own', sets:1, goal:null, desc:'Sla putts van grote afstanden puur om de snelheid van de green in je armen te laden.', tip:'💡 Kijk tijdens het maken van je oefenswing naar het doelwit.' },
+            { id:'wu_m5', cat:'puttShort', clubHint:'putter', name:'Makeables', dur:4, dif:'Gemakkelijk', balls:3, ballType:'own', sets:1, goal:null, desc:'Tik ballen van 1,5 meter resoluut in de hole. Twijfel niet.', tip:'💡 Bouw aan je vertrouwen op de korte afstand.' }
+        ];
+    } else if (type === 'long') {
+        title = "Lange Warm-up"; mins = 50;
+        exs = [
+            { id:'wu_l1', cat:'drive', clubHint:'wedge', name:'Fysiek & Korte Swings', dur:10, dif:'Gemakkelijk', balls:10, ballType:'range', sets:1, goal:null, desc:'Uitgebreid dynamisch rekken (5m). Sla daarna 10 pitch-swings met je hoogste wedge.', tip:'💡 Maak de spieren langzaam warm.' },
+            { id:'wu_l2', cat:'approach', clubHint:'short_iron', name:'IJzer Opbouw', dur:8, dif:'Gemiddeld', balls:15, ballType:'range', sets:1, goal:null, desc:'Sla 10 ballen met een kort ijzer, en 5 met een lang ijzer. Neem de tijd voor elke bal. Volledige routine.', tip:'💡 Neem ruim 1.5 minuut per bal. Simuleer de rust van de baan.' },
+            { id:'wu_l3', cat:'drive', clubHint:'driver', name:'Tee-box Simulatie', dur:7, dif:'Gemiddeld', balls:10, ballType:'range', sets:1, goal:null, desc:'5 slagen met een wood/hybride. De laatste 5 met de Driver. Verander bij elke driver-slag je denkbeeldige doelwit.', tip:'💡 Elke slag is een nieuwe hole. Reset je houding elke keer.' },
+            { id:'wu_l4', cat:'chip', clubHint:'wedge', name:'All-round Chipping', dur:10, dif:'Gemiddeld', balls:8, ballType:'own', sets:1, goal:null, desc:'Oefen de bump-and-run, de lob shot en speel vanuit verschillende liggingen (rough vs strak gras).', tip:'💡 Test de omstandigheden van de dag.' },
+            { id:'wu_l5', cat:'puttLong', clubHint:'putter', name:'Green Snelheid Kalibratie', dur:10, dif:'Gemakkelijk', balls:4, ballType:'own', sets:1, goal:null, desc:'Lange putts van hoek tot hoek over de oefengreen. Combineer uphill en downhill putts.', tip:'💡 Afstandscontrole voorkomt drie-putts.' },
+            { id:'wu_l6', cat:'puttShort', clubHint:'putter', name:'De Laatste Lijn', dur:5, dif:'Gemakkelijk', balls:4, ballType:'own', sets:1, goal:null, desc:'Sluit je warmup af met rechte putts van 1,5 meter. Zie de bal vallen, pak hem op, en loop naar tee 1.', tip:'💡 Mentale overwinning.' }
+        ];
+    }
 
     const newSession = {
         id: 'preround_' + Date.now(),
-        lbl: lbl,
+        lbl: title,
         icon: '🔥',
         bc: 'bd4',
-        desc: 'Pre-round warm-up',
-        exs: pExs,
+        desc: 'Pre-round baanvoorbereiding',
+        exs: exs,
         mins: mins,
         completed: false
     };
@@ -1307,7 +1316,7 @@ window.startWarmup = async (type) => {
     activeWarmup = newSession;
     
     renderSessions();
-    toast(`⛳ ${lbl} geladen!`);
+    toast(`🔥 ${title} geladen! Speel goed vandaag!`);
     if(currentUser) await saveToDb();
 };
 
@@ -1452,7 +1461,7 @@ function renderSessions(){
                 <div class="shl">
                     ${badgeHtml}
                     <div><div class="stit" style="${done?'text-decoration:line-through;color:var(--mu);':''}">Sessie ${i+1}: ${sess.lbl}</div>
-                    <div class="smeta">${sess.desc} · ~${tot+5} min · 🟡 ~${rangeBalls} range ballen</div></div>
+                    <div class="smeta">${sess.desc} · ~${tot+10} min · 🟡 ~${rangeBalls} range ballen</div></div>
                 </div>
                 <div class="schev" id="chev-${i}">▼</div>
             </div>
@@ -1463,7 +1472,7 @@ function renderSessions(){
 
 window.recalcSession = async (idx) => {
     if(!activePlan || !activePlan[idx]) return;
-    const newMins = parseInt(prompt("Hoeveel minuten heb je voor deze sessie (excl. 5m warming-up)?", activePlan[idx].mins));
+    const newMins = parseInt(prompt("Hoeveel minuten heb je voor deze sessie (excl. 10m warming-up)?", activePlan[idx].mins));
     if(!newMins || isNaN(newMins) || newMins < 10) return;
     
     const lat = getLatest();
@@ -1537,9 +1546,10 @@ function exMetaHtml(ex){
     const bHtml=ex.ballType==='none'?`<span class="ex-tag ex-none">🏌️ Geen ballen</span>`:
                 ex.ballType==='range'?`<span class="ex-tag ex-range">🟡 ${ex.balls} range ballen</span>`:
                 `<span class="ex-tag ex-own">⚪ ${ex.balls} eigen ballen</span>`;
-    const sHtml=ex.goal?`<span class="ex-tag ex-goal">🎯 ${ex.goal}</span>`:`<span class="ex-tag ex-sets">${ex.sets}× herhalen</span>`;
+    const sHtml=ex.goal?`<span class="ex-tag ex-goal">🎯 ${ex.goal}</span>`:
+                (ex.sets && ex.sets > 1)?`<span class="ex-tag ex-sets">${ex.sets}× herhalen</span>`:'';
     const adv=getClubAdvice(ex);
-    const cHtml=adv?`<span class="ex-tag ex-club">${adv}</span>`:''; // Emoji is al toegevoegd door getClubAdvice
+    const cHtml=adv?`<span class="ex-tag ex-club">${adv}</span>`:'';
     return`<div class="ex-meta">${bHtml}${sHtml}${cHtml}</div>`;
 }
 
