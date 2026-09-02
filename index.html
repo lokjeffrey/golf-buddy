@@ -339,6 +339,7 @@
                 <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--mu);margin-top:4px;"><span>30 min</span><span>120 min</span></div>
                 
                 <button class="btn btn-p" onclick="genSessions()" style="margin-top:16px;">🚀 Start Trainingsblok</button>
+                <button class="btn btn-s" onclick="startPreRound()" style="margin-top:10px;background:#fff9c4;color:#7b5e00;border:1.5px solid #f9a825;">⛳ Start Pre-Round Warm-up</button>
             </div>
         </div>
 
@@ -402,23 +403,42 @@
 
     <!-- COMM TAB (Leaderboard) -->
     <div id="tab-comm" class="tab">
-        <div class="card">
+        <div class="card" style="margin-bottom:16px;">
             <div class="ctit">🏆 Challenge van de Week</div>
             <div id="comm-week-ex" style="margin-bottom:12px;"></div>
             
             <div style="background:var(--gp);border:1px solid var(--gl);border-radius:8px;padding:12px;margin-bottom:12px;">
-                <div style="font-size:12px;font-weight:700;color:var(--gd);margin-bottom:6px;">Mijn Score:</div>
+                <div style="font-size:12px;font-weight:700;color:var(--gd);margin-bottom:6px;">Mijn Weekscore:</div>
                 <div style="display:flex;gap:8px;align-items:center;">
                     <input type="number" id="comm-score-input" placeholder="0" style="flex:1;padding:8px 10px;border:1.5px solid var(--gl);border-radius:8px;font-size:14px;background:#fff;max-width:80px;">
-                    <button class="btn btn-p" onclick="submitCommScore()" style="flex:2;margin:0;padding:8px;font-size:13px;">Opslaan in Leaderboard</button>
+                    <button class="btn btn-p" onclick="submitCommScore('week')" style="flex:2;margin:0;padding:8px;font-size:13px;">Opslaan in Leaderboard</button>
                 </div>
             </div>
 
-            <div class="ctit">📈 Live Leaderboard</div>
-            <div class="info-strip">Vul je weergavenaam in bij Profiel om in plaats van "Golfer" herkenbaar te zijn in de lijst!</div>
+            <div class="ctit">📈 Live Leaderboard (Week)</div>
+            <div class="info-strip">Vul je weergavenaam in bij Profiel om herkenbaar te zijn!</div>
             <table class="stbl">
                 <thead><tr><th>#</th><th>Naam</th><th style="text-align:right;">Score</th></tr></thead>
                 <tbody id="comm-leaderboard-body"><tr><td colspan="3" style="text-align:center;">Laden...</td></tr></tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <div class="ctit">🌟 Maand Challenge</div>
+            <div id="comm-month-ex" style="margin-bottom:12px;"></div>
+            
+            <div style="background:var(--gp);border:1px solid var(--gl);border-radius:8px;padding:12px;margin-bottom:12px;">
+                <div style="font-size:12px;font-weight:700;color:var(--gd);margin-bottom:6px;">Mijn Maandscore:</div>
+                <div style="display:flex;gap:8px;align-items:center;">
+                    <input type="number" id="comm-month-score-input" placeholder="0" style="flex:1;padding:8px 10px;border:1.5px solid var(--gl);border-radius:8px;font-size:14px;background:#fff;max-width:80px;">
+                    <button class="btn btn-p" onclick="submitCommScore('month')" style="flex:2;margin:0;padding:8px;font-size:13px;background:var(--gd);">Opslaan in Leaderboard</button>
+                </div>
+            </div>
+
+            <div class="ctit">📈 Live Leaderboard (Maand)</div>
+            <table class="stbl">
+                <thead><tr><th>#</th><th>Naam</th><th style="text-align:right;">Score</th></tr></thead>
+                <tbody id="comm-month-leaderboard-body"><tr><td colspan="3" style="text-align:center;">Laden...</td></tr></tbody>
             </table>
         </div>
     </div>
@@ -458,6 +478,7 @@ let currentUser = null;
 let entriesData = [];
 let clubsData = [];
 let challengeScores = {}; // scores per oefening-ID, gesynchroniseerd met Firebase
+let exHistoryData = {}; // logboek notities per oefening
 
 /* ═══════════════════════════════════════════════════════
    AUTH LOGIC
@@ -536,6 +557,7 @@ async function loadUserData(){
                 entriesData = userData.entries || [];
                 clubsData = userData.clubs || [];
                 challengeScores = userData.challengeScores || {};
+                exHistoryData = userData.exHistoryData || {};
                 activePlan = userData.activePlan || null;
             }
             // Always refresh UI when data changes in background
@@ -556,6 +578,7 @@ async function saveToDb(){
             entries: entriesData,
             clubs: clubsData,
             challengeScores: challengeScores,
+            exHistoryData: exHistoryData,
             activePlan: activePlan
         }, { merge: true });
     } catch(e){ console.error("Error saving data:", e); toast("Fout bij opslaan in cloud"); throw e; }
@@ -939,20 +962,22 @@ window.showTab = (t) => {
     if(t==='comm')      initComm();
 };
 
-let unsubComm = null;
+let unsubCommWeek = null;
+let unsubCommMonth = null;
 let currentWeekStr = '';
+let currentMonthStr = '';
 let currentWeekEx = null;
+let currentMonthEx = null;
 
 function initComm() {
-    // Bepaal ISO week
     const d = new Date();
+    // Week logica
     d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay()||7));
     const yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
     const weekNo = Math.ceil(( ( (d - yearStart) / 86400000) + 1)/7);
     currentWeekStr = `${d.getUTCFullYear()}_W${weekNo}`;
     
-    // Selecteer oefening (geen "pogingen", want hoger is beter in leaderboard)
-    const chExs = EX.filter(e => e.goal && !e.desc.includes('pogingen'));
+    const chExs = EX.filter(e => e.goal && !e.desc.includes('pogingen') && e.dif !== 'Moeilijk');
     currentWeekEx = chExs[weekNo % chExs.length];
     
     document.getElementById('comm-week-ex').innerHTML = `
@@ -964,42 +989,77 @@ function initComm() {
         </div>
     `;
     
-    if(unsubComm) unsubComm();
-    unsubComm = onSnapshot(
+    if(unsubCommWeek) unsubCommWeek();
+    unsubCommWeek = onSnapshot(
         query(collection(db, "leaderboards", currentWeekStr, "scores"), orderBy("score", "desc"), limit(50)),
         (snap) => {
-            let html = '';
-            let rank = 1;
+            let html = ''; let rank = 1;
             snap.forEach(doc => {
-                const d = doc.data();
-                const isMe = doc.id === currentUser.uid;
+                const isMe = doc.id === currentUser?.uid;
                 html += `<tr style="${isMe ? 'background:#e3f2fd;font-weight:700;' : ''}">
                     <td>${rank++}</td>
-                    <td>${d.name || 'Golfer'}${isMe ? ' (Jij)' : ''}</td>
-                    <td style="text-align:right;font-weight:700;color:var(--gd);">${d.score}</td>
+                    <td>${doc.data().name || 'Golfer'}${isMe ? ' (Jij)' : ''}</td>
+                    <td style="text-align:right;font-weight:700;color:var(--gd);">${doc.data().score}</td>
                 </tr>`;
             });
-            if(html === '') html = '<tr><td colspan="3" style="text-align:center;color:var(--mu);padding:20px;">Nog geen scores deze week.<br>Wees de eerste!</td></tr>';
+            if(html === '') html = '<tr><td colspan="3" style="text-align:center;color:var(--mu);padding:20px;">Nog geen scores deze week.</td></tr>';
             document.getElementById('comm-leaderboard-body').innerHTML = html;
+        }
+    );
+
+    // Maand logica
+    const monthNo = d.getUTCMonth() + 1;
+    currentMonthStr = `${d.getUTCFullYear()}_M${monthNo < 10 ? '0'+monthNo : monthNo}`;
+    
+    // Monthly challenge: only hard challenges
+    const monthChExs = EX.filter(e => e.goal && e.dif === 'Moeilijk');
+    currentMonthEx = monthChExs[monthNo % monthChExs.length];
+    
+    document.getElementById('comm-month-ex').innerHTML = `
+        <div class="ei" style="border-left:4px solid var(--gd);margin:0;box-shadow:0 2px 5px rgba(0,0,0,0.05);">
+            <div class="eih"><div class="ein">🌟 ${currentMonthEx.name}</div><div class="eid">${currentMonthEx.dur} min</div></div>
+            ${exMetaHtml(currentMonthEx)}
+            <div class="eidesc">${currentMonthEx.desc}</div>
+            <div class="eitip">${currentMonthEx.tip}</div>
+        </div>
+    `;
+
+    if(unsubCommMonth) unsubCommMonth();
+    unsubCommMonth = onSnapshot(
+        query(collection(db, "leaderboards", currentMonthStr, "scores"), orderBy("score", "desc"), limit(50)),
+        (snap) => {
+            let html = ''; let rank = 1;
+            snap.forEach(doc => {
+                const isMe = doc.id === currentUser?.uid;
+                html += `<tr style="${isMe ? 'background:#fffde7;font-weight:700;' : ''}">
+                    <td>${rank++}</td>
+                    <td>${doc.data().name || 'Golfer'}${isMe ? ' (Jij)' : ''}</td>
+                    <td style="text-align:right;font-weight:700;color:var(--gd);">${doc.data().score}</td>
+                </tr>`;
+            });
+            if(html === '') html = '<tr><td colspan="3" style="text-align:center;color:var(--mu);padding:20px;">Nog geen scores deze maand.</td></tr>';
+            document.getElementById('comm-month-leaderboard-body').innerHTML = html;
         }
     );
 }
 
-window.submitCommScore = async () => {
+window.submitCommScore = async (type) => {
     if(!currentUser) return;
-    const val = parseFloat(document.getElementById('comm-score-input').value);
+    const inputId = type === 'week' ? 'comm-score-input' : 'comm-month-score-input';
+    const val = parseFloat(document.getElementById(inputId).value);
     if(isNaN(val)) return toast('❌ Vul een getal in als score.');
     
     const emailName = currentUser.email ? currentUser.email.split('@')[0] : 'Golfer';
+    const targetCol = type === 'week' ? currentWeekStr : currentMonthStr;
     
     try {
-        await setDoc(doc(db, "leaderboards", currentWeekStr, "scores", currentUser.uid), {
+        await setDoc(doc(db, "leaderboards", targetCol, "scores", currentUser.uid), {
             score: val,
-            name: emailName,
+            name: userData.displayName || emailName,
             timestamp: new Date().getTime()
         });
         toast('🏆 Score toegevoegd aan het Leaderboard!');
-        document.getElementById('comm-score-input').value = '';
+        document.getElementById(inputId).value = '';
     } catch(e) {
         console.error(e);
         toast('❌ Fout bij opslaan. Check je internetverbinding.');
@@ -1183,6 +1243,52 @@ const WARMUP_HTML = `
         <div class="eidesc"><strong>1. Losdraaien (2 min)</strong> — Draai je schouders, heupen, knieën en polsen zachtjes los. Geen clubs nodig.<br><strong>2. Korte swings (3 min)</strong> — Pak je Sand Wedge of Pitching Wedge. Sla 10–15 halve, ontspannen slagen om het ritme te voelen.</div>
     </div>`;
 
+window.startPreRound = async () => {
+    // Variabele pre-round warmup logica
+    const pExs = [];
+    const used = new Set();
+    const getRandomEx = (cat, difficultyCondition, clubHintCondition, ballsOverride) => {
+        const cands = EX.filter(e => e.cat === cat && (!difficultyCondition || e.dif === difficultyCondition) && (!clubHintCondition || e.clubHint === clubHintCondition) && !used.has(e.id));
+        let e = cands.length ? cands[Math.floor(Math.random()*cands.length)] : EX.find(e => e.cat === cat && !used.has(e.id));
+        if(e) {
+            e = {...e};
+            used.add(e.id);
+            if(ballsOverride !== undefined) e.balls = ballsOverride;
+            pExs.push(e);
+        }
+    };
+    
+    // 1 Wedge (Gemakkelijk/Gemiddeld, 10 ballen)
+    getRandomEx('chip', null, 'wedge', 10);
+    // 1 Ijzer (Gemakkelijk/Gemiddeld, 10 ballen)
+    getRandomEx('approach', null, 'short_iron', 10);
+    // 1 Driver (Gemakkelijk/Gemiddeld, 10 ballen)
+    getRandomEx('drive', null, 'driver', 10);
+    // 1 Korte Chip
+    getRandomEx('chip', 'Gemakkelijk');
+    // 1 Lag putt (Lang)
+    getRandomEx('puttLong');
+    // 1 Korte putt
+    getRandomEx('puttShort');
+
+    const newPlan = [{
+        id: 'preround_1',
+        lbl: 'Pre-Round Warm-up',
+        icon: '⛳',
+        bc: 'bd4',
+        desc: 'Een strak en vast schema voor de perfecte wedstrijdvoorbereiding.',
+        exs: pExs,
+        mins: 30
+    }];
+
+    activePlan = newPlan;
+    document.getElementById('tc-generate').style.display = 'none';
+    document.getElementById('tc-active').style.display = 'block';
+    
+    renderSessions();
+    toast(`⛳ Pre-Round Warm-up geladen!`);
+    if(currentUser) await saveToDb();
+};
 
 window.genSessions = async () => {
     const lat = getLatest();
@@ -1390,18 +1496,8 @@ function renderExList(exs, sessIdx=0){
         return 0;
     });
 
-    // Pick the challenge: first with a measurable goal, else hardest
-    const challengeIdx = (() => {
-        let idx = reordered.findIndex(e => e.goal);
-        if(idx < 0) idx = reordered.findIndex(e => e.dif === 'Moeilijk');
-        if(idx < 0) idx = 0;
-        return idx;
-    })();
-
     return reordered.map((e,i)=>{
         const isWeekly = e.isWeeklyChallenge;
-        const isChallenge = i === challengeIdx && !isWeekly;
-        const savedScore = challengeScores[e.id] || '';
         
         let challengeHtml = '';
         if (isWeekly) {
@@ -1409,22 +1505,11 @@ function renderExList(exs, sessIdx=0){
                 <div><div style="font-size:12px;font-weight:800;color:#1565C0;margin-bottom:2px;">🏆 Challenge van de Week</div><div style="font-size:11px;color:#1565C0;">Speel deze oefening en vul je score in op het Leaderboard!</div></div>
                 <button class="btn btn-p" style="margin:0;padding:6px 10px;font-size:11px;min-width:70px;" onclick="showTab('comm')">Naar Leaderboard</button>
             </div>`;
-        } else if (isChallenge) {
-            challengeHtml = `<div style="background:#fff9c4;border:1.5px solid #f9a825;border-radius:8px;padding:8px 10px;margin-bottom:8px;">
-                <div style="font-size:12px;font-weight:700;color:#7b5e00;margin-bottom:6px;">🏆 Sessie Challenge — noteer je score!</div>
-                <div style="display:flex;gap:8px;align-items:center;">
-                    <input type="text" placeholder="Bijv. 7/10 of 3 pogingen..."
-                        value="${savedScore}"
-                        oninput="window.saveChallengeScore('${e.id}', this.value); document.getElementById('save-status-${e.id}').textContent='⏳ Opslaan...'; document.getElementById('save-status-${e.id}').style.color='#7b5e00';"
-                        style="flex:1;padding:6px 10px;border:1.5px solid #f9a825;border-radius:8px;font-size:13px;background:#fff;">
-                    <span id="save-status-${e.id}" style="font-size:10px;white-space:nowrap;font-weight:600;color:${savedScore?'var(--gm)':'#aaa'};">${savedScore ? '✔ Opgeslagen' : '—'}</span>
-                </div>
-               </div>`;
         }
 
         const ytHtml = e.yt ? `<a href="${e.yt}" target="_blank" style="text-decoration:none;font-size:10px;background:#ffebee;color:#c62828;padding:3px 6px;border-radius:4px;font-weight:800;display:inline-flex;align-items:center;margin-left:6px;box-shadow:0 1px 2px rgba(0,0,0,0.1);">📺 YouTube</a>` : '';
-        const headerBg = isWeekly ? 'background:#e3f2fd;border-radius:8px;padding:4px 8px;' : isChallenge ? 'background:#fffde7;border-radius:8px;padding:4px 8px;' : '';
-        const borderStyle = isWeekly ? 'border-bottom:2px solid #1565C0;' : isChallenge ? 'border-bottom:2px solid #f9a825;' : '';
+        const headerBg = isWeekly ? 'background:#e3f2fd;border-radius:8px;padding:4px 8px;' : '';
+        const borderStyle = isWeekly ? 'border-bottom:2px solid #1565C0;' : '';
         
         // ExState logic for checkboxes
         const exState = (activePlan[sessIdx].exState || {})[e.id] || { done: false, rating: null };
@@ -1444,16 +1529,45 @@ function renderExList(exs, sessIdx=0){
             </div>
         </div>`;
 
+        const hist = exHistoryData[e.id] || [];
+        const histHtml = hist.length ? `<div style="max-height:80px;overflow-y:auto;font-size:11px;color:var(--mu);margin-bottom:8px;">
+            ${hist.slice(0, 5).map(h => `<div style="border-bottom:1px solid #eee;padding:4px 0;"><strong>${h.date.split('T')[0]}</strong>: ${h.note}</div>`).join('')}
+        </div>` : '';
+
+        const logHtml = `<div style="margin-top:10px;background:#fcfcfc;border:1px solid #eee;border-radius:6px;padding:8px;">
+            <div style="font-size:11px;font-weight:700;margin-bottom:6px;color:#555;">📝 Persoonlijk Logboek</div>
+            ${histHtml}
+            <div style="display:flex;gap:6px;">
+                <input type="text" id="ex-note-input-${e.id}" placeholder="Voeg een notitie toe (bijv. 7/10 gehaald)..." style="flex:1;padding:6px;font-size:12px;border:1px solid #ccc;border-radius:4px;">
+                <button class="btn btn-s" onclick="saveExNote('${e.id}')" style="margin:0;padding:6px 12px;font-size:12px;">Opslaan</button>
+            </div>
+        </div>`;
+
         return `<div class="ei" style="${borderStyle}">
-        <div class="eih" style="${headerBg}"><div class="ein">${isWeekly||isChallenge ? '🏆 ' : ''}${e.name}${ytHtml}</div><div class="eid">${e.dur} min</div></div>
+        <div class="eih" style="${headerBg}"><div class="ein">${isWeekly ? '🏆 ' : ''}${e.name}${ytHtml}</div><div class="eid">${e.dur} min</div></div>
         ${challengeHtml}${exMetaHtml(e)}
         <div class="eidesc">${e.desc}</div>
         <div class="eitip">${e.tip}</div>
         <span class="eicat" style="background:${CAT_COL[e.cat]||'#f5f5f5'};color:#333;">${CAT_LBL[e.cat]||e.cat}</span>${difBadge(e.dif)}
+        ${logHtml}
         ${interactionHtml}
     </div>`;
     }).join('');
 }
+
+window.saveExNote = async (exId) => {
+    const input = document.getElementById(`ex-note-input-${exId}`);
+    if(!input || !input.value.trim()) return;
+    if(!exHistoryData[exId]) exHistoryData[exId] = [];
+    exHistoryData[exId].unshift({
+        date: new Date().toISOString(),
+        note: input.value.trim()
+    });
+    input.value = '';
+    renderSessions();
+    if(currentUser) await saveToDb();
+    toast('Notitie opgeslagen!');
+};
 
 window.toggleExDone = async (sessIdx, exId, checked) => {
     if(!activePlan || !activePlan[sessIdx]) return;
