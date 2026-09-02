@@ -636,7 +636,7 @@ const EX=[
  {id:'c11',cat:'chip',clubHint:'wedge',name:'Twee-Wedge Vergelijking',dur:8,dif:'Gemiddeld',balls:10,ballType:'own',sets:2,goal:null,desc:'Set 1: 5 chips met je meest loftige wedge. Set 2: 5 chips met je tweede wedge – zelfde situatie. Voel het verschil in roll en hoogte.',tip:'💡 Ken welke wedge welke roll geeft – dan kies je bewuster op de baan.'},
  {id:'c12',cat:'chip',clubHint:'wedge',name:'Pitch Afstandsreeks',dur:9,dif:'Gemiddeld',balls:15,ballType:'range',sets:3,goal:null,desc:'3 sets: 5 ballen van 10m → 5 van 20m → 5 van 30m. Gebruik dezelfde wedge. Pas alleen de armlengte aan, niet de snelheid.',tip:'💡 Afstand controleer je met armlengte, niet met zwingsnelheid.'},
  {id:'c13',cat:'chip',clubHint:'wedge',name:'Eén-Arm Chip (Links)',dur:6,dif:'Moeilijk',balls:10,ballType:'own',sets:1,goal:null,desc:'Chip met alleen je linkerhand en een wedge. 10 ballen. Kleine, beheerste beweging.',tip:'💡 Verbetert de non-dominante hand die bij veel golfers passief is.'},
- {id:'c14',cat:'chip',clubHint:'short_iron',name:'Fringe: Chippen of Putten?',dur:7,dif:'Gemiddeld',balls:8,ballType:'own',sets:1,goal:null,desc:'Leg 8 ballen op de fringe. Oefen de beslissing: chippen (8-ijzer) of putten? Probeer beide methodes voor dezelfde bal.',tip:'💡 Helder pad → putter. Ongelijk gras → chip met je 8-ijzer.'},
+ {id:'c14',cat:'chip',clubHint:'short_iron',name:'Fringe: Chippen of Putten?',dur:7,dif:'Gemiddeld',balls:8,ballType:'own',sets:1,goal:null,desc:'Leg 8 ballen op de fringe. Oefen de beslissing: chippen (met een kort ijzer, bijv. 7, 8 of 9) of putten? Probeer beide methodes voor dezelfde bal.',tip:'💡 Helder pad → putter. Ongelijk gras → chip met je korte ijzer.'},
  {id:'c15',cat:'chip',clubHint:'wedge',name:'Bunker Basisoefening',dur:8,dif:'Moeilijk',balls:0,ballType:'none',sets:null,goal:'12 bunkerswings met juiste techniek',desc:'Geen ballen nodig. Open face, open stance, swingoefening 3cm achter denkbeeldige bal met je sand wedge. 12 herhalingen.',tip:'💡 Denk "zand tussen club en bal" bij elke bunkerslag.'},
 
  
@@ -707,6 +707,7 @@ function calcScores(s){
     sc.chip=0;
     if(s.cgem) sc.chip+=Math.max(0,(+s.cgem - bm.chipGem)*2);
     if(s.cuad) sc.chip+=Math.max(0,(bm.chipUaD - +s.cuad)*1.5);
+    if(s.csan) sc.chip+=Math.max(0,(bm.csan - +s.csan)*1.5);
     const pB=s.puttAvg?Math.max(0,(+s.puttAvg - bm.puttAvg)*40):0;
     sc.puttShort =(s.puttShort ?Math.max(0,(+s.puttShort  - bm.puttShort) *2.0):0)+pB*0.2;
     sc.puttMedium=(s.puttMedium?Math.max(0,(+s.puttMedium - bm.puttMedium)*1.5):0)+pB*0.4;
@@ -748,12 +749,16 @@ function getClubAdvice(ex){
         return c ? `🔀 ${fmt(c)}` : '🔀 Hybride of Hout';
     }
     if(hint === 'long_iron'){
-        const c = find(/ijzer\s*[3456]/i) || find(/hybride|hybrid/i);
+        const clubs = findAll(/ijzer\s*[3456]/i);
+        if(clubs.length > 0) return `⛳ ` + clubs.map(fmt).join(' / ');
+        const c = find(/hybride|hybrid/i);
         return c ? `⛳ ${fmt(c)}` : '⛳ Lang IJzer (5–6) of Hybride';
     }
     if(hint === 'short_iron'){
-        const c = find(/ijzer\s*[789]/i) || find(/ijzer/i);
-        return c ? `⛳ ${fmt(c)}` : '⛳ Kort IJzer (7–9)';
+        const clubs = findAll(/ijzer\s*[789]/i);
+        if(clubs.length > 0) return `⛳ ` + clubs.map(fmt).join(' / ');
+        const c = find(/ijzer/i);
+        return c ? `⛳ ${fmt(c)}` : '⛳ Kort IJzer (7, 8 of 9)';
     }
     if(hint === 'wedge'){
         if(ex.id === 'c11'){
@@ -1361,26 +1366,22 @@ function difBadge(dif){
     return`<span class="dif-badge ${cls}">${dif}</span>`;
 }
 
-// Volgorde voor afslag: kort naar lang
-const DRIVE_HINT_ORDER = {long_iron:0, hybrid:1, wood:2, driver:3};
-
 const CAT_ORDER = { drive: 1, approach: 2, chip: 3, puttShort: 4, puttMedium: 5, puttLong: 6 };
+const CLUB_PROGRESSION = { wedge: 1, short_iron: 2, long_iron: 3, hybrid: 4, wood: 5, driver: 6 };
 
 function renderExList(exs, sessIdx=0){
     if(!exs.length)return'<p style="color:var(--mu);font-size:13px;padding:10px 0;">Geen oefeningen voor deze configuratie.</p>';
 
     // Sorteer op fysieke locatie (Range -> Chipping -> Putting)
     const reordered = [...exs].sort((a,b) => {
-        // Zorg dat Weekly Challenge altijd bovenaan staat (als we dat willen), of gewoon locatie.
-        // We houden de fysieke locatie aan als hoofdregel.
         const orderA = CAT_ORDER[a.cat] || 99;
         const orderB = CAT_ORDER[b.cat] || 99;
         
         if (orderA !== orderB) return orderA - orderB;
         
-        // Binnen drive: sorteer op clubHint indien van toepassing
-        if (a.cat === 'drive' && b.cat === 'drive') {
-            return (DRIVE_HINT_ORDER[a.clubHint]??99) - (DRIVE_HINT_ORDER[b.clubHint]??99);
+        // Binnen drive en approach (de range): sorteer op CLUB_PROGRESSION (van wedges naar driver)
+        if ((a.cat === 'drive' || a.cat === 'approach') && (b.cat === 'drive' || b.cat === 'approach')) {
+            return (CLUB_PROGRESSION[a.clubHint]??99) - (CLUB_PROGRESSION[b.clubHint]??99);
         }
         return 0;
     });
