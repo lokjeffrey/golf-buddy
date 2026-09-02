@@ -866,7 +866,7 @@ function getClubAdvice(ex){
 ═══════════════════════════════════════════════════════ */
 function shuffle(arr){return arr.slice().sort(()=>Math.random()-.5);}
 
-function buildSess(type,sc,mins,usedIds,hcp){
+function buildSess(type,sc,mins,usedIds,hcp,preRangeClubs=[]){
     const h=hcp?+hcp:14;
     const rank=rankCats(sc);
     let planCats=[];
@@ -896,6 +896,7 @@ function buildSess(type,sc,mins,usedIds,hcp){
     let moeilijkUsed=0;
     const moeilijkLimit=h<=9?99:h<=18?1:0;
     const targetMins = mins - 5; // 5 min warmup eraf
+    const rangeClubs = new Set(preRangeClubs);
 
     let catIndex = 0;
     let attempts = 0;
@@ -921,6 +922,7 @@ function buildSess(type,sc,mins,usedIds,hcp){
                     const ballsToAdd = e.sets ? e.balls * e.sets : e.balls;
                     if(fullSwingBalls + ballsToAdd > 65) return false;
                 }
+                if((cat === 'drive' || cat === 'approach') && e.clubHint && rangeClubs.has(e.clubHint)) return false;
                 return true;
             });
             
@@ -944,6 +946,9 @@ function buildSess(type,sc,mins,usedIds,hcp){
                 if(cat === 'drive') driveCount++;
                 if((cat === 'drive' || cat === 'approach') && ex.ballType === 'range' && ex.balls) {
                     fullSwingBalls += ex.sets ? ex.balls * ex.sets : ex.balls;
+                }
+                if((cat === 'drive' || cat === 'approach') && ex.clubHint) {
+                    rangeClubs.add(ex.clubHint);
                 }
             }
         }
@@ -1369,11 +1374,16 @@ window.genSessions = async () => {
         let targetForBuild = mins; 
         
         // Weekly Challenge wordt geïnjecteerd in sessie 1
+        let preClubs = [];
         if (i === 0 && currentWeekEx) {
             targetForBuild -= currentWeekEx.dur;
+            used.add(currentWeekEx.id);
+            if ((currentWeekEx.cat === 'drive' || currentWeekEx.cat === 'approach') && currentWeekEx.clubHint) {
+                preClubs.push(currentWeekEx.clubHint);
+            }
         }
 
-        const exs = buildSess(base.id, lat.ws, targetForBuild, used, hcp);
+        const exs = buildSess(base.id, lat.ws, targetForBuild, used, hcp, preClubs);
         
         newPlan.push({
             id: base.id + '_' + i,
@@ -1511,9 +1521,17 @@ window.recalcSession = async (idx) => {
     activePlan[idx].mins = newMins;
     
     let targetForBuild = newMins;
-    if(idx === 0 && currentWeekEx) targetForBuild -= currentWeekEx.dur; // Weekly Challenge
+    let preClubs = [];
+    const used = new Set();
+    if(idx === 0 && currentWeekEx) {
+        targetForBuild -= currentWeekEx.dur; // Weekly Challenge
+        used.add(currentWeekEx.id);
+        if ((currentWeekEx.cat === 'drive' || currentWeekEx.cat === 'approach') && currentWeekEx.clubHint) {
+            preClubs.push(currentWeekEx.clubHint);
+        }
+    }
     
-    const exs = buildSess(baseId, lat.ws, targetForBuild, new Set(), lat.stats?.hcp);
+    const exs = buildSess(baseId, lat.ws, targetForBuild, used, lat.stats?.hcp, preClubs);
 
     activePlan[idx].exs = exs;
     
