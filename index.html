@@ -476,6 +476,33 @@
         <button class="nbtn"        id="nav-clubs"     onclick="showTab('profiel')">   <span class="ico">👤</span>Profiel</button>
     </nav>
 </div>
+<!-- TRACKMAN DEBRIEF MODAL -->
+<div id="tm-debrief-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;display:none;align-items:center;justify-content:center;padding:20px;">
+    <div style="background:#fff;border-radius:16px;padding:24px;width:100%;max-width:400px;box-shadow:var(--sh);">
+        <div style="font-size:18px;font-weight:800;color:var(--bl);margin-bottom:12px;">💻 Trackman Debriefing</div>
+        <p style="font-size:13px;color:var(--mu);margin-bottom:16px;">Hoe ging je ronde? Jouw eerlijkheid hier bepaalt je trainingsschema van volgende week.</p>
+        
+        <div class="fg">
+            <label class="fl">Bruto Score / Resultaat</label>
+            <input type="text" id="tm-score" class="fi" placeholder="Bijv. 82 slagen">
+        </div>
+        
+        <div class="fg">
+            <label class="fl">Wat ging er het vaakst mis onder druk?</label>
+            <select id="tm-weakness" class="fi">
+                <option value="none">Ging eigenlijk heel goed!</option>
+                <option value="drive">Afslag (Veel gemiste fairways / out of bounds)</option>
+                <option value="approach">Approach (Greens gemist / slecht ijzer-contact)</option>
+                <option value="puttMedium">Putten (Veel 3-putts / slechte afstandscontrole)</option>
+            </select>
+        </div>
+        
+        <div style="display:flex;gap:10px;margin-top:20px;">
+            <button class="btn btn-s" onclick="closeTmDebrief()">Annuleren</button>
+            <button class="btn btn-p" onclick="saveTmDebrief()" style="background:#1565C0;">Opslaan & Toepassen</button>
+        </div>
+    </div>
+</div>
 <div class="toast" id="toast"></div>
 
 <!-- FIREBASE & APP SCRIPT -->
@@ -503,6 +530,7 @@ let entriesData = [];
 let clubsData = [];
 let challengeScores = {}; // scores per oefening-ID, gesynchroniseerd met Firebase
 let exHistoryData = {}; // logboek notities per oefening
+let trackmanLogs = []; // debriefings van Trackman
 
 /* ═══════════════════════════════════════════════════════
    AUTH LOGIC
@@ -583,6 +611,7 @@ async function loadUserData(){
                 clubsData = userData.clubs || [];
                 challengeScores = userData.challengeScores || {};
                 exHistoryData = userData.exHistoryData || {};
+                trackmanLogs = userData.trackmanLogs || [];
                 activePlan = userData.activePlan || null;
                 activeWarmup = userData.activeWarmup || null;
             }
@@ -605,6 +634,7 @@ async function saveToDb(){
             clubs: clubsData,
             challengeScores: challengeScores,
             exHistoryData: exHistoryData,
+            trackmanLogs: trackmanLogs, // <-- NIEUW
             activePlan: activePlan,
             activeWarmup: activeWarmup
         }, { merge: true });
@@ -779,6 +809,17 @@ function calcScores(s){
     sc.puttShort =(s.puttShort ?Math.max(0,(+s.puttShort  - bm.puttShort) *2.0):0)+pB*0.2;
     sc.puttMedium=(s.puttMedium?Math.max(0,(+s.puttMedium - bm.puttMedium)*1.5):0)+pB*0.4;
     sc.puttLong  =(s.puttLong  ?Math.max(0,(+s.puttLong   - bm.puttLong)  *1.5):0)+pB*0.4;
+
+    // --- TRACKMAN FEEDBACK LOOP ---
+    if (trackmanLogs && trackmanLogs.length > 0) {
+        const lastLog = trackmanLogs[0];
+        const daysOld = (new Date() - new Date(lastLog.date)) / (1000 * 3600 * 24);
+        // Alleen toepassen als feedback minder dan 14 dagen oud is
+        if (daysOld < 14 && lastLog.weakness && lastLog.weakness !== 'none' && sc[lastLog.weakness] !== undefined) {
+            sc[lastLog.weakness] += 15; // 15 strafpunten = extra prioriteit in generator
+        }
+    }
+
     return sc;
 }
 
@@ -1712,21 +1753,30 @@ function renderExList(exs, sessIdx=0){
             ${hist.slice(0, 5).map(h => `<div style="border-bottom:1px solid #eee;padding:4px 0;"><strong>${h.date.split('T')[0]}</strong>: ${h.note}</div>`).join('')}
         </div>` : '';
 
-        const logHtml = sessIdx === 'warmup' ? '' : `<div style="margin-top:10px;background:${isD?'#f0fdf4':'#fcfcfc'};border:1px solid ${isD?'#bbf7d0':'#eee'};border-radius:6px;padding:8px;transition:all 0.3s;">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-                <div style="font-size:11px;font-weight:700;color:${isD?'#166534':'#555'};">📝 Persoonlijk Logboek ${isD?'(Afgerond 🎉)':''}</div>
-                <div style="display:flex;gap:8px;font-size:20px;user-select:none;">
-                    <span style="cursor:pointer;transition:all 0.2s;${rClass('bad')}" onclick="rateEx('${sessIdx}', '${e.id}', 'bad')" title="Ging slecht">😔</span>
-                    <span style="cursor:pointer;transition:all 0.2s;${rClass('ok')}" onclick="rateEx('${sessIdx}', '${e.id}', 'ok')" title="Ging oké">😐</span>
-                    <span style="cursor:pointer;transition:all 0.2s;${rClass('good')}" onclick="rateEx('${sessIdx}', '${e.id}', 'good')" title="Ging super">😀</span>
-                </div>
-            </div>
-            ${histHtml}
-            <div style="display:flex;gap:6px;">
-                <input type="text" id="ex-note-input-${e.id}" placeholder="Voeg een notitie toe (bijv. 7/10 gehaald)..." style="flex:1;padding:6px;font-size:12px;border:1px solid #ccc;border-radius:4px;">
-                <button class="btn btn-s" onclick="saveExNote('${sessIdx}', '${e.id}')" style="margin:0;padding:6px 12px;font-size:12px;">Opslaan</button>
-            </div>
-        </div>`;
+        let logHtml = '';
+        if (sessIdx !== 'warmup') {
+            if (e.id.startsWith('tm_1_')) {
+                logHtml = `<div style="margin-top:10px;text-align:center;">
+                    <button class="btn btn-s" style="background:#e3f2fd;color:#1565C0;border:1px solid #1565C0;font-size:12px;padding:8px;font-weight:800;" onclick="openTmDebrief('${sessIdx}', '${e.id}')">${isD ? '✅ Debriefing Opgeslagen' : '📝 Debriefing Invullen'}</button>
+                </div>`;
+            } else {
+                logHtml = `<div style="margin-top:10px;background:${isD?'#f0fdf4':'#fcfcfc'};border:1px solid ${isD?'#bbf7d0':'#eee'};border-radius:6px;padding:8px;transition:all 0.3s;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                        <div style="font-size:11px;font-weight:700;color:${isD?'#166534':'#555'};">📝 Persoonlijk Logboek ${isD?'(Afgerond 🎉)':''}</div>
+                        <div style="display:flex;gap:8px;font-size:20px;user-select:none;">
+                            <span style="cursor:pointer;transition:all 0.2s;${rClass('bad')}" onclick="rateEx('${sessIdx}', '${e.id}', 'bad')" title="Ging slecht">😔</span>
+                            <span style="cursor:pointer;transition:all 0.2s;${rClass('ok')}" onclick="rateEx('${sessIdx}', '${e.id}', 'ok')" title="Ging oké">😐</span>
+                            <span style="cursor:pointer;transition:all 0.2s;${rClass('good')}" onclick="rateEx('${sessIdx}', '${e.id}', 'good')" title="Ging super">😀</span>
+                        </div>
+                    </div>
+                    ${histHtml}
+                    <div style="display:flex;gap:6px;">
+                        <input type="text" id="ex-note-input-${e.id}" placeholder="Voeg een notitie toe..." style="flex:1;padding:6px;font-size:12px;border:1px solid #ccc;border-radius:4px;">
+                        <button class="btn btn-s" onclick="saveExNote('${sessIdx}', '${e.id}')" style="margin:0;padding:6px 12px;font-size:12px;">Opslaan</button>
+                    </div>
+                </div>`;
+            }
+        }
 
         return `<div class="ei" style="${borderStyle}">
         <div class="eih" style="${headerBg}"><div class="ein">${isWeekly ? '🏆 ' : ''}${e.name}${ytHtml}</div><div class="eid">${e.dur} min</div></div>
@@ -1785,6 +1835,43 @@ window.rateEx = async (sessIdx, exId, rating) => {
 window.togSess = (i) => {
     document.getElementById('sb-'+i).classList.toggle('open');
     document.getElementById('chev-'+i).classList.toggle('open');
+};
+
+let activeTmSessIdx = null;
+let activeTmExId = null;
+
+window.openTmDebrief = (sessIdx, exId) => {
+    activeTmSessIdx = sessIdx;
+    activeTmExId = exId;
+    document.getElementById('tm-score').value = '';
+    document.getElementById('tm-weakness').value = 'none';
+    document.getElementById('tm-debrief-overlay').style.display = 'flex';
+};
+
+window.closeTmDebrief = () => {
+    document.getElementById('tm-debrief-overlay').style.display = 'none';
+};
+
+window.saveTmDebrief = async () => {
+    const score = document.getElementById('tm-score').value;
+    const weakness = document.getElementById('tm-weakness').value;
+    
+    trackmanLogs.unshift({
+        date: new Date().toISOString(),
+        score: score,
+        weakness: weakness
+    });
+    
+    if(activePlan && activePlan[activeTmSessIdx]) {
+        if(!activePlan[activeTmSessIdx].exState) activePlan[activeTmSessIdx].exState = {};
+        if(!activePlan[activeTmSessIdx].exState[activeTmExId]) activePlan[activeTmSessIdx].exState[activeTmExId] = { done: false, rating: null };
+        activePlan[activeTmSessIdx].exState[activeTmExId].done = true;
+    }
+    
+    closeTmDebrief();
+    renderSessions();
+    if(currentUser) await saveToDb();
+    toast('Debriefing opgeslagen! Je volgende plan wordt hierop aangepast.');
 };
 
 /* ═══════════════════════════════════════════════════════
