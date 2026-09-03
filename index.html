@@ -1386,11 +1386,13 @@ window.genSessions = async () => {
     const newPlan = [];
     for(let i=0; i<planLen; i++) {
         const base = SESS[i % SESS.length];
+        const weekNum = i + 1; // De actuele week van het plan
         
         let targetForBuild = mins; 
-        
         let preClubs = [];
-        if (i === 0 && currentWeekEx) {
+        
+        // VOEG WEEKLY CHALLENGE TOE AAN ELKE TECHNISCHE SESSIE
+        if (currentWeekEx) {
             targetForBuild -= currentWeekEx.dur;
             used.add(currentWeekEx.id);
             if ((currentWeekEx.cat === 'drive' || currentWeekEx.cat === 'approach') && currentWeekEx.clubHint) {
@@ -1400,9 +1402,16 @@ window.genSessions = async () => {
 
         const exs = buildSess(base.id, lat.ws, targetForBuild, used, hcp, preClubs);
         
-        // 1. Voeg de normale technische training toe
+        // Push de challenge gewoon in de array. renderExList regelt de perfecte sortering!
+        if (currentWeekEx) {
+            exs.push({...currentWeekEx, isWeeklyChallenge: true});
+        }
+        
+        // 1. Voeg de vaste technische training toe (isCore: true)
         newPlan.push({
             id: base.id + '_' + i,
+            weekNum: weekNum,
+            isCore: true,
             lbl: base.lbl,
             icon: base.icon,
             bc: base.bc,
@@ -1412,41 +1421,33 @@ window.genSessions = async () => {
             completed: false
         });
 
-        // 2. Als aangevinkt: Voeg direct daarna de Trackman sessie toe
+        // 2. Als aangevinkt: Voeg de optionele speelronde toe (isOptional: true)
         if (includeTrackman) {
             newPlan.push({
                 id: 'trackman_' + i,
-                lbl: 'Trackman Virtuele Ronde',
+                weekNum: weekNum,
+                isOptional: true,
+                lbl: 'Trackman of Baan',
                 icon: '💻',
                 bc: 'bd4',
-                desc: 'Speel 18 holes op de simulator en sluit af op de echte green.',
-                mins: 70, // 60 min spelen + 10 min putten
+                desc: 'Speel 18 holes (virtueel of echt) als transfer-training.',
+                mins: 70, 
                 completed: false,
                 exs: [
                     { 
-                        id: 'tm_1_' + i, cat: 'drive', clubHint: null, name: '18 Holes Simulator', 
-                        dur: 60, dif: 'Gemiddeld', balls: 0, ballType: 'none', sets: 1, goal: 'Noteer je virtuele score', 
-                        desc: 'Speel een volledige ronde van 18 holes op een virtuele baan naar keuze. Denk aan je baanmanagement: speel de veilige kant van de green en vermijd onnodige risico\'s.', 
-                        tip: '💡 Tussen het slaan van de ballen door: doe een stap achteruit en maak je pre-shot routine exact zoals buiten op de baan.' 
+                        id: 'tm_1_' + i, cat: 'drive', clubHint: null, name: '18 Holes Spelen', 
+                        dur: 60, dif: 'Gemiddeld', balls: 0, ballType: 'none', sets: 1, goal: 'Noteer je (virtuele) score', 
+                        desc: 'Speel een volledige ronde van 18 holes op de simulator OF buiten op de echte baan. Denk aan je baanmanagement: speel de veilige kant van de green en vermijd onnodige risico\\'s.', 
+                        tip: '💡 Geen technische gedachten! Maak je beslissing, stap naar de bal en vertrouw op je swing.' 
                     },
                     {
                         id: 'tm_2_' + i, cat: 'puttLong', clubHint: 'putter', name: 'Reality Check (Echt Gras)',
                         dur: 10, dif: 'Gemakkelijk', balls: 3, ballType: 'own', sets: 1, goal: 'Spiergeheugen resetten',
-                        desc: 'Neem je putter mee naar de echte oefengreen buiten. Sla 5 minuten lange lag-putts om de snelheid van echt gras te voelen. Eindig met 5 minuten putts van 1 meter.',
-                        tip: '💡 Trackman putten voelt als een videogame. Dit herstelt je gevoel naar de realiteit, cruciaal voor je volgende ronde!'
+                        desc: 'Als je simulator hebt gespeeld: neem je putter mee naar de echte oefengreen. Sla 5 minuten lange lag-putts om de snelheid van echt gras te voelen. Eindig met 5 minuten putts van 1 meter.',
+                        tip: '💡 Simulator putten voelt als een videogame. Dit herstelt je gevoel naar de realiteit.'
                     }
                 ]
             });
-        }
-    }
-
-    // Injecteer Weekly Challenge in Sessie 1
-    if (newPlan.length > 0 && typeof currentWeekEx !== 'undefined' && currentWeekEx) {
-        if (!newPlan[0].exs.find(e => e.id === currentWeekEx.id)) {
-            newPlan[0].exs.unshift({...currentWeekEx, isWeeklyChallenge: true});
-        } else {
-            const ex = newPlan[0].exs.find(e => e.id === currentWeekEx.id);
-            if(ex) ex.isWeeklyChallenge = true;
         }
     }
 
@@ -1514,9 +1515,11 @@ function renderSessions(){
     document.getElementById('tc-generate').style.display = 'none';
     document.getElementById('tc-active').style.display = 'block';
 
-    const completedCount = activePlan.filter(s => s.completed).length;
-    document.getElementById('plan-prog-text').textContent = `${completedCount}/${activePlan.length} Sessies`;
-    document.getElementById('plan-prog-bar').style.width = `${(completedCount/activePlan.length)*100}%`;
+    const coreSess = activePlan.filter(s => s.isCore);
+    const completedCount = coreSess.length > 0 ? coreSess.filter(s => s.completed).length : activePlan.filter(s => s.completed).length;
+    const totLen = coreSess.length > 0 ? coreSess.length : activePlan.length;
+    document.getElementById('plan-prog-text').textContent = `${completedCount}/${totLen} Weken voltooid`;
+    document.getElementById('plan-prog-bar').style.width = totLen ? `${(completedCount/totLen)*100}%` : '0%';
 
     document.getElementById('sess-container').innerHTML = activePlan.map((sess,i)=>{
         const tot = sess.exs.reduce((s,e)=>s+e.dur,0);
@@ -1538,11 +1541,12 @@ function renderSessions(){
                </div>`
             : `<div style="text-align:center;color:var(--gm);font-weight:700;margin-top:16px;">Sessie Voltooid 🎉</div>`;
 
+        const titlePrefix = sess.isOptional ? `Week ${sess.weekNum} - Optioneel` : (sess.weekNum ? `Week ${sess.weekNum} - Training` : `Sessie ${i+1}`);
         return `<div class="sc" style="${bg}opacity:${opacity};">
             <div class="sh" onclick="togSess(${i})">
                 <div class="shl">
                     ${badgeHtml}
-                    <div><div class="stit" style="${done?'text-decoration:line-through;color:var(--mu);':''}">Sessie ${i+1}: ${sess.lbl}</div>
+                    <div><div class="stit" style="${done?'text-decoration:line-through;color:var(--mu);':''}">${titlePrefix}: ${sess.lbl}</div>
                     <div class="smeta">${sess.desc} · ~${tot+10} min · 🟡 ~${rangeBalls} range ballen</div></div>
                 </div>
                 <div class="schev" id="chev-${i}">▼</div>
@@ -1554,20 +1558,28 @@ function renderSessions(){
 
 window.recalcSession = async (idx) => {
     if(!activePlan || !activePlan[idx]) return;
+    
+    const baseId = activePlan[idx].id.split('_')[0];
+    if (baseId === 'trackman') {
+        toast('Trackman sessie tijd staat vast op 70 minuten.');
+        return;
+    }
+
     const newMins = parseInt(prompt("Hoeveel minuten heb je voor deze sessie (excl. 10m warming-up)?", activePlan[idx].mins));
     if(!newMins || isNaN(newMins) || newMins < 10) return;
     
     const lat = getLatest();
     if(!lat) { toast('Geen data gevonden.'); return; }
     
-    const baseId = activePlan[idx].id.split('_')[0];
     activePlan[idx].mins = newMins;
     
     let targetForBuild = newMins;
     let preClubs = [];
     const used = new Set();
-    if(idx === 0 && currentWeekEx) {
-        targetForBuild -= currentWeekEx.dur; // Weekly Challenge
+    
+    // Voeg challenge tijd en club restricties toe vóór het bouwen
+    if(currentWeekEx) {
+        targetForBuild -= currentWeekEx.dur;
         used.add(currentWeekEx.id);
         if ((currentWeekEx.cat === 'drive' || currentWeekEx.cat === 'approach') && currentWeekEx.clubHint) {
             preClubs.push(currentWeekEx.clubHint);
@@ -1576,13 +1588,12 @@ window.recalcSession = async (idx) => {
     
     const exs = buildSess(baseId, lat.ws, targetForBuild, used, lat.stats?.hcp, preClubs);
 
-    activePlan[idx].exs = exs;
-    
-    if(idx === 0 && currentWeekEx) {
-         if (!activePlan[0].exs.find(e => e.id === currentWeekEx.id)) {
-            activePlan[0].exs.unshift({...currentWeekEx, isWeeklyChallenge: true});
-         }
+    // Push de challenge in de opnieuw berekende sessie
+    if(currentWeekEx) {
+         exs.push({...currentWeekEx, isWeeklyChallenge: true});
     }
+
+    activePlan[idx].exs = exs;
     
     renderSessions();
     if(currentUser) await saveToDb();
@@ -1608,14 +1619,15 @@ window.completeSession = async (idx) => {
     activePlan[idx].completed = true;
     
     // Check if all are done
-    const allDone = activePlan.every(s => s.completed);
+    const coreSess = activePlan.filter(s => s.isCore);
+    const allDone = coreSess.length > 0 ? coreSess.every(s => s.completed) : activePlan.every(s => s.completed);
     
     renderSessions();
     if(currentUser) await saveToDb();
 
     if(allDone) {
         setTimeout(() => {
-            alert('🎉 Gefeliciteerd! Je hebt je trainingsblok afgerond. Tijd om je data bij te werken en een nieuw blok te genereren.');
+            alert('🎉 Gefeliciteerd! Je hebt alle verplichte trainingen van dit blok afgerond. Tijd om je data bij te werken en een nieuw blok te genereren.');
             activePlan = null;
             if(currentUser) saveToDb();
             renderSessions();
