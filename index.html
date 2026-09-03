@@ -351,6 +351,16 @@
                 <input type="range" id="dur-slider" min="30" max="120" step="5" value="60" oninput="updDur()">
                 <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--mu);margin-top:4px;"><span>30 min</span><span>120 min</span></div>
                 
+                <div style="background: var(--gp); border: 1.5px solid var(--gl); border-radius: 8px; padding: 12px; margin-top: 12px; margin-bottom: 16px;">
+                    <label style="display:flex; align-items:center; gap:10px; font-size:13px; font-weight:700; color:var(--gd); cursor:pointer;">
+                        <input type="checkbox" id="add-trackman" style="width:18px; height:18px; accent-color:var(--gd);">
+                        💻 Voeg wekelijkse Trackman ronde (18 holes) toe
+                    </label>
+                    <div style="font-size:11px; color:var(--mu); margin-top:4px; margin-left:28px;">
+                        Ideaal als 2e training van de week voor 'Transfer Training' naar de baan.
+                    </div>
+                </div>
+
                 <button class="btn btn-p" onclick="genSessions()" style="margin-top:16px;">🚀 Start Trainingsblok</button>
             </div>
         </div>
@@ -1370,14 +1380,15 @@ window.genSessions = async () => {
     const used = new Set();
     const planLen = parseInt(document.getElementById('plan-len').value) || 4;
     
-    // Create plan of selected length by repeating the 4 base focuses
+    // Check of de Trackman optie is aangevinkt
+    const includeTrackman = document.getElementById('add-trackman') ? document.getElementById('add-trackman').checked : false;
+    
     const newPlan = [];
     for(let i=0; i<planLen; i++) {
         const base = SESS[i % SESS.length];
         
         let targetForBuild = mins; 
         
-        // Weekly Challenge wordt geïnjecteerd in sessie 1
         let preClubs = [];
         if (i === 0 && currentWeekEx) {
             targetForBuild -= currentWeekEx.dur;
@@ -1389,6 +1400,7 @@ window.genSessions = async () => {
 
         const exs = buildSess(base.id, lat.ws, targetForBuild, used, hcp, preClubs);
         
+        // 1. Voeg de normale technische training toe
         newPlan.push({
             id: base.id + '_' + i,
             lbl: base.lbl,
@@ -1396,11 +1408,39 @@ window.genSessions = async () => {
             bc: base.bc,
             desc: base.desc,
             exs: exs,
-            mins: mins
+            mins: mins,
+            completed: false
         });
+
+        // 2. Als aangevinkt: Voeg direct daarna de Trackman sessie toe
+        if (includeTrackman) {
+            newPlan.push({
+                id: 'trackman_' + i,
+                lbl: 'Trackman Virtuele Ronde',
+                icon: '💻',
+                bc: 'bd4',
+                desc: 'Speel 18 holes op de simulator en sluit af op de echte green.',
+                mins: 70, // 60 min spelen + 10 min putten
+                completed: false,
+                exs: [
+                    { 
+                        id: 'tm_1_' + i, cat: 'drive', clubHint: null, name: '18 Holes Simulator', 
+                        dur: 60, dif: 'Gemiddeld', balls: 0, ballType: 'none', sets: 1, goal: 'Noteer je virtuele score', 
+                        desc: 'Speel een volledige ronde van 18 holes op een virtuele baan naar keuze. Denk aan je baanmanagement: speel de veilige kant van de green en vermijd onnodige risico\'s.', 
+                        tip: '💡 Tussen het slaan van de ballen door: doe een stap achteruit en maak je pre-shot routine exact zoals buiten op de baan.' 
+                    },
+                    {
+                        id: 'tm_2_' + i, cat: 'puttLong', clubHint: 'putter', name: 'Reality Check (Echt Gras)',
+                        dur: 10, dif: 'Gemakkelijk', balls: 3, ballType: 'own', sets: 1, goal: 'Spiergeheugen resetten',
+                        desc: 'Neem je putter mee naar de echte oefengreen buiten. Sla 5 minuten lange lag-putts om de snelheid van echt gras te voelen. Eindig met 5 minuten putts van 1 meter.',
+                        tip: '💡 Trackman putten voelt als een videogame. Dit herstelt je gevoel naar de realiteit, cruciaal voor je volgende ronde!'
+                    }
+                ]
+            });
+        }
     }
 
-    // Inject Weekly Challenge into Session 1
+    // Injecteer Weekly Challenge in Sessie 1
     if (newPlan.length > 0 && typeof currentWeekEx !== 'undefined' && currentWeekEx) {
         if (!newPlan[0].exs.find(e => e.id === currentWeekEx.id)) {
             newPlan[0].exs.unshift({...currentWeekEx, isWeeklyChallenge: true});
@@ -1416,9 +1456,8 @@ window.genSessions = async () => {
     document.getElementById('tc-active').style.display = 'block';
     
     renderSessions();
-    toast(`🎯 Trainingsblok van ${planLen} sessies opgeslagen!`);
+    toast(`🎯 Trainingsblok opgeslagen!`);
     
-    // Save to firebase
     if(currentUser) {
         await saveToDb();
     }
