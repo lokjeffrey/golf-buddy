@@ -425,6 +425,22 @@
         </div>
     </div>
 
+    <!-- COACH TAB (Alleen voor Admins) -->
+    <div id="tab-coach" class="tab">
+        <div class="card" style="background:var(--gd); color:#fff; border-radius:12px; margin-bottom:16px; box-shadow:var(--sh);">
+            <div style="font-size:18px; font-weight:800; margin-bottom:6px;">📋 Coach Dashboard</div>
+            <div style="font-size:12px; opacity:0.8;">Welkom, Coach. Hier is de actuele status van je spelers.</div>
+        </div>
+        
+        <div class="card">
+            <div class="ctit">🏌️ Mijn Leerlingen / Spelers</div>
+            <div class="info-strip">Live data vanuit de cloud. Spelers met kritieke zwaktes lichten direct op.</div>
+            <div id="coach-users-list">
+                <div class="loader"></div> Spelers laden...
+            </div>
+        </div>
+    </div>
+
     <!-- COMM TAB (Leaderboard) -->
     <div id="tab-comm" class="tab">
         <div class="card" style="margin-bottom:16px;">
@@ -474,6 +490,7 @@
         <button class="nbtn"        id="nav-comm"      onclick="showTab('comm')">      <span class="ico">🏆</span>Challenge</button>
         <button class="nbtn"        id="nav-voortgang" onclick="showTab('voortgang')"> <span class="ico">📊</span>Progress</button>
         <button class="nbtn"        id="nav-clubs"     onclick="showTab('profiel')">   <span class="ico">👤</span>Profiel</button>
+        <button class="nbtn"        id="nav-coach"     onclick="showTab('coach')" style="display:none;"> <span class="ico">📋</span>Coach</button>
     </nav>
 </div>
 <!-- TRACKMAN DEBRIEF MODAL -->
@@ -620,6 +637,16 @@ async function loadUserData(){
             initAppUI();
             if(window.currentMode === 'manual') drawManualFocus();
             if(document.getElementById('tc-active').style.display === 'block' || document.getElementById('tc-preround-container').style.display === 'block') renderSessions();
+            
+            // --- COACH ADMIN CHECK ---
+            if (userData.isAdmin) {
+                document.getElementById('nav-coach').style.display = 'flex';
+                window.loadCoachData(); // Start met het inladen van andere spelers
+            } else {
+                document.getElementById('nav-coach').style.display = 'none';
+            }
+            // -------------------------
+            
             resolve();
         }, (e) => {
             console.error("Error loading data:", e); toast("Fout bij laden data");
@@ -2206,6 +2233,67 @@ window.submitReport = async () => {
         btn.disabled = false;
     }
 };
+let coachUnsub = null;
+
+window.loadCoachData = () => {
+    if (coachUnsub) coachUnsub();
+    
+    // We luisteren live naar ALLE documenten in de 'users' collectie
+    coachUnsub = onSnapshot(collection(db, "users"), (snap) => {
+        let html = '';
+        
+        snap.forEach(userDoc => {
+            const u = userDoc.data();
+            // Optioneel: Sla jezelf over in de lijst (if(userDoc.id === currentUser.uid) return;)
+            // Maar voor testen is het leuk om jezelf ook te zien!
+            
+            const name = u.displayName || u.email?.split('@')[0] || 'Anonieme Speler';
+            const entries = u.entries || [];
+            const lat = entries.length ? entries[0] : null; // Laatste meting
+            const hcp = lat?.stats?.hcp || '—';
+            const laatsteDatum = lat ? fmtDate(lat.ts) : 'Nog geen data';
+            
+            let topWeaknessHtml = '<span style="color:var(--mu);font-size:11px;">Geen actuele data</span>';
+            
+            if (lat && lat.ws) {
+                const rank = Object.entries(lat.ws).sort((a,b)=>b[1]-a[1]);
+                if(rank[0] && rank[0][1] > 5) {
+                    const sev = rank[0][1] > 30 ? '🔴 Kritiek' : (rank[0][1] > 15 ? '🟠 Zwak' : '🟡 Aandacht');
+                    topWeaknessHtml = `<span style="font-weight:700;font-size:12px;">${sev}: ${CAT_LBL[rank[0][0]] || rank[0][0]}</span>`;
+                } else {
+                    topWeaknessHtml = `<span style="color:var(--gm);font-weight:700;font-size:12px;">✅ Data is netjes gebalanceerd</span>`;
+                }
+            }
+
+            html += `
+            <div style="background:var(--gx); border:1.5px solid var(--bd); border-radius:10px; padding:12px; margin-bottom:10px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                    <div style="font-weight:800; color:var(--gd); font-size:15px;">${name}</div>
+                    <div class="hcp-cls" style="background:var(--wh); border:1px solid var(--gl); color:var(--gd);">HCP ${hcp}</div>
+                </div>
+                <div style="font-size:11px; color:var(--mu); margin-bottom:6px;">Laatste meting: ${laatsteDatum}</div>
+                <div style="background:var(--wh); padding:8px; border-radius:6px; border:1px dashed var(--bd);">
+                    ${topWeaknessHtml}
+                </div>
+            </div>`;
+        });
+        
+        document.getElementById('coach-users-list').innerHTML = html || '<div class="empty"><p>Geen spelers in de database.</p></div>';
+    }, (error) => {
+        console.error("Coach fetch error:", error);
+        document.getElementById('coach-users-list').innerHTML = '<p style="color:var(--rd);font-size:12px;">Fout bij inladen data. Check database regels.</p>';
+    });
+};
+
+// ----------------------------------------------------------------------
+// 🚨 TIJDELIJKE HACK: Roep deze functie in je browser-console aan, of
+// maak even een tijdelijke knop om jezelf Admin te maken!
+window.makeMeCoach = async () => {
+    if(!currentUser) return toast("Niet ingelogd!");
+    await setDoc(doc(db, "users", currentUser.uid), { isAdmin: true }, { merge: true });
+    toast("✅ Je bent nu een Coach! Herlaad de app.");
+};
+// ----------------------------------------------------------------------
 </script>
 <script>
     if ('serviceWorker' in navigator) {
