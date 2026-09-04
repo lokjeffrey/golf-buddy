@@ -480,26 +480,27 @@
 <div id="tm-debrief-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;display:none;align-items:center;justify-content:center;padding:20px;">
     <div style="background:#fff;border-radius:16px;padding:24px;width:100%;max-width:400px;box-shadow:var(--sh);">
         <div style="font-size:18px;font-weight:800;color:var(--bl);margin-bottom:12px;">💻 Trackman Debriefing</div>
-        <p style="font-size:13px;color:var(--mu);margin-bottom:16px;">Hoe ging je ronde? Jouw eerlijkheid hier bepaalt je trainingsschema van volgende week.</p>
+        <p style="font-size:13px;color:var(--mu);margin-bottom:16px;">Vul je simulator data in (zie Trackman screenshot). De app past hier direct je resterende trainingen op aan!</p>
         
         <div class="fg">
-            <label class="fl">Bruto Score / Resultaat</label>
-            <input type="text" id="tm-score" class="fi" placeholder="Bijv. 82 slagen">
+            <label class="fl">Trackman Score (Strokes)</label>
+            <input type="number" id="tm-score" class="fi" placeholder="Bijv. 89">
         </div>
         
-        <div class="fg">
-            <label class="fl">Wat ging er het vaakst mis onder druk?</label>
-            <select id="tm-weakness" class="fi">
-                <option value="none">Ging eigenlijk heel goed!</option>
-                <option value="drive">Afslag (Veel gemiste fairways / out of bounds)</option>
-                <option value="approach">Approach (Greens gemist / slecht ijzer-contact)</option>
-                <option value="puttMedium">Putten (Veel 3-putts / slechte afstandscontrole)</option>
-            </select>
+        <div class="gr2">
+            <div class="fg">
+                <label class="fl">Fairways Hit (%)</label>
+                <input type="number" id="tm-fw" class="fi" placeholder="Bijv. 57">
+            </div>
+            <div class="fg">
+                <label class="fl">GIR (%)</label>
+                <input type="number" id="tm-gir" class="fi" placeholder="Bijv. 33">
+            </div>
         </div>
         
         <div style="display:flex;gap:10px;margin-top:20px;">
             <button class="btn btn-s" onclick="closeTmDebrief()">Annuleren</button>
-            <button class="btn btn-p" onclick="saveTmDebrief()" style="background:#1565C0;">Opslaan & Toepassen</button>
+            <button class="btn btn-p" onclick="saveTmDebrief()" style="background:#1565C0;">Opslaan & Herbereken</button>
         </div>
     </div>
 </div>
@@ -1462,6 +1463,19 @@ window.genSessions = async () => {
             completed: false
         });
 
+        // Bepaal persoonlijke missie op basis van zwaktes
+        const rank = rankCats(lat.ws);
+        const topWeakness = rank[0]?.cat || 'none';
+        let tmDesc = 'Speel een volledige ronde op de simulator of buiten op de echte baan. Denk aan je baanmanagement en speel je eigen spel.';
+        
+        if (topWeakness === 'drive') {
+            tmDesc = '🎯 Persoonlijke Missie: Jouw afslag is momenteel je valkuil. Speel een uitdagende, smalle virtuele baan. Focus puur op het in het spel houden van de bal. Pak bij twijfel een hout of hybride van de tee in plaats van je driver!';
+        } else if (topWeakness === 'approach') {
+            tmDesc = '🎯 Persoonlijke Missie: Je GIR is laag. Op een simulator train je dit het beste via afstandscontrole. Neem vandaag bij élke approach standaard één club extra en maak een gecontroleerde, soepele 80% swing. Focus 100% op zuiver contact en je Carry-afstand.';
+        } else if (topWeakness === 'chip' || topWeakness.startsWith('putt')) {
+            tmDesc = '🎯 Persoonlijke Missie: Jouw echte verbeterpunt (korte spel) kunnen we hier niet trainen, want de simulator maakt alles onder 30m automatisch af! Jouw missie vandaag: Sla zoveel mogelijk greens (GIR) zodat je in het echt dat korte spel helemaal niet nodig hebt.';
+        }
+
         // 2. Als aangevinkt: Voeg de optionele speelronde toe (isOptional: true)
         if (includeTrackman) {
             newPlan.push({
@@ -1471,15 +1485,15 @@ window.genSessions = async () => {
                 lbl: 'Trackman of Baan',
                 icon: '💻',
                 bc: 'bd4',
-                desc: 'Speel 18 holes (virtueel of echt) als transfer-training.',
+                desc: 'Speel 18 holes (virtueel of echt) met een specifieke opdracht.',
                 mins: 70, 
                 completed: false,
                 exs: [
                     { 
                         id: 'tm_1_' + i, cat: 'drive', clubHint: null, name: '18 Holes Spelen', 
-                        dur: 60, dif: 'Gemiddeld', balls: 0, ballType: 'none', sets: 1, goal: 'Noteer je (virtuele) score', 
-                        desc: 'Speel een volledige ronde van 18 holes op de simulator OF buiten op de echte baan. Denk aan je baanmanagement: speel de veilige kant van de green en vermijd onnodige risico\'s.', 
-                        tip: '💡 Geen technische gedachten! Maak je beslissing, stap naar de bal en vertrouw op je swing.' 
+                        dur: 60, dif: 'Gemiddeld', balls: 0, ballType: 'none', sets: 1, goal: 'Noteer je data', 
+                        desc: tmDesc, // <--- HIER GEBRUIKEN WE DE DYNAMISCHE TEKST
+                        tip: '💡 Geen technische gedachten! Maak je beslissing, stap naar de bal en vertrouw op je spiergeheugen.' 
                     },
                     {
                         id: 'tm_2_' + i, cat: 'puttLong', clubHint: 'putter', name: 'Reality Check (Echt Gras)',
@@ -1844,7 +1858,8 @@ window.openTmDebrief = (sessIdx, exId) => {
     activeTmSessIdx = sessIdx;
     activeTmExId = exId;
     document.getElementById('tm-score').value = '';
-    document.getElementById('tm-weakness').value = 'none';
+    document.getElementById('tm-fw').value = '';
+    document.getElementById('tm-gir').value = '';
     document.getElementById('tm-debrief-overlay').style.display = 'flex';
 };
 
@@ -1854,24 +1869,80 @@ window.closeTmDebrief = () => {
 
 window.saveTmDebrief = async () => {
     const score = document.getElementById('tm-score').value;
-    const weakness = document.getElementById('tm-weakness').value;
+    const fw = parseInt(document.getElementById('tm-fw').value);
+    const gir = parseInt(document.getElementById('tm-gir').value);
     
+    // Algoritme: bepaal automatisch het probleem o.b.v. data
+    let detectedWeakness = 'none';
+    if (!isNaN(fw) && !isNaN(gir)) {
+        // We leggen de lat op 50% Fairway en 40% GIR. Alles daaronder trekt de aandacht.
+        const fwDeficit = 50 - fw; 
+        const girDeficit = 40 - gir; 
+        
+        if (fwDeficit > 0 || girDeficit > 0) {
+            // Wat is er erger aan de hand?
+            if (girDeficit >= fwDeficit) detectedWeakness = 'approach';
+            else detectedWeakness = 'drive';
+        }
+    }
+    
+    // 1. Log opslaan
     trackmanLogs.unshift({
         date: new Date().toISOString(),
         score: score,
-        weakness: weakness
+        fwPct: fw,
+        girPct: gir,
+        weakness: detectedWeakness
     });
     
+    // 2. Markeer de Trackman sessie-kaart als voltooid
     if(activePlan && activePlan[activeTmSessIdx]) {
         if(!activePlan[activeTmSessIdx].exState) activePlan[activeTmSessIdx].exState = {};
         if(!activePlan[activeTmSessIdx].exState[activeTmExId]) activePlan[activeTmSessIdx].exState[activeTmExId] = { done: false, rating: null };
         activePlan[activeTmSessIdx].exState[activeTmExId].done = true;
     }
     
+    // 3. ✨ DIRECT HERBEREKENEN VAN RESTERENDE TRAININGEN ✨
+    const lat = getLatest();
+    if(lat && activePlan) {
+        activePlan.forEach((sess, idx) => {
+            // Zoek trainingen (isCore) die in de TOEKOMST liggen (nog niet voltooid)
+            if (sess.isCore && !sess.completed) {
+                const baseId = sess.id.split('_')[0];
+                let targetForBuild = sess.mins;
+                const used = new Set();
+                let preClubs = [];
+                
+                // Houd rekening met een eventuele wekelijkse challenge die er al stond
+                const existingWeekly = sess.exs.find(e => e.isWeeklyChallenge);
+                if (existingWeekly) {
+                    targetForBuild -= existingWeekly.dur;
+                    used.add(existingWeekly.id);
+                    if ((existingWeekly.cat === 'drive' || existingWeekly.cat === 'approach') && existingWeekly.clubHint) {
+                        preClubs.push(existingWeekly.clubHint);
+                    }
+                }
+                
+                // Bouw de sessie OPNIEUW op. lat.ws haalt nu de strafpunten uit calcScores() mee!
+                const newExs = buildSess(baseId, lat.ws, targetForBuild, used, lat.stats?.hcp, preClubs);
+                
+                if (existingWeekly) {
+                    newExs.unshift(existingWeekly);
+                }
+                
+                sess.exs = newExs;
+                // Geef een visuele indicatie in de titel
+                if (!sess.desc.includes('Trackman data')) {
+                    sess.desc = sess.desc + " 🔄 (Aangepast o.b.v. recente Trackman data)";
+                }
+            }
+        });
+    }
+    
     closeTmDebrief();
     renderSessions();
     if(currentUser) await saveToDb();
-    toast('Debriefing opgeslagen! Je volgende plan wordt hierop aangepast.');
+    toast('Debriefing verwerkt! Toekomstige trainingen zijn direct op maat aangepast.');
 };
 
 /* ═══════════════════════════════════════════════════════
