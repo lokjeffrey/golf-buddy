@@ -1480,6 +1480,7 @@ window.genSessions = async () => {
         newPlan.push({
             id: base.id + '_' + i,
             weekNum: weekNum,
+            createdAt: Date.now(),
             isCore: true,
             lbl: base.lbl,
             icon: base.icon,
@@ -1500,7 +1501,7 @@ window.genSessions = async () => {
         } else if (topWeakness === 'approach') {
             tmDesc = '🎯 Persoonlijke Missie: Je GIR is laag. Op een simulator train je dit het beste via afstandscontrole. Neem vandaag bij élke approach standaard één club extra en maak een gecontroleerde, soepele 80% swing. Focus 100% op zuiver contact en je Carry-afstand.';
         } else if (topWeakness === 'chip' || topWeakness.startsWith('putt')) {
-            tmDesc = '🎯 Persoonlijke Missie: Jouw echte verbeterpunt (korte spel) kunnen we hier niet trainen, want de simulator maakt alles onder 30m automatisch af! Jouw missie vandaag: Sla zoveel mogelijk greens (GIR) zodat je in het echt dat korte spel helemaal niet nodig hebt.';
+            tmDesc = '🎯 Persoonlijke Missie: Jouw echte verbeterpunt (korte spel) kunnen we hier niet trainen (de simulator maakt alles onder 30m af). Jouw missie vandaag: Sla zoveel mogelijk greens (GIR) zodat je dat korte spel niet nodig hebt. Hoe? Mik bij élke approach puur op het absolute midden van de green. Negeer de vlag en neem bij twijfel één club extra voor een soepele swing.';
         }
 
         // 2. Als aangevinkt: Voeg de optionele speelronde toe (isOptional: true)
@@ -1508,6 +1509,7 @@ window.genSessions = async () => {
             newPlan.push({
                 id: 'trackman_' + i,
                 weekNum: weekNum,
+                createdAt: Date.now(),
                 isOptional: true,
                 lbl: 'Trackman of Baan',
                 icon: '💻',
@@ -1603,7 +1605,38 @@ function renderSessions(){
     document.getElementById('plan-prog-text').textContent = `${completedCount}/${totLen} Weken voltooid`;
     document.getElementById('plan-prog-bar').style.width = totLen ? `${(completedCount/totLen)*100}%` : '0%';
 
+    // Bepaal hoeveel weken er zijn vrijgeschakeld sinds de aanmaak van het plan
+    let weeksUnlocked = 1;
+    if (activePlan.length > 0 && activePlan[0].createdAt) {
+        const dStart = new Date(activePlan[0].createdAt);
+        const dNow = new Date();
+        // Bereken ISO weeknummers om maandag als wisselmoment te gebruiken
+        dStart.setUTCDate(dStart.getUTCDate() + 4 - (dStart.getUTCDay()||7));
+        const wStart = Math.ceil((((dStart - new Date(Date.UTC(dStart.getUTCFullYear(),0,1))) / 86400000) + 1)/7);
+        dNow.setUTCDate(dNow.getUTCDate() + 4 - (dNow.getUTCDay()||7));
+        const wNow = Math.ceil((((dNow - new Date(Date.UTC(dNow.getUTCFullYear(),0,1))) / 86400000) + 1)/7);
+        
+        weeksUnlocked = 1 + (wNow - wStart);
+        if (dNow.getUTCFullYear() > dStart.getUTCFullYear()) weeksUnlocked += 52; // Jaarwisseling correctie
+    }
+
     document.getElementById('sess-container').innerHTML = activePlan.map((sess,i)=>{
+        // --- DRIP FEED LOGICA ---
+        const isLocked = sess.weekNum > weeksUnlocked;
+        
+        if (isLocked) {
+            return `<div class="sc" style="background:#fafafa; opacity:0.6; border:1px dashed #ccc;">
+                <div class="sh" style="cursor:not-allowed;">
+                    <div class="shl">
+                        <div class="sbadge" style="background:#e0e0e0;">🔒</div>
+                        <div><div class="stit" style="color:var(--mu);">Week ${sess.weekNum} - ${sess.isOptional ? 'Optioneel' : 'Training'}</div>
+                        <div class="smeta">Kom op maandag terug om deze sessie vrij te spelen.</div></div>
+                    </div>
+                </div>
+            </div>`;
+        }
+        // ------------------------
+
         const tot = sess.exs.reduce((s,e)=>s+e.dur,0);
         let rangeBalls = 15; // 15 balls for default warmup
         sess.exs.forEach(e => {
@@ -1624,16 +1657,30 @@ function renderSessions(){
             : `<div style="text-align:center;color:var(--gm);font-weight:700;margin-top:16px;">Sessie Voltooid 🎉</div>`;
 
         const titlePrefix = sess.isOptional ? `Week ${sess.weekNum} - Optioneel` : (sess.weekNum ? `Week ${sess.weekNum} - Training` : `Sessie ${i+1}`);
+        
+        // --- DOEL SAMENVATTING HTML ---
+        const doelHtml = `<div style="background:var(--bll); border-left:4px solid var(--bl); padding:12px; margin-bottom:16px; border-radius:4px;">
+            <div style="font-size:12px; font-weight:800; color:var(--bl); margin-bottom:4px;">🎯 Doel van deze training</div>
+            <div style="font-size:13px; color:var(--tx); line-height:1.4;">${sess.desc}</div>
+            ${sess.exs.some(e => e.isWeeklyChallenge) ? `<div style="margin-top:6px; font-size:11px; color:#1565C0; font-weight:700;">🏆 Inclusief Challenge van de Week</div>` : ''}
+        </div>`;
+        // ------------------------------
+
         return `<div class="sc" style="${bg}opacity:${opacity};">
             <div class="sh" onclick="togSess(${i})">
                 <div class="shl">
                     ${badgeHtml}
                     <div><div class="stit" style="${done?'text-decoration:line-through;color:var(--mu);':''}">${titlePrefix}: ${sess.lbl}</div>
-                    <div class="smeta">${sess.desc} · ~${tot+10} min · 🟡 ~${rangeBalls} range ballen</div></div>
+                    <div class="smeta">~${tot+10} min · 🟡 ~${rangeBalls} range ballen</div></div>
                 </div>
                 <div class="schev" id="chev-${i}">▼</div>
             </div>
-            <div class="ssb" id="sb-${i}">${WARMUP_HTML}${renderExList(sess.exs,i)}${btnHtml}</div>
+            <div class="ssb" id="sb-${i}">
+                ${doelHtml}
+                ${WARMUP_HTML}
+                ${renderExList(sess.exs,i)}
+                ${btnHtml}
+            </div>
         </div>`;
     }).join('');
 }
@@ -2095,35 +2142,42 @@ window.saveClubs = async () => {
    INIT
 ═══════════════════════════════════════════════════════ */
 function initAppUI(){
-    const lat=getLatest();
+    const lat = getLatest();
     if(!lat) {
-        document.getElementById('hdr-sub').textContent='Voer je data in om te beginnen';
-        document.getElementById('te').style.display='block';
-        document.getElementById('tc-generate').style.display='none';
-        document.getElementById('tc-active').style.display='none';
+        document.getElementById('hdr-sub').textContent = 'Voer je data in om te beginnen';
+        document.getElementById('te').style.display = 'block';
+        document.getElementById('tc-generate').style.display = 'none';
+        document.getElementById('tc-active').style.display = 'none';
+        window.showTab('data'); // Geen data? Forceer naar invoer.
         return;
     }
-    if(lat.mode==='manual'){
+    
+    if(lat.mode === 'manual'){
         window.setMode('manual');
-        if(lat.stats?.hcp) document.getElementById('s-hcp').value=lat.stats.hcp;
+        if(lat.stats?.hcp) document.getElementById('s-hcp').value = lat.stats.hcp;
         if(lat.manualFocus){manualFocus={...lat.manualFocus};drawManualFocus();}
     }else{
         window.setMode('garmin');
-        const s=lat.stats;
-        const map={hcp:'s-hcp',drive:'s-drv',drl:'s-drl',drf:'s-drf',drr:'s-drr',
-                   approach:'s-gir',cgem:'s-cgem',cuad:'s-cuad',csan:'s-csan',
-                   puttAvg:'s-pavg',p1s:'s-p1s',p1m:'s-p1m',p1l:'s-p1l',
-                   puttShort:'s-ps',puttMedium:'s-pm',puttLong:'s-pl'};
+        const s = lat.stats;
+        const map = {hcp:'s-hcp',drive:'s-drv',drl:'s-drl',drf:'s-drf',drr:'s-drr',
+                     approach:'s-gir',cgem:'s-cgem',cuad:'s-cuad',csan:'s-csan',
+                     puttAvg:'s-pavg',p1s:'s-p1s',p1m:'s-p1m',p1l:'s-p1l',
+                     puttShort:'s-ps',puttMedium:'s-pm',puttLong:'s-pl'};
         Object.entries(map).forEach(([k,id])=>{if(s&&s[k])document.getElementById(id).value=s[k];});
     }
     updHeader(lat);
-    document.getElementById('te').style.display='none';
+    
+    document.getElementById('te').style.display = 'none';
+    
+    // Altijd standaard op de Train-pagina beginnen als er data is!
+    window.showTab('training');
+    
     if(activePlan && activePlan.length > 0) {
-        document.getElementById('tc-generate').style.display='none';
-        document.getElementById('tc-active').style.display='block';
+        document.getElementById('tc-generate').style.display = 'none';
+        document.getElementById('tc-active').style.display = 'block';
     } else {
-        document.getElementById('tc-generate').style.display='block';
-        document.getElementById('tc-active').style.display='none';
+        document.getElementById('tc-generate').style.display = 'block';
+        document.getElementById('tc-active').style.display = 'none';
     }
 }
 
