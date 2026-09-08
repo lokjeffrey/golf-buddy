@@ -1606,6 +1606,8 @@ window.genSessions = async () => {
 };
 
 function renderSessions(){
+    const openSess = {};
+    document.querySelectorAll('.ssb.open').forEach(el => openSess[el.id] = true);
     if (activeWarmup) {
         document.getElementById('tc-preround-menu').style.display = 'none';
         document.getElementById('tc-preround-container').style.display = 'block';
@@ -1639,7 +1641,7 @@ function renderSessions(){
                 </div>
                 <div class="schev" id="chev-warmup" style="transform:rotate(180deg);">▼</div>
             </div>
-            <div class="ssb" id="sb-warmup" style="display:block;">${renderExList(sess.exs, 'warmup')}${btnHtml}</div>
+            <div class="ssb ${openSess['sb-warmup'] ? 'open' : ''}" id="sb-warmup" style="display:block;">${renderExList(sess.exs, 'warmup')}${btnHtml}</div>
         </div>`;
     } else {
         document.getElementById('tc-preround-menu').style.display = 'block';
@@ -1752,9 +1754,9 @@ function renderSessions(){
                     <div><div class="stit" style="${done?'text-decoration:line-through;color:var(--mu);':''}">${titlePrefix}: ${sess.lbl}</div>
                     <div class="smeta">~${tot+10} min${rangeBalls > 0 ? ` · 🟡 ${bucketStr} range ballen (incl. warmup)` : ''}</div></div>
                 </div>
-                <div class="schev" id="chev-${i}">▼</div>
+                <div class="schev ${openSess['sb-'+i] ? 'open' : ''}" id="chev-${i}">▼</div>
             </div>
-            <div class="ssb" id="sb-${i}">
+            <div class="ssb ${openSess['sb-'+i] ? 'open' : ''}" id="sb-${i}">
                 ${doelHtml}
                 ${WARMUP_HTML}
                 ${renderExList(sess.exs,i)}
@@ -1822,11 +1824,69 @@ window.completeWarmup = async () => {
     toast("Warm-up afgerond! Succes in de baan! ⛳");
 };
 
-window.completeSession = async (idx) => {
+let currentFeedbackIdx = null;
+
+window.undoSession = async (idx) => {
     if(!activePlan || !activePlan[idx]) return;
-    activePlan[idx].completed = true;
+    activePlan[idx].completed = false;
+    renderSessions();
+    if(currentUser) await saveToDb();
+};
+
+window.openSessionFeedback = (idx) => {
+    currentFeedbackIdx = idx;
     
-    // Check if all are done
+    // Render feedback questions dynamically
+    const qHtml = `
+        <div style="margin-bottom:12px;">
+            <label style="font-size:12px;font-weight:700;color:var(--gd);display:block;margin-bottom:6px;">1. Hoe zou je de sessie in het algemeen beoordelen? (<span id="fb-score-val">8</span>/10)</label>
+            <input type="range" id="fb-q1" min="1" max="10" value="8" style="width:100%;" oninput="document.getElementById('fb-score-val').textContent=this.value; document.getElementById('feedback-extra').style.display = this.value < 9 ? 'block' : 'none';">
+        </div>
+        
+        <div style="margin-bottom:12px;">
+            <label style="font-size:12px;font-weight:700;color:var(--gd);display:block;margin-bottom:6px;">2. Waren de oefeningen duidelijk?</label>
+            <select id="fb-q2" class="rfield" style="padding:8px;"><option>Ja</option><option>Gedeeltelijk</option><option>Nee</option></select>
+        </div>
+
+        <div style="margin-bottom:12px;">
+            <label style="font-size:12px;font-weight:700;color:var(--gd);display:block;margin-bottom:6px;">3. Was de logistiek / volgorde logisch?</label>
+            <select id="fb-q3" class="rfield" style="padding:8px;"><option>Ja</option><option>Gedeeltelijk</option><option>Nee</option></select>
+        </div>
+
+        <div style="margin-bottom:12px;">
+            <label style="font-size:12px;font-weight:700;color:var(--gd);display:block;margin-bottom:6px;">4. Sloot het niveau goed aan op je kunnen?</label>
+            <select id="fb-q4" class="rfield" style="padding:8px;"><option>Precies goed</option><option>Te makkelijk</option><option>Te moeilijk</option></select>
+        </div>
+
+        <div style="margin-bottom:16px;">
+            <label style="font-size:12px;font-weight:700;color:var(--gd);display:block;margin-bottom:6px;">5. Hoe is je zelfvertrouwen na deze training?</label>
+            <select id="fb-q5" class="rfield" style="padding:8px;"><option>Beter</option><option>Hetzelfde</option><option>Slechter</option></select>
+        </div>
+    `;
+    
+    document.getElementById('feedback-questions').innerHTML = qHtml;
+    document.getElementById('feedback-improve').value = '';
+    document.getElementById('feedback-extra').style.display = 'none';
+    document.getElementById('sess-feedback-overlay').style.display = 'flex';
+};
+
+window.submitSessionFeedback = async () => {
+    document.getElementById('sess-feedback-overlay').style.display = 'none';
+    
+    const fb = {
+        score: document.getElementById('fb-q1').value,
+        clear: document.getElementById('fb-q2').value,
+        logic: document.getElementById('fb-q3').value,
+        level: document.getElementById('fb-q4').value,
+        conf: document.getElementById('fb-q5').value,
+        improve: document.getElementById('feedback-improve').value
+    };
+    
+    if(activePlan && activePlan[currentFeedbackIdx]) {
+        activePlan[currentFeedbackIdx].feedback = fb;
+        activePlan[currentFeedbackIdx].completed = true;
+    }
+    
     const coreSess = activePlan.filter(s => s.isCore);
     const allDone = coreSess.length > 0 ? coreSess.every(s => s.completed) : activePlan.every(s => s.completed);
     
@@ -1950,9 +2010,13 @@ function renderExList(exs, sessIdx=0){
                         ${isD ? '✅ Oefening afgerond' : '📝 Notitie (optioneel)'}
                     </div>
                     ${histHtml}
-                    ${!isD ? `<div style="display:flex;gap:6px;">
-                        <input type="text" id="ex-note-input-${e.id}" placeholder="Voeg een notitie toe..." style="flex:1;padding:7px 10px;font-size:12px;border:1.5px solid #ddd;border-radius:6px;">
-                        <button class="btn btn-p" onclick="saveExNote('${sessIdx}', '${e.id}')" style="margin:0;padding:6px 14px;font-size:12px;">Gedaan ✓</button>
+                    ${!isD ? `<div style="${isWeekly ? 'display:block;' : 'display:flex;gap:6px;'}">
+                        ${isWeekly ? `<div style="font-size:11px; font-weight:700; color:#1565C0; margin-bottom:4px;">Je score voor het Leaderboard (bijv. 5):</div>` : ''}
+                        <div style="display:flex;gap:6px;margin-bottom:6px;">
+                            ${isWeekly ? `<input type="number" id="ex-score-input-${e.id}" placeholder="Score" style="width:80px;padding:7px;font-size:12px;border:1.5px solid #1565C0;border-radius:6px;">` : ''}
+                            <input type="text" id="ex-note-input-${e.id}" placeholder="Voeg een notitie toe..." style="flex:1;padding:7px 10px;font-size:12px;border:1.5px solid #ddd;border-radius:6px;">
+                        </div>
+                        <button class="btn btn-p" onclick="saveExNote('${sessIdx}', '${e.id}', ${isWeekly})" style="margin:0;padding:6px 14px;font-size:12px;${isWeekly ? 'width:100%;' : ''}">Gedaan ✓</button>
                     </div>` : `<div style="font-size:12px;color:#166534;">Klik op "Afronden" als alle oefeningen klaar zijn.</div>`}
                 </div>`;
             }
@@ -1970,9 +2034,11 @@ function renderExList(exs, sessIdx=0){
     }).join('');
 }
 
-window.saveExNote = async (sessIdx, exId) => {
+window.saveExNote = async (sessIdx, exId, isWeekly) => {
     const input = document.getElementById(`ex-note-input-${exId}`);
+    const scoreInput = document.getElementById(`ex-score-input-${exId}`);
     const noteText = input ? input.value.trim() : '';
+    const scoreVal = scoreInput ? parseFloat(scoreInput.value) : null;
 
     if(!exHistoryData[exId]) exHistoryData[exId] = [];
     if(noteText) {
@@ -1980,6 +2046,23 @@ window.saveExNote = async (sessIdx, exId) => {
             date: new Date().toISOString(),
             note: noteText
         });
+    }
+
+    // Leaderboard logic
+    if (isWeekly && !isNaN(scoreVal) && currentUser) {
+        const emailName = currentUser.email ? currentUser.email.split('@')[0] : 'Golfer';
+        // Need to use Firestore setDoc correctly
+        try {
+            // Using existing db reference
+            await setDoc(doc(db, "leaderboards", currentWeekStr, "scores", currentUser.uid), {
+                score: scoreVal,
+                name: userData.displayName || emailName,
+                timestamp: new Date().getTime()
+            });
+            toast('🏆 Score opgeslagen in Leaderboard!');
+        } catch(e) {
+            console.error("Leaderboard error", e);
+        }
     }
     
     let targetSess = sessIdx === 'warmup' ? activeWarmup : (activePlan ? activePlan[sessIdx] : null);
