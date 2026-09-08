@@ -789,6 +789,57 @@ const EX=[
 const CAT_LBL={drive:'🏌️ Afslag',approach:'🎯 Approach',chip:'🏌 Chip/Pitch',puttShort:'🎱 Putt Kort',puttMedium:'🎱 Putt Medium',puttLong:'🎱 Putt Lang'};
 const CAT_COL={drive:'#e3f2fd',approach:'#e8f5e9',chip:'#f3e5f5',puttShort:'#fce4ec',puttMedium:'#fff3e0',puttLong:'#e0f2f1'};
 
+/* ═══════════════════════════════════════════════════════
+   CHALLENGE DEEP-DIVES (Kennisbank)
+═══════════════════════════════════════════════════════ */
+const CHALLENGE_DETAILS = {
+    'd7': {
+        why: 'Deze oefening simuleert de meedogenloze druk van de eerste tee. Na 3 goede drives begint je hartslag te stijgen bij bal 4 en 5.',
+        focus: 'Loop na élke bal weg van je mat. Doe je volledige pre-shot routine alsof het een nieuwe hole is.',
+        mistake: 'Te snel doorslaan na een misser uit frustratie, om maar weer "snel op 1 te beginnen".'
+    },
+    'd13': {
+        why: 'Driver is vaak de "ego-club". We slaan liever 10m verder in de rough dan 10m korter op de fairway. Deze test dwingt je tot fairway-finder swings.',
+        focus: 'Kies een micro-target in de verte (een specifieke boom of paal), niet simpelweg "het midden van het gras".',
+        mistake: 'Op 100% kracht slaan. Een soepele 85% swing levert veel meer nauwkeurigheid op met minimaal afstandsverlies.'
+    },
+    'a4': {
+        why: 'De vlag aanvallen vereist exacte afstandscontrole. Blind slaan op de range leert je niets over afwijkingen in meters.',
+        focus: 'Vertrouw op de club die je kiest. Twijfel je over de afstand? Dan is je swingritme direct verpest.',
+        mistake: 'Alleen kijken naar de stuit, zonder te evalueren hoever de bal uiteindelijk uitrolt na de landing.'
+    },
+    'a12': {
+        why: 'Binnen 6 meter van de vlag liggen is de ultieme kans op een birdie of een stressvrije par. Dit is de "scoring zone" van ijzers.',
+        focus: 'Focus op balans en tempo. Hoe korter het ijzer, hoe vloeiender en rustiger je swing moet zijn.',
+        mistake: 'Te agressief op de pin mikken (die bijv. kort aan het water staat) in plaats van veilig het midden van de green te pakken.'
+    },
+    'c3': {
+        why: 'Een chip binnen 3 meter noemt men de "Scrambling zone". Vanaf hier dwing je een makkelijke 1-putt af om par te redden na een gemiste green.',
+        focus: 'Kies exclusief een landingspunt op de green. Kijk daarnaar tijdens je swing, de bal rolt daarna vanzelf naar de hole.',
+        mistake: 'Te snel omhoog kijken om te zien waar de bal heen gaat, wat resulteert in het beruchte "toppen" van de bal.'
+    },
+    'pm1': {
+        why: 'De ultieme test voor je snelheidscontrole ("touch") onder druk. Lengte aanvoelen is cruciaal om 3-putts te vermijden.',
+        focus: 'Het tempo van de putt blijft altijd gelijk (1-2, tik). Alleen de lengte van je backswing bepaalt de afstand.',
+        mistake: 'Decelereren (afremmen) van de putter net voor de impact, vaak uit onbewuste angst om de bal te ver te slaan.'
+    },
+    'pm2': {
+        why: 'Vanaf 5 meter gaat 80% van de amateurs drieputten als ze hem erin willen "rammen". Het échte doel is een veilige tap-in overlaten.',
+        focus: 'Lees de baan van de bal en stem je snelheid af op de break. Visualiseer een grote emmer rondom de hole.',
+        mistake: 'De putt agressief willen "maken" in plaats van hem zachtjes "dood te leggen" bij de hole.'
+    },
+    'pl1': {
+        why: 'Lag-putting is essentieel. Hiermee voorkom je de fatale en zenuwslopende 3-putt vanaf de andere kant van de green.',
+        focus: 'Puur gevoel in de handen en een vloeiende, pendelende schouderbeweging. Gebruik absoluut géén polsen!',
+        mistake: 'Te veel kijken naar de ideale lijn (break), en te weinig focussen op pure afstand. Snelheid is hier 10x belangrijker dan richting.'
+    },
+    'pl2': {
+        why: '10 meter is een heel standaard eerste putt op grote greens. Een tap-in overlaten haalt alle stress uit de rest van de hole.',
+        focus: 'Kijk tijdens je oefenswings naar de hole, zodat je hersenen de afstand onbewust kunnen kalibreren in je armen.',
+        mistake: 'Frustratie of teleurstelling als de bal er niet in rolt. Lag-putts zijn puur om te overleven, niet voor de scorekaart.'
+    }
+};
+
 const SESS=[
     {id:'spotlight',lbl:'Spotlight Focus',     icon:'💡',bc:'bd1',desc:'Vandaag trainen we exclusief op de club waarmee je de meeste slagen op de baan verliest. Dicht dit lek en je handicap daalt razendsnel.'},
     {id:'balance',  lbl:'Gebalanceerde Aanval',icon:'⚖️',bc:'bd2',desc:'Vandaag focussen we ons op je 3 zwakste punten. Zo repareer je in één sessie meerdere lekken tegelijk.'},
@@ -1123,12 +1174,19 @@ function initComm() {
     const weekEl = document.getElementById('comm-week-ex');
     if (!weekEl) return; // tab niet beschikbaar, stop hier
     
+    const wDive = CHALLENGE_DETAILS[currentWeekEx.id] || { why: 'Test je vaardigheden.', focus: 'Concentratie.', mistake: 'Haasten.' };
+    
     weekEl.innerHTML = `
-        <div class="ei" style="border-left:4px solid var(--yw);margin:0;box-shadow:0 2px 5px rgba(0,0,0,0.05);">
-            <div class="eih"><div class="ein">🎯 ${currentWeekEx.name}</div><div class="eid">${currentWeekEx.dur} min</div></div>
+        <div style="background:#e3f2fd; border:1.5px solid #1565C0; border-radius:10px; padding:12px; margin-bottom:12px;">
+            <div class="eih" style="margin-bottom:8px;"><div class="ein" style="color:#1565C0; font-size:15px;">🏆 ${currentWeekEx.name}</div><div class="eid" style="background:#1565C0; color:#fff;">${currentWeekEx.dur} min</div></div>
             ${exMetaHtml(currentWeekEx)}
-            <div class="eidesc">${currentWeekEx.desc}</div>
-            <div class="eitip">${currentWeekEx.tip}</div>
+            <div style="font-size:12px; font-weight:700; margin-bottom:12px; margin-top:8px;">📝 Opdracht: <span style="font-weight:400;">${currentWeekEx.desc}</span></div>
+            
+            <div style="background:#fff; border-radius:8px; padding:12px; font-size:12px; color:var(--tx); border-left:4px solid #1565C0;">
+                <div style="margin-bottom:8px;"><strong>🤔 Waarom doen we dit?</strong><br><span style="color:var(--mu);">${wDive.why}</span></div>
+                <div style="margin-bottom:8px;"><strong>🎯 Waar moet je op letten?</strong><br><span style="color:var(--mu);">${wDive.focus}</span></div>
+                <div><strong>⚠️ Veelgemaakte fout:</strong><br><span style="color:var(--mu);">${wDive.mistake}</span></div>
+            </div>
         </div>
     `;
     
@@ -1849,9 +1907,22 @@ function renderExList(exs, sessIdx=0){
         
         let challengeHtml = '';
         if (isWeekly) {
-            challengeHtml = `<div style="background:#e3f2fd;border:1.5px solid #1565C0;border-radius:8px;padding:8px 10px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;">
-                <div><div style="font-size:12px;font-weight:800;color:#1565C0;margin-bottom:2px;">🏆 Challenge van de Week</div><div style="font-size:11px;color:#1565C0;">Speel deze oefening en vul je score in op het Leaderboard!</div></div>
-                <button class="btn btn-p" style="margin:0;padding:6px 10px;font-size:11px;min-width:70px;" onclick="showTab('comm')">Naar Leaderboard</button>
+            const deepDive = CHALLENGE_DETAILS[e.id] || { why: 'Test je vaardigheden onder druk.', focus: 'Volledige concentratie op je routine.', mistake: 'Te snel willen slaan.' };
+            
+            challengeHtml = `<div style="background:#e3f2fd; border:1.5px solid #1565C0; border-radius:10px; padding:12px; margin-bottom:12px; box-shadow:0 2px 6px rgba(21,101,192,0.15);">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">
+                    <div>
+                        <div style="font-size:14px; font-weight:800; color:#1565C0; margin-bottom:2px;">🏆 Challenge van de Week: ${e.name}</div>
+                        <div style="font-size:11px; color:#1565C0;">Speel deze test en vul je score in op het Live Leaderboard!</div>
+                    </div>
+                    <button class="btn btn-p" style="margin:0; padding:6px 12px; font-size:11px; min-width:80px; background:#1565C0;" onclick="showTab('comm')">Leaderboard</button>
+                </div>
+                
+                <div style="background:#fff; border-radius:8px; padding:12px; font-size:12px; color:var(--tx); border-left:4px solid #1565C0;">
+                    <div style="margin-bottom:8px;"><strong>🤔 Waarom doen we dit?</strong><br><span style="color:var(--mu);">${deepDive.why}</span></div>
+                    <div style="margin-bottom:8px;"><strong>🎯 Waar moet je op letten?</strong><br><span style="color:var(--mu);">${deepDive.focus}</span></div>
+                    <div><strong>⚠️ Veelgemaakte fout:</strong><br><span style="color:var(--mu);">${deepDive.mistake}</span></div>
+                </div>
             </div>`;
         }
 
