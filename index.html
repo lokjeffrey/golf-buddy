@@ -1095,7 +1095,7 @@ let currentMonthStr = '';
 let currentWeekEx = null;
 let currentMonthEx = null;
 
-function initComm() {
+function initCommData() {
     const d = new Date();
     // Week logica
     d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay()||7));
@@ -1110,7 +1110,20 @@ function initComm() {
     const chExs = EX.filter(e => e.goal && (e.desc.toLowerCase().includes('noteer') || e.desc.toLowerCase().includes('score')) && !MONTHLY_IDS.includes(e.id));
     currentWeekEx = chExs[weekNo % chExs.length];
     
-    document.getElementById('comm-week-ex').innerHTML = `
+    // Maand logica
+    const monthNo = d.getUTCMonth() + 1;
+    currentMonthStr = `${d.getUTCFullYear()}_M${monthNo < 10 ? '0'+monthNo : monthNo}`;
+    const monthChExs = EX.filter(e => MONTHLY_IDS.includes(e.id));
+    currentMonthEx = monthChExs[monthNo % monthChExs.length];
+}
+
+function initComm() {
+    initCommData(); // zorg dat currentWeekEx altijd gevuld is
+    
+    const weekEl = document.getElementById('comm-week-ex');
+    if (!weekEl) return; // tab niet beschikbaar, stop hier
+    
+    weekEl.innerHTML = `
         <div class="ei" style="border-left:4px solid var(--yw);margin:0;box-shadow:0 2px 5px rgba(0,0,0,0.05);">
             <div class="eih"><div class="ein">🎯 ${currentWeekEx.name}</div><div class="eid">${currentWeekEx.dur} min</div></div>
             ${exMetaHtml(currentWeekEx)}
@@ -1137,13 +1150,7 @@ function initComm() {
         }
     );
 
-    // Maand logica
-    const monthNo = d.getUTCMonth() + 1;
-    currentMonthStr = `${d.getUTCFullYear()}_M${monthNo < 10 ? '0'+monthNo : monthNo}`;
-    
-    // Monthly challenge: uit de speciaal gedefinieerde zware lijst
-    const monthChExs = EX.filter(e => MONTHLY_IDS.includes(e.id));
-    currentMonthEx = monthChExs[monthNo % monthChExs.length];
+    // Maand UI (data al ingesteld door initCommData)
     
     document.getElementById('comm-month-ex').innerHTML = `
         <div class="ei" style="border-left:4px solid var(--gd);margin:0;box-shadow:0 2px 5px rgba(0,0,0,0.05);">
@@ -1547,10 +1554,10 @@ function renderSessions(){
         
         const sess = activeWarmup;
         const tot = sess.exs.reduce((s,e)=>s+e.dur,0);
-        let rangeBalls = 0;
+        let rangeBalls = sess.isOptional ? 0 : 20; // 20 ballen voor warming-up
         sess.exs.forEach(e => {
             if(e.ballType === 'range' && typeof e.balls === 'number') {
-                rangeBalls += (e.sets ? e.balls * e.sets : e.balls);
+                rangeBalls += e.balls; // balls is altijd het TOTAAL voor die oefening, niet per set
             }
         });
 
@@ -1641,10 +1648,10 @@ function renderSessions(){
         // ------------------------
 
         const tot = sess.exs.reduce((s,e)=>s+e.dur,0);
-        let rangeBalls = sess.isOptional ? 0 : 20; // 20 ballen voor warming-up (10 wedge + 10 ijzer)
+        let rangeBalls = sess.isOptional ? 0 : 20; // 20 ballen voor warming-up
         sess.exs.forEach(e => {
             if(e.ballType === 'range' && typeof e.balls === 'number') {
-                rangeBalls += (e.sets ? e.balls * e.sets : e.balls);
+                rangeBalls += e.balls; // balls is altijd het TOTAAL voor die oefening, niet per set
             }
         });
 
@@ -1659,14 +1666,27 @@ function renderSessions(){
                </div>`
             : `<div style="text-align:center;color:var(--gm);font-weight:700;margin-top:16px;">Sessie Voltooid 🎉</div>`;
 
-        const titlePrefix = sess.isOptional ? `Week ${sess.weekNum} - Optioneel` : (sess.weekNum ? `Week ${sess.weekNum} - Training` : `Sessie ${i+1}`);
+        // Bucket berekening: goedkoopste combinatie van 30/45/60
+        const bucketStr = rangeBalls <= 30 ? '30' :
+                          rangeBalls <= 45 ? '45' :
+                          rangeBalls <= 60 ? '60' :
+                          rangeBalls <= 75 ? '30+45' :
+                          rangeBalls <= 90 ? '30+60' :
+                          rangeBalls <= 105 ? '45+60' : '60+60';
+
+        const weeklyEx = sess.exs.find(e => e.isWeeklyChallenge);
         
         // --- DOEL SAMENVATTING HTML ---
-        const doelHtml = `<div style="background:var(--bll); border-left:4px solid var(--bl); padding:12px; margin-bottom:16px; border-radius:4px;">
-            <div style="font-size:12px; font-weight:800; color:var(--bl); margin-bottom:4px;">🎯 Doel van deze training</div>
-            <div style="font-size:13px; color:var(--tx); line-height:1.4;">${sess.desc}</div>
-            ${sess.exs.some(e => e.isWeeklyChallenge) ? `<div style="margin-top:6px; font-size:11px; color:#1565C0; font-weight:700;">🏆 Inclusief Challenge van de Week</div>` : ''}
-        </div>`;
+        const doelHtml = weeklyEx
+            ? `<div style="background:#e3f2fd; border-left:4px solid var(--bl); padding:12px; margin-bottom:16px; border-radius:4px;">
+                <div style="font-size:12px; font-weight:800; color:#1565C0; margin-bottom:6px;">🏆 Challenge van de Week: ${weeklyEx.name}</div>
+                <div style="font-size:13px; color:var(--tx); line-height:1.4; margin-bottom:6px;">${weeklyEx.desc}</div>
+                <div style="font-size:12px; color:#1565C0; font-style:italic;">${weeklyEx.tip}</div>
+               </div>`
+            : `<div style="background:var(--bll); border-left:4px solid var(--bl); padding:12px; margin-bottom:16px; border-radius:4px;">
+                <div style="font-size:12px; font-weight:800; color:var(--bl); margin-bottom:4px;">🎯 Doel van deze training</div>
+                <div style="font-size:13px; color:var(--tx); line-height:1.4;">${sess.desc}</div>
+               </div>`;
         // ------------------------------
 
         return `<div class="sc" style="${bg}opacity:${opacity};">
@@ -1674,7 +1694,7 @@ function renderSessions(){
                 <div class="shl">
                     ${badgeHtml}
                     <div><div class="stit" style="${done?'text-decoration:line-through;color:var(--mu);':''}">${titlePrefix}: ${sess.lbl}</div>
-                    <div class="smeta">~${tot+10} min${rangeBalls > 0 ? ` · 🟡 ${rangeBalls <= 30 ? '30' : rangeBalls <= 45 ? '45' : '60'} range ballen (incl. warmup)` : ''}</div></div>
+                    <div class="smeta">~${tot+10} min${rangeBalls > 0 ? ` · 🟡 ${bucketStr} range ballen (incl. warmup)` : ''}</div></div>
                 </div>
                 <div class="schev" id="chev-${i}">▼</div>
             </div>
@@ -2178,7 +2198,7 @@ function initAppUI(){
     document.getElementById('te').style.display = 'none';
     
     // --- Initialiseer de challenges direct in de achtergrond! ---
-    initComm();
+    initCommData();
     // -------------------------------------------------------------------
     
     // Altijd standaard op de Train-pagina beginnen als er data is!
