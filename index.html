@@ -742,7 +742,7 @@ const EX=[
  
  {id:'c16',cat:'chip',clubHint:'sand_wedge',name:'Lijn in het Zand Drill',dur:8,dif:'Gemiddeld',balls:15,ballType:'own',sets:1,goal:'Raak exact de lijn in het zand',desc:'Trek een lange lijn in het zand van de oefenbunker. Zet je voeten zo neer dat de lijn precies in het midden ligt. Maak 15 volle swings zonder bal, waarbij je doel is om de lijn exact weg te slaan (impact direct op de lijn). Leg daarna ballen 3 cm vóór de lijn en herhaal.',tip:'💡 Deze oefening traint het allerbelangrijkste in de bunker: consistente impact op de juiste plek in het zand.',yt:'https://www.youtube.com/watch?v=RkP_G-X62f8'},
  {id:'c17',cat:'chip',clubHint:'sand_wedge',name:'Bunker Splash (Hoog & Zacht)',dur:10,dif:'Moeilijk',balls:10,ballType:'own',sets:null,goal:'≥ 6/10 ballen in één keer op de green',desc:'Plaats 10 ballen in een greenbunker met een redelijke rand (lip). Open je clubface en je stand aanzienlijk. Sla de ballen de green op. Vertrouw op de snelheid van je swing; het zand remt de club af.',tip:'💡 Snelheid is je vriend in de bunker. Decelereer nooit tijdens je downswing!',yt:'https://www.youtube.com/watch?v=s5R-tH3Fm80'},
- {id:'c21',cat:'chip',clubHint:'short_iron',name:'Bump & Run Meesterschap',dur:8,dif:'Gemakkelijk',balls:15,ballType:'own',sets:1,goal:'Laat de bal rollen als een putt',desc:'Kies een vlag waarbij je veel green hebt om mee te werken. Pak een kort ijzer (bijv. ijzer 8, 9 of PW). Zet de bal iets meer achterin je stand, leun iets op links en maak een simpele putting-stroke. Laat de bal zo snel mogelijk landen en rollen.',tip:'💡 Lucht is risico, de grond is veilig. De Bump & Run is de meest consistente slag rond de green.',yt:'https://www.youtube.com/results?search_query=golf+bump+and+run+tutorial'}
+ {id:'c21',cat:'chip',clubHint:'short_iron',name:'Bump & Run Meesterschap',dur:8,dif:'Gemakkelijk',balls:15,ballType:'own',sets:1,goal:'Laat de bal rollen als een putt',desc:'Kies een vlag waarbij je veel green hebt om mee te werken. Pak een kort ijzer (7, 8 of 9). Zet de bal iets meer achterin je stand, leun iets op links en maak een simpele putting-stroke. Laat de bal zo snel mogelijk landen en rollen.',tip:'💡 Lucht is risico, de grond is veilig. De Bump & Run is de meest consistente slag rond de green.',yt:'https://www.youtube.com/results?search_query=golf+bump+and+run+tutorial'}
 ,{id:'ps1',cat:'puttShort',clubHint:'putter',name:'Dave Pelz 3-Voet Cirkel',dur:8,dif:'Gemakkelijk',balls:6,ballType:'own',sets:3,goal:null,desc:'De gouden standaard van Dave Pelz. Leg 6 ballen in een cirkel op 3 voet (±1 meter). Maak ze allemaal. Herhaal 3x.',tip:'💡 Op 3 voet verlies je de meeste slagen als je twijfelt. Train op automatisme.'},
  {id:'ps2',cat:'puttShort',clubHint:'putter',name:'Tiger\'s Gate Drill',dur:7,dif:'Gemakkelijk',balls:9,ballType:'own',sets:null,goal:'putter raakt de tees niet',desc:'Dé opwarmoefening van Tiger Woods. Zet twee tees net iets breder dan je putter face. 9 putts van 1,5m. Raak de tees niet!',tip:'💡 De ultieme feedback voor een square clubface bij impact.'},
  {id:'ps3',cat:'puttShort',clubHint:'putter',name:'String Line Training',dur:8,dif:'Gemiddeld',balls:10,ballType:'own',sets:1,goal:null,desc:'Span een stukje draad van bal naar hole. Sla 10 putts langs de draad voor perfecte lijnvisualisatie.',tip:'💡 String Line is het meest effectieve hulpmiddel voor putterlijngevoel.'},
@@ -1720,9 +1720,12 @@ function renderSessions(){
         const btnHtml = !done 
             ? `<div style="display:flex;gap:8px;margin-top:16px;">
                  <button class="btn btn-s" style="flex:1;padding:8px 0;" onclick="recalcSession(${i})">⏱️ Tijd wijzigen</button>
-                 <button class="btn btn-p" style="flex:2;padding:8px 0;margin:0;" onclick="completeSession(${i})">✅ Afronden</button>
+                 <button class="btn btn-p" style="flex:2;padding:8px 0;margin:0;" onclick="openSessionFeedback(${i})">✅ Afronden</button>
                </div>`
-            : `<div style="text-align:center;color:var(--gm);font-weight:700;margin-top:16px;">Sessie Voltooid 🎉</div>`;
+            : `<div style="display:flex; justify-content:space-between; align-items:center; margin-top:16px; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:8px; padding:10px 14px;">
+                 <div style="color:#166534; font-weight:700;">Sessie Voltooid 🎉</div>
+                 <button onclick="undoSession(${i})" style="background:none; border:none; color:var(--mu); font-size:12px; font-weight:700; text-decoration:underline; cursor:pointer;">Ongedaan maken</button>
+               </div>`;
 
         // Bucket berekening: goedkoopste combinatie van 30/45/60
         const bucketStr = rangeBalls <= 30 ? '30' :
@@ -1736,13 +1739,7 @@ function renderSessions(){
         const weeklyEx = sess.exs.find(e => e.isWeeklyChallenge);
         
         // --- DOEL SAMENVATTING HTML ---
-        const doelHtml = weeklyEx
-            ? `<div style="background:#e3f2fd; border-left:4px solid var(--bl); padding:12px; margin-bottom:16px; border-radius:4px;">
-                <div style="font-size:12px; font-weight:800; color:#1565C0; margin-bottom:6px;">🏆 Challenge van de Week: ${weeklyEx.name}</div>
-                <div style="font-size:13px; color:var(--tx); line-height:1.4; margin-bottom:6px;">${weeklyEx.desc}</div>
-                <div style="font-size:12px; color:#1565C0; font-style:italic;">${weeklyEx.tip}</div>
-               </div>`
-            : `<div style="background:var(--bll); border-left:4px solid var(--bl); padding:12px; margin-bottom:16px; border-radius:4px;">
+        const doelHtml = `<div style="background:var(--bll); border-left:4px solid var(--bl); padding:12px; margin-bottom:16px; border-radius:4px;">
                 <div style="font-size:12px; font-weight:800; color:var(--bl); margin-bottom:4px;">🎯 Doel van deze training</div>
                 <div style="font-size:13px; color:var(--tx); line-height:1.4;">${sess.desc}</div>
                </div>`;
@@ -1948,20 +1945,15 @@ function renderExList(exs, sessIdx=0){
                     <button class="btn btn-s" style="background:#e3f2fd;color:#1565C0;border:1px solid #1565C0;font-size:12px;padding:8px;font-weight:800;" onclick="openTmDebrief('${sessIdx}', '${e.id}')">${isD ? '✅ Debriefing Opgeslagen' : '📝 Debriefing Invullen'}</button>
                 </div>`;
             } else {
-                logHtml = `<div style="margin-top:10px;background:${isD?'#f0fdf4':'#fcfcfc'};border:1px solid ${isD?'#bbf7d0':'#eee'};border-radius:6px;padding:8px;transition:all 0.3s;">
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-                        <div style="font-size:11px;font-weight:700;color:${isD?'#166534':'#555'};">📝 Persoonlijk Logboek ${isD?'(Afgerond 🎉)':''}</div>
-                        <div style="display:flex;gap:8px;font-size:20px;user-select:none;">
-                            <span style="cursor:pointer;transition:all 0.2s;${rClass('bad')}" onclick="rateEx('${sessIdx}', '${e.id}', 'bad')" title="Ging slecht">😔</span>
-                            <span style="cursor:pointer;transition:all 0.2s;${rClass('ok')}" onclick="rateEx('${sessIdx}', '${e.id}', 'ok')" title="Ging oké">😐</span>
-                            <span style="cursor:pointer;transition:all 0.2s;${rClass('good')}" onclick="rateEx('${sessIdx}', '${e.id}', 'good')" title="Ging super">😀</span>
-                        </div>
+                logHtml = `<div style="margin-top:10px;background:${isD?'#f0fdf4':'#fcfcfc'};border:1.5px solid ${isD?'#86efac':'#eee'};border-radius:8px;padding:10px;transition:all 0.3s;">
+                    <div style="font-size:11px;font-weight:700;color:${isD?'#166534':'#888'};margin-bottom:6px;">
+                        ${isD ? '✅ Oefening afgerond' : '📝 Notitie (optioneel)'}
                     </div>
                     ${histHtml}
-                    <div style="display:flex;gap:6px;">
-                        <input type="text" id="ex-note-input-${e.id}" placeholder="Voeg een notitie toe..." style="flex:1;padding:6px;font-size:12px;border:1px solid #ccc;border-radius:4px;">
-                        <button class="btn btn-s" onclick="saveExNote('${sessIdx}', '${e.id}')" style="margin:0;padding:6px 12px;font-size:12px;">Opslaan</button>
-                    </div>
+                    ${!isD ? `<div style="display:flex;gap:6px;">
+                        <input type="text" id="ex-note-input-${e.id}" placeholder="Voeg een notitie toe..." style="flex:1;padding:7px 10px;font-size:12px;border:1.5px solid #ddd;border-radius:6px;">
+                        <button class="btn btn-p" onclick="saveExNote('${sessIdx}', '${e.id}')" style="margin:0;padding:6px 14px;font-size:12px;">Gedaan ✓</button>
+                    </div>` : `<div style="font-size:12px;color:#166534;">Klik op "Afronden" als alle oefeningen klaar zijn.</div>`}
                 </div>`;
             }
         }
@@ -1970,7 +1962,8 @@ function renderExList(exs, sessIdx=0){
         <div class="eih" style="${headerBg}"><div class="ein">${isWeekly ? '🏆 ' : ''}${e.name}${ytHtml}</div><div class="eid">${e.dur} min</div></div>
         ${challengeHtml}${exMetaHtml(e)}
         <div class="eidesc">${e.desc}</div>
-        <div class="eitip">${e.tip}</div>
+        <button onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none';this.textContent=this.textContent.includes('▼')?'▲ Minder info':'▼ Coach tip'" style="background:none;border:none;color:var(--bl);font-size:11px;font-weight:700;padding:4px 0;cursor:pointer;text-align:left;">▼ Coach tip</button>
+        <div class="eitip" style="display:none;">${e.tip}</div>
         <span class="eicat" style="background:${CAT_COL[e.cat]||'#f5f5f5'};color:#333;">${CAT_LBL[e.cat]||e.cat}</span>${difBadge(e.dif)}
         ${logHtml}
     </div>`;
@@ -1979,25 +1972,40 @@ function renderExList(exs, sessIdx=0){
 
 window.saveExNote = async (sessIdx, exId) => {
     const input = document.getElementById(`ex-note-input-${exId}`);
-    if(!input || !input.value.trim()) return;
+    const noteText = input ? input.value.trim() : '';
+
     if(!exHistoryData[exId]) exHistoryData[exId] = [];
-    exHistoryData[exId].unshift({
-        date: new Date().toISOString(),
-        note: input.value.trim()
-    });
-    input.value = '';
+    if(noteText) {
+        exHistoryData[exId].unshift({
+            date: new Date().toISOString(),
+            note: noteText
+        });
+    }
     
     let targetSess = sessIdx === 'warmup' ? activeWarmup : (activePlan ? activePlan[sessIdx] : null);
     if(targetSess) {
         if(!targetSess.exState) targetSess.exState = {};
         if(!targetSess.exState[exId]) targetSess.exState[exId] = { done: false, rating: null };
         targetSess.exState[exId].done = true;
+        if(noteText) targetSess.exState[exId].lastNote = noteText;
     }
     
-    renderSessions();
+    // Update DOM in-place — géén renderSessions() zodat de sessie open blijft
+    const logDiv = input ? input.closest('div[style*="border-radius:8px"]') : null;
+    if (logDiv) {
+        logDiv.style.background = '#f0fdf4';
+        logDiv.style.border = '1.5px solid #86efac';
+        logDiv.innerHTML = `
+            <div style="font-size:11px;font-weight:700;color:#166534;margin-bottom:6px;">✅ Oefening afgerond</div>
+            ${noteText ? `<div style="font-size:11px;color:#166534;background:#dcfce7;padding:6px 8px;border-radius:4px;">📝 "${noteText}"</div>` : ''}
+            <div style="font-size:12px;color:#166534;margin-top:6px;">Klik op "Afronden" als alle oefeningen klaar zijn.</div>
+        `;
+    }
+
     if(currentUser) await saveToDb();
-    toast('Notitie opgeslagen!');
+    toast(noteText ? 'Notitie opgeslagen! ✅' : 'Oefening afgerond! ✅');
 };
+
 
 window.rateEx = async (sessIdx, exId, rating) => {
     let targetSess = sessIdx === 'warmup' ? activeWarmup : (activePlan ? activePlan[sessIdx] : null);
@@ -2464,5 +2472,45 @@ window.makeMeCoach = async () => {
         });
     }
 </script>
+
+<!-- REPORT OVERLAY (Fix 1: was missing from DOM) -->
+<div id="report-overlay" onclick="closeReportOnOverlay(event)">
+  <div id="report-modal">
+    <h2>📣 Melding sturen</h2>
+    <p>Gevonden een bug of heb je een idee? Laat het weten!</p>
+    <select id="report-type" class="rfield">
+      <option value="">Kies type melding...</option>
+      <option value="bug">🐛 Bug / Fout</option>
+      <option value="idea">💡 Idee / Verbetering</option>
+      <option value="content">📝 Oefening klopt niet</option>
+      <option value="other">💬 Overig</option>
+    </select>
+    <textarea id="report-text" class="rfield" rows="4" placeholder="Beschrijf het probleem of idee zo concreet mogelijk..."></textarea>
+    <div id="report-status"></div>
+    <button id="btn-send-report" class="btn btn-p" onclick="submitReport()" style="width:100%;margin-top:4px;">Versturen 📨</button>
+    <button class="btn btn-s" onclick="closeReport()" style="width:100%;margin-top:8px;">Annuleren</button>
+  </div>
+</div>
+
+<!-- SESSION FEEDBACK MODAL (Fix 2) -->
+<div id="sess-feedback-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9997;align-items:flex-end;justify-content:center;">
+  <div style="background:#fff;border-radius:20px 20px 0 0;padding:24px 20px 32px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;animation:slideUp .28s ease;">
+    <h2 style="font-size:17px;font-weight:800;color:var(--gd);margin-bottom:4px;">🎉 Training Afgerond!</h2>
+    <p style="font-size:12px;color:var(--mu);margin-bottom:20px;">Geef je feedback zodat de app steeds beter wordt voor jou.</p>
+    
+    <div id="feedback-questions"></div>
+    
+    <div id="feedback-extra" style="display:none;margin-top:8px;">
+      <label style="font-size:12px;font-weight:700;color:var(--gd);display:block;margin-bottom:6px;">💬 Wat kan er beter aan de training?</label>
+      <textarea id="feedback-improve" class="rfield" rows="3" placeholder="Bijv. oefening was te moeilijk, te veel ballen, onduidelijke uitleg..."></textarea>
+    </div>
+
+    <div style="display:flex; gap:8px; margin-top:16px;">
+      <button class="btn btn-s" onclick="document.getElementById('sess-feedback-overlay').style.display='none'" style="flex:1;">Annuleren</button>
+      <button class="btn btn-p" onclick="submitSessionFeedback()" style="flex:2;margin:0;">Opslaan & Klaar 🏌️</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
