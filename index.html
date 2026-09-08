@@ -970,7 +970,7 @@ function buildSess(type,sc,mins,usedIds,hcp,preRangeClubs=[]){
     let currentDur = 0;
     let moeilijkUsed=0;
     const moeilijkLimit=h<=9?99:h<=18?1:0;
-    const targetMins = mins - 5; // 5 min warmup eraf
+    const targetMins = mins - 10; // 10 minuten warmup echt reserveren
     const rangeClubs = new Set(preRangeClubs);
 
     let catIndex = 0;
@@ -1674,7 +1674,7 @@ function renderSessions(){
                 <div class="shl">
                     ${badgeHtml}
                     <div><div class="stit" style="${done?'text-decoration:line-through;color:var(--mu);':''}">${titlePrefix}: ${sess.lbl}</div>
-                    <div class="smeta">~${tot+10} min${rangeBalls > 0 ? ` · 🟡 ~${rangeBalls} range ballen (incl. warmup)` : ''}</div></div>
+                    <div class="smeta">~${tot+10} min${rangeBalls > 0 ? ` · 🟡 ${rangeBalls <= 30 ? '30' : rangeBalls <= 45 ? '45' : '60'} range ballen (incl. warmup)` : ''}</div></div>
                 </div>
                 <div class="schev" id="chev-${i}">▼</div>
             </div>
@@ -2176,6 +2176,10 @@ function initAppUI(){
     updHeader(lat);
     
     document.getElementById('te').style.display = 'none';
+    
+    // --- Initialiseer de challenges direct in de achtergrond! ---
+    initComm();
+    // -------------------------------------------------------------------
     
     // Altijd standaard op de Train-pagina beginnen als er data is!
     window.showTab('training');
