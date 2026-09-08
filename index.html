@@ -1674,6 +1674,7 @@ function renderSessions(){
                           rangeBalls <= 90 ? '30+60' :
                           rangeBalls <= 105 ? '45+60' : '60+60';
 
+        const titlePrefix = sess.isOptional ? `Week ${sess.weekNum} - Optioneel` : (sess.weekNum ? `Week ${sess.weekNum} - Training` : `Sessie ${i+1}`);
         const weeklyEx = sess.exs.find(e => e.isWeeklyChallenge);
         
         // --- DOEL SAMENVATTING HTML ---
